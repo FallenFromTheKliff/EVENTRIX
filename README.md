@@ -1,11 +1,10 @@
-# EVENTRIX
-EVENTRIX DevLog
+# EVENTRIX - Project Log
 
-Current Version: 0.1
+Current Version: v0.1.0
 
 Changelog:
 - Frontend
-  - Landing page redefined
   - File structure reorganized
+  - CSS and JavaScript folders structure optimized
 - Backend
   - Committed reset, awaiting restructuring
