@@ -2,7 +2,7 @@ import axiosClient from './api/axiosClient';
 import authService from './api/authService';
 import { jwtDecode } from 'jwt-decode';
 import { useState } from 'react';
-import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
+import { Navigate, BrowserRouter, Route, Routes } from 'react-router-dom';
 
 import AboutUs from './pages/public/AboutUs';
 import Landing from './pages/public/Landing';
