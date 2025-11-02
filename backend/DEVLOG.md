@@ -1,17 +1,22 @@
-# EVENTRIX - Backend DevLog
+# EVENTRIX - Backend
 
-Current Version: v0.1.0
+## Current Version: v0.1.0
 
-Changelog:
-- Models
+### Changelog:
+- **Models**
     - Pending revision
-- Controllers
+- **Controllers**
     - Pending revision
-- Repositories
+- **Repositories**
     - Pending revision
-- Services
+- **Services**
     - Pending revision
-- Config
+- **Config**
     - Uninitialized
-- Jwt
+- **Jwt**
     - Uninitialized
+
+### To be implemented next:
+- User Model
+- AuthController
+- Login & Register Testing
