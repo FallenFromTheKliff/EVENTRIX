@@ -20,7 +20,7 @@ export default function AuthSide({ isOpen, onClose }) {
                     Support
                 </NavLink>
                 <NavLink to="/about" className="btn" onClick={onClose}>
-                    About Us
+                    About
                 </NavLink>
             </div>
         </div>
