@@ -107,8 +107,8 @@ function App() {
                 } />
 
                 <Route path="*" element={
-                    <h1 style={{ textAlign: 'center', color: 'var(--text-primary)' }}>
-                        404 ERROR: Page Not Found Bro!
+                    <h1 style={{ fontSize: '48px', textAlign: 'center', color: 'var(--text-primary)' }}>
+                        404 ERROR: Page Not Found
                     </h1>
                 } />
             </Routes>
