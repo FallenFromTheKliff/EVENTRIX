@@ -7,9 +7,9 @@
     - Header handles login/registration through modals
     - Photo collage placeholder added
     - Support and About pages added
-- **User Pages**
+- **User Pages** *- To be categorized*
     - Awaiting restructuring
-- **Admin Pages**
+- **Admin Pages** *- To be categorized*
     - Awaiting restructuring
 
 ### To be implemented next:
