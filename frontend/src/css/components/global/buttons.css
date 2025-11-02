@@ -1,0 +1,73 @@
+/*
+    Jerome notes:
+    standardized buttons with interactive UI
+*/
+
+/* main button design and behavior */
+.btn {
+    width: 100%;
+    display: inline-block;
+    padding: 10px 15px;
+    font-size: 1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--text-primary);
+    transition: background 0.3s ease, transform 0.1s ease;
+}
+
+/* design for landing page buttons */
+.btn-auth {
+    width: 100%;
+    border: 2px solid white;
+    padding: 0.75rem 3rem;
+    font-size: 0.8rem;
+    font-weight: bold;
+    border-radius: 30px;
+    margin-top: 10px;
+    color: var(--text-primary);
+    transition: background 0.3s ease, transform 0.1s ease;
+}
+.btn-auth.land {background-color: transparent;}
+
+/* buttons for socials as alternative authentication */
+.btn-social {
+    background-color: var(--text-primary);
+    color: var(--input-bg);
+    font-size: 20px;
+    border: none;
+}
+.btn-social:hover {background-color: var(--text-muted);}
+
+/* primary (teal) button */
+.btn-primary {background-color: var(--primary-accent);}
+.btn-primary:hover {background-color: var(--primary-darkened);}
+
+/* secondary (yellow) button */
+.btn-secondary {background-color: var(--secondary-accent);}
+.btn-secondary:hover {background-color: var(--secondary-darkened);}
+
+/* success (green) button */
+.btn-success {background-color: var(--success-accent);}
+.btn-success:hover {background-color: var(--success-darkened);}
+
+/* danger (red) button */
+.btn-danger {background-color: var(--danger-accent);}
+.btn-danger:hover {background-color: var(--danger-darkened);}
+
+/* utility buttons for modals */
+.btn-reply {background-color: var(--primary-accent);}
+.btn-reply:hover {background-color: var(--primary-darkened);}
+
+.btn-edit {background-color: var(--secondary-accent);}
+.btn-edit:hover {background-color: var(--secondary-darkened);}
+
+.btn-delete {background-color: var(--danger-accent);}
+.btn-delete:hover {background-color: var(--danger-darkened);}
+
+.btn-send {background-color: var(--success-accent);}
+.btn-send:hover {background-color: var(--success-darkened);}
+
+.btn-cancel {background-color: gray;}
+.btn-cancel:hover {background-color: #3f3f3f;}

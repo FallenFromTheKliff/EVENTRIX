@@ -1,0 +1,51 @@
+/*
+    Jerome notes:
+    main eventrix layout, contains header, sidebar, containers, and footer
+*/
+
+/* sidebar for user and admin */
+.sidebar {
+    width: 260px;
+    color: var(--text-primary);
+    gap: 10px;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease;
+    background-color: #212426;
+    z-index: 3001;
+}
+.sidebar a {
+    padding: 15px 25px;
+    text-decoration: none;
+    color: var(--text-primary);
+    border-radius: 6px;
+}
+.sidebar a:hover {background-color: var(--primary-darkened);}
+.sidebar a.active {
+    background-color: var(--primary-accent);
+}
+.sidebar.admin {background-color: #0a1a2a;}
+
+/* sidebar for landing page */
+.sidebar.auth {
+    width: 220px;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(6px);
+}
+
+/* for modal-overlay consistency */
+.side {
+    z-index: 3000;
+}
+
+@media screen and (max-width: 880px) {
+    .sidebar {
+        position: fixed;
+        margin-top: 80px;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        animation: slideIn 0.3s ease;
+        z-index: 3001;
+    }
+}

@@ -1,0 +1,60 @@
+/*
+    Jerome notes:
+    this is the photo collage for the landing page
+*/
+
+/* photo showcase container */
+.photo-collage {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 0 0 8rem;
+    width: 100%;
+    height: 400px;
+    margin-top: 70px;
+}
+
+/* photo style */
+.photo-collage .photo {
+    position: absolute;
+    width: 260px;
+    height: 380px;
+    object-fit: cover;
+    border-radius: 12px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+    opacity: 0.85;
+}
+
+/* positions of the photos */
+.photo-collage .photo:nth-child(1) {
+    transform: translateX(-120px);
+    z-index: 1;
+}
+.photo-collage .photo:nth-child(2) {
+    transform: translateX(0);
+    z-index: 2;
+}
+.photo-collage .photo:nth-child(3) {
+    transform: translateX(120px);
+    z-index: 1;
+}
+
+/* only active photo is put to the front */
+.photo-collage .photo.active {
+    transform: translateY(-10px) scale(1.2);
+    z-index: 10;
+    opacity: 1;
+}
+
+@media screen and (max-width: 880px) {
+    .photo-collage {
+        margin-top: 40px;
+        padding: 0;
+    }
+    .photo-collage .photo {
+        width: 220px;
+        height: 300px;
+    }
+}

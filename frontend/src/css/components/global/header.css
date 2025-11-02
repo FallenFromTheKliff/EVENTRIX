@@ -1,0 +1,76 @@
+/*
+    Jerome notes:
+    style for header, can be manipulated for ease of use across all pages
+*/
+
+/* EVENTRIX logo */
+.logo img {
+    margin-top: 15px;
+    height: 80px;
+    width: auto;
+}
+
+/* header bar */
+.header {
+    position: fixed;
+    width: 100%;
+    height: 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 3002;
+}
+.header.user {background-color: #303437;}
+.header.admin {background-color: var(--primary-accent);}
+.header-left,
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.header-hamburger {
+    display: none;
+}
+
+/* container for nav buttons in pages with header */
+.header-nav {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-top: 8px;
+    margin-right: 20px;
+}
+
+/* button styling for AuthHead header-nav buttons */
+.header-nav .btn {
+    position: relative;
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+.header-nav .btn.active::after {
+    content: "";
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    height: 2px;
+    width: 100%;
+    background-color: var(--text-primary);
+    border-radius: 4px;
+    animation: underSlideIn 0.3s ease forwards;
+}
+
+@media screen and (max-width: 880px) {
+    .header-nav {
+        display: none;
+    }
+    .header-hamburger {
+        display: block;
+        background: none;
+        border: none;
+        color: var(--text-primary);
+        margin-top: 15px;
+        cursor: pointer;
+    }
+}

@@ -1,0 +1,41 @@
+/* 
+    Jerome notes:
+    keeps the font and text tags consistent across all pages
+*/
+
+body {
+    font-family: var(--font-body);
+    font-size: 16px;
+    color: var(--text-primary);
+    background-color: var(--page-bg-user);
+    line-height: 1.5;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--text-primary);
+    margin-bottom: 0.5em;
+    font-weight: bold;
+}
+
+p {
+    color: var(--text-secondary);
+    margin-bottom: 1em;
+}
+
+a {
+    color: var(--primary-accent);
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+
+strong {
+    color: var(--text-primary);
+    font-weight: bold;
+}
+
+small {
+    font-size: 0.875em;
+    color: var(--text-muted);
+}

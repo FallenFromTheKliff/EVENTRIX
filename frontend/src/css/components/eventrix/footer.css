@@ -1,0 +1,25 @@
+/*
+    Jerome notes:
+    style for footer, mainly used by users
+*/
+
+/* footer for socials */
+.footer {
+    width: 100%;
+    background-color: #131518;
+    color: var(--text-secondary);
+    padding: 50px 80px 30px;
+}
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 50px;
+}
+.footer-bottom {
+    text-align: center;
+    font-size: 14px;
+    margin-top: 30px;
+    border-top: 1px solid #333;
+    padding-top: 15px;
+}

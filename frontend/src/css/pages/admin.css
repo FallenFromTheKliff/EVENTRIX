@@ -1,0 +1,53 @@
+/*
+    Jerome notes:
+    stylizes admin-exclusive features like dashboard and review tab
+*/
+
+/* dashboard grid */
+.dashboard-container {
+    padding: 24px;
+    background-color: var(--page-bg-admin);
+}
+
+/* analytics of the business */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.stat-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+.stat-card-value {
+    font-size: 28px;
+    color: var(--text-primary);
+}
+.stat-card-label {
+    color: var(--text-secondary);
+}
+
+/* review tab layout */
+.review-card {
+    background-color: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+.review-message {
+    color: var(--text-primary);
+    line-height: 1.6;
+}
+.review-sidebar-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
