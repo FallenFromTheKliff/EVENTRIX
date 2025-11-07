@@ -18,7 +18,6 @@ export default function LoginForm({ onClose, onOpenRegister, onSubmit }) {
             setError("Please fill in all fields!");
             return;
         }
-
         try {
             const data = await authService.login({ email, password });
             localStorage.setItem("token", data.jwt);
@@ -49,11 +48,9 @@ export default function LoginForm({ onClose, onOpenRegister, onSubmit }) {
                         value={password}
                         onChange={(data) => setPassword(data.target.value)}
                     />
-
                     <button type="submit" className="btn btn-primary">
                         LOG IN
                     </button>
-
                     <div className="check">
                         <input
                             type="checkbox"

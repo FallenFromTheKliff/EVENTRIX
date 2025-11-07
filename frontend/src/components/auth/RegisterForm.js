@@ -14,7 +14,7 @@ export default function RegisterForm({ onClose, onOpenLogin }) {
         password: ""
     });
 
-    const [success, setSuccess] = useState("");
+    const [registered, setRegistered] = useState("");
     const [error, setError] = useState("");
 
     const handleChange = (data) => {
@@ -32,16 +32,16 @@ export default function RegisterForm({ onClose, onOpenLogin }) {
         const { name, email, phoneNumber, password } = formData;
         if (!name || !email || !phoneNumber || !password) {
             setError("Please fill in all fields!");
-            setSuccess("");
+            setRegistered("");
             return;
         }
         try {
             await authService.register(formData);
             setError("");
-            setSuccess("Account created!");
+            setRegistered("Account created!");
         } catch (err) {
             setError("Email is already in use!");
-            setSuccess("");
+            setRegistered("");
         }
     }
 
@@ -49,8 +49,8 @@ export default function RegisterForm({ onClose, onOpenLogin }) {
         <div className="modal-overlay auth" onClick={onClose}>
             <div className="modal auth-box register" onClick={(stop) => stop.stopPropagation()}>
                 <h2>SIGN UP</h2>
-                {success && <div className="auth-msg registered">{success}</div>}
-                {error && <div className="auth-msg unregistered">{error}</div>}
+                {registered && <div className="auth-msg registered">{registered}</div>}
+                {error && <div className="auth-msg error">{error}</div>}
 
                 <form onSubmit={handleSubmit}>
                     <label>Name:</label>
@@ -86,7 +86,6 @@ export default function RegisterForm({ onClose, onOpenLogin }) {
                         value={formData.password}
                         onChange={handleChange}
                     />
-                    
                     <button type="submit" className="btn btn-secondary">
                         CREATE ACCOUNT
                     </button>
@@ -105,7 +104,6 @@ export default function RegisterForm({ onClose, onOpenLogin }) {
                         <FaApple />
                     </button>
                 </div>
-
                 <p className="sub">
                     Already have an account?{" "}
                     <span className="link link-login"

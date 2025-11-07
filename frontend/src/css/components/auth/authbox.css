@@ -72,7 +72,7 @@
     background-color: var(--secondary-bg);
     border: 1px solid var(--secondary-accent);
 }
-.auth-msg.unregistered {
+.auth-msg.error {
     color: var(--danger-accent);
     background-color: var(--danger-bg);
     border: 1px solid var(--danger-accent);

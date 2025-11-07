@@ -1,7 +1,7 @@
 import axiosClient from './api/axiosClient';
 import authService from './api/authService';
 import { jwtDecode } from 'jwt-decode';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Navigate, BrowserRouter, Route, Routes } from 'react-router-dom';
 
 import AboutUs from './pages/public/AboutUs';
@@ -21,6 +21,20 @@ import AdminLogs from './pages/admin/Transactions';
 function App() {
     const [userRole, setUserRole] = useState(null);
 
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (token) {
+            try {
+                const decoded = jwtDecode(token);
+                const role = decoded.role === "ADMIN" ? "Admin" : "User";
+                setUserRole(role);
+                axiosClient.defaults.headers.Authorization = `Bearer ${token}`;
+            } catch {
+                localStorage.removeItem("token");
+            }
+        }
+    }, []);
+
     const ProtectedRoute = ({ children, allowedRoles }) => {
         const token = localStorage.getItem("token");
         if (!token) {return <Navigate to="/" replace />;}
@@ -29,31 +43,30 @@ function App() {
         }
         return children;
     };
-
     const handleLogin = async(credentials) => {
         try {
             const data = await authService.login(credentials);
-            const token = data.jwt;
-            localStorage.setItem("token", token);
-            axiosClient.defaults.headers.Authorization = `Bearer ${token}`;
+            localStorage.setItem("token", data.jwt);
+            axiosClient.defaults.headers.Authorization = `Bearer ${data.jwt}`;
             
-            const decoded = jwtDecode(token);
-            const role = decoded.role === "ROLE_ADMIN" ? "Admin" : "User";
+            const decoded = jwtDecode(data.jwt);
+            const role = decoded.role === "ADMIN" ? "Admin" : "User";
             setUserRole(role);
-
             if (role === "Admin") {
-                window.location.href = './pages/admin/Dashboard';
+                window.location.href = "/admin/dashboard";
             } else {
-                window.location.href = './pages/user/Events';
+                window.location.href = "/user/events";
             }
         } catch (err) {
             alert("Invalid credentials!");
         }
     };
-
     const handleLogout = () => {
+        localStorage.removeItem("token");
         setUserRole(null);
-    }
+        axiosClient.defaults.headers.Authorization = null;
+        window.location.href = "/";
+    };
     
     return (
         <BrowserRouter>
