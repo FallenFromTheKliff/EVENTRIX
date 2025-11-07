@@ -1,10 +1,13 @@
 # EVENTRIX - Project Details
 
-### Current Version: v0.1.0
+### Current Version: v0.2.0
 
 #### Changelog:
 - #### Frontend *- (React)*
-  - File structure reorganized
-  - CSS and JavaScript folders structure optimized
+  - Can now communicate with backend for registration
+  - Accounts can now sign in for EVENTRIX as users
+  - Minor CSS changes
 - #### Backend *- (Spring Boot, PostgreSQL)*
-  - Committed reset, awaiting restructuring
+  - AuthService and AuthController are now active
+  - Users table now connected
+  - Login/Register now functional, automatically designates accounts as "USER"
