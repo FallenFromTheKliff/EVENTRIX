@@ -28,13 +28,20 @@ public class JwtService {
                 .compact();
     }
     public String extractEmail(String token) {
-        return Jwts.parserBuilder().setSigningKey(getSignKey()).build()
-                .parseClaimsJws(token)
-                .getBody().getSubject();
+        try {
+            return getClaims(token).getSubject();
+        } catch (ExpiredJwtException e) {
+            return null;
+        }
     }
     public String extractRole(String token) {
-        return (String) Jwts.parserBuilder().setSigningKey(getSignKey()).build()
-                .parseClaimsJws(token)
-                .getBody().get("role");
+        try {
+            return (String) getClaims(token).get("role");
+        } catch (ExpiredJwtException e) {
+            return null;
+        }
+    }
+    private Claims getClaims(String token) {
+        return Jwts.parserBuilder().setSigningKey(getSignKey()).build().parseClaimsJws(token).getBody();
     }
 }
