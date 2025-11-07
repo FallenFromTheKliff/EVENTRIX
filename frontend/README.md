@@ -1,6 +1,6 @@
 # EVENTRIX - Frontend
 
-## Current Version: v0.1.0
+## Build Version: v0.1.1
 
 ### Changelog:
 - **Landing Page**
@@ -14,7 +14,6 @@
     - Awaiting restructuring
 
 ### To be implemented next:
-1. User Profile / Admin Profile
-2. Admin Dashboard
-3. User Events / Admin Events
-4. Repair image imports
+1. AppLayout structure for internal EVENTRIX
+2. Designs for User pages
+3. Repair image imports
