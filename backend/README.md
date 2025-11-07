@@ -4,19 +4,23 @@
 
 ### Changelog:
 - **Models**
-    - Pending revision
+    - User model established
 - **Controllers**
-    - Pending revision
+    - AuthController established
 - **Repositories**
-    - Pending revision
+    - UserRepository established
 - **Services**
-    - Pending revision
+    - AuthService established
 - **Config**
-    - Uninitialized
-- **Jwt**
-    - Uninitialized
+    - SecurityConfig established
+    - Jwt merged integrated into Config folder
+    - JwtService established
+    - JwtAuthFilter established
+- **Others**
+    - build.gradle.kts updated with dependencies
+    - cleaned build using terminal to refresh dependencies
 
 ### To be implemented next:
-1. User Model
-2. AuthController
-3. Login & Register Testing
+1. Login & Register Testing
+2. User Events Page functionalities
+3. Admin Dashboard Page functionalities
