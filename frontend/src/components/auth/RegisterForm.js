@@ -49,8 +49,8 @@ export default function RegisterForm({ onClose, onOpenLogin }) {
         <div className="modal-overlay auth" onClick={onClose}>
             <div className="modal auth-box register" onClick={(stop) => stop.stopPropagation()}>
                 <h2>SIGN UP</h2>
-                {success && <div className="auth-msg success">{success}</div>}
-                {error && <div className="auth-msg error">{error}</div>}
+                {success && <div className="auth-msg registered">{success}</div>}
+                {error && <div className="auth-msg unregistered">{error}</div>}
 
                 <form onSubmit={handleSubmit}>
                     <label>Name:</label>

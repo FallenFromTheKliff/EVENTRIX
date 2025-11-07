@@ -67,12 +67,12 @@
     margin-bottom: 15px;
     text-align: center;
 }
-.auth-msg.success {
-    color: var(--primary-accent);
-    background-color: var(--primary-bg);
-    border: 1px solid var(--primary-accent);
+.auth-msg.registered {
+    color: var(--secondary-accent);
+    background-color: var(--secondary-bg);
+    border: 1px solid var(--secondary-accent);
 }
-.auth-msg.error {
+.auth-msg.unregistered {
     color: var(--danger-accent);
     background-color: var(--danger-bg);
     border: 1px solid var(--danger-accent);

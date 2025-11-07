@@ -5,6 +5,7 @@
 ### Changelog:
 - **Landing Page**
     - Header handles login/registration through modals
+    - Login/Register functionality synced with backend
     - Photo collage placeholder added
     - Support and About pages added
 - **User Pages** *- To be categorized*
@@ -13,7 +14,7 @@
     - Awaiting restructuring
 
 ### To be implemented next:
-1. Login & Register Functionality 
-2. User Profile / Admin Profile
-3. Admin Dashboard
-4. User Events / Admin Events
+1. User Profile / Admin Profile
+2. Admin Dashboard
+3. User Events / Admin Events
+4. Repair image imports
