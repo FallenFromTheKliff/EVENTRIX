@@ -10,3 +10,4 @@
   - AuthService and AuthController are now active
   - Users table now connected
   - Register now functional, automatically designates accounts as "USER"
+    
