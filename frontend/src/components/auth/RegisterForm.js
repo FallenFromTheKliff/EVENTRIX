@@ -51,7 +51,6 @@ export default function RegisterForm({ onClose, onOpenLogin }) {
                 <h2>SIGN UP</h2>
                 {registered && <div className="auth-msg registered">{registered}</div>}
                 {error && <div className="auth-msg error">{error}</div>}
-
                 <form onSubmit={handleSubmit}>
                     <label>Name:</label>
                     <input
@@ -91,7 +90,6 @@ export default function RegisterForm({ onClose, onOpenLogin }) {
                     </button>
                     <br/><br/><hr/>
                 </form>
-
                 <h3>or</h3>
                 <div className="socials">
                     <button className="btn btn-social">

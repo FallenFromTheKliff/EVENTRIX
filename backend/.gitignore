@@ -16,6 +16,10 @@ bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
 
+# Local Spring Boot secrets
+src/main/resources/application.properties
+!src/main/resources/application.properties.example
+
 ### IntelliJ IDEA ###
 .idea
 *.iws

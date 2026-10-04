@@ -32,7 +32,6 @@ export default function LoginForm({ onClose, onOpenRegister, onSubmit }) {
             <div className="modal auth-box login" onClick={(stop) => stop.stopPropagation()}>
                 <h2>SIGN IN</h2>
                 {error && <div className="auth-msg error">{error}</div>}
-
                 <form onSubmit={handleSubmit}>
                     <label>Email:</label>
                     <input
@@ -61,7 +60,6 @@ export default function LoginForm({ onClose, onOpenRegister, onSubmit }) {
                     </div>
                     <hr/>
                 </form>
-
                 <h3>or</h3>
                 <div className="socials">
                     <button className="btn btn-social">
@@ -74,7 +72,6 @@ export default function LoginForm({ onClose, onOpenRegister, onSubmit }) {
                         <FaApple />
                     </button>
                 </div>
-
                 <p className="sub">
                     Don't have an account?{" "}
                     <span className="link link-register"

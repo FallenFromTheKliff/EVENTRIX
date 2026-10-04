@@ -10,7 +10,7 @@ const authService = {
         return response.data;
     },
     logout: async () => {
-        const response = await axiosClient.post("/auth/logout");
+        const response = await axiosClient.post("/user/logout");
         return response.data;
     }
 };

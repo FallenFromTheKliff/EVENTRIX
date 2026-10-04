@@ -61,11 +61,17 @@ function App() {
             alert("Invalid credentials!");
         }
     };
-    const handleLogout = () => {
-        localStorage.removeItem("token");
-        setUserRole(null);
-        axiosClient.defaults.headers.Authorization = null;
-        window.location.href = "/";
+    const handleLogout = async () => {
+        try {
+            await authService.logout();
+        } catch (error) {
+            console.warn("Backend logout failed.");
+        } finally {
+            localStorage.removeItem("token");
+            setUserRole(null);
+            axiosClient.defaults.headers.Authorization = null;
+            window.location.href = "/";
+        }
     };
     
     return (

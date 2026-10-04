@@ -1,13 +1,149 @@
-# EVENTRIX - Project Details
+<h1 align="center">EVENTRIX: AN EVENT MANAGEMENT AND TICKETING PLATFORM</h1>
 
-### Build Version: v0.2.1
+> EVENTRIX is a full-stack event management platform that lets users browse, book, and pay for events, while giving administrators tools to create, manage, and track events and transactions.
 
-#### Changelog:
-- #### Frontend *- (React)*
-  - Can now communicate with backend for registration
-  - Minor CSS changes
-- #### Backend *- (Spring Boot, PostgreSQL)*
-  - AuthService and AuthController are now active
-  - Users table now connected
-  - Register now functional, automatically designates accounts as "USER"
-    
+---
+
+## Tech Stack
+
+| Category | Technologies |
+|---|---|
+| **Languages** | ![Java](https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white) ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black) ![CSS](https://img.shields.io/badge/CSS-1572B6?style=for-the-badge&logo=css&logoColor=white) |
+| **Frontend** | ![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black) ![React Router](https://img.shields.io/badge/React_Router-CA4245?style=for-the-badge&logo=reactrouter&logoColor=white) ![Axios](https://img.shields.io/badge/Axios-5A29E4?style=for-the-badge&logo=axios&logoColor=white) |
+| **Backend & Database** | ![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white) ![Spring Security](https://img.shields.io/badge/Spring_Security-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white) ![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white) |
+| **Auth** | ![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white) ![BCrypt](https://img.shields.io/badge/BCrypt-4A4A55?style=for-the-badge&logo=letsencrypt&logoColor=white) |
+| **Tools & Build** | ![Gradle](https://img.shields.io/badge/Gradle-02303A?style=for-the-badge&logo=gradle&logoColor=white) ![npm](https://img.shields.io/badge/npm-CB3837?style=for-the-badge&logo=npm&logoColor=white) |
+
+---
+
+## SYSTEM MODULES
+
+| Role | Modules |
+|---|---|
+| **PUBLIC** | Landing, About Us, Support, Login, Register |
+| **USER** | Events, View Event, Bookings, Cart |
+| **ADMIN** | Dashboard, Events, Manage Events, Transactions |
+
+> Route access is role-gated: **USER** and **ADMIN** routes are protected client-side by JWT role decoding, and enforced server-side via Spring Security (`/api/user/**` requires `USER`, `/api/admin/**` requires `ADMIN`).
+
+---
+
+## Project Structure
+
+```
+EVENTRIX/
+├── backend/                                # Spring Boot API
+│   ├── gradle/
+│   │   └── wrapper/
+│   ├── src/
+│   │   ├── main/
+│   │   │   ├── java/com/eventrix/backend/
+│   │   │   │   ├── config/                 # SecurityConfig, JwtService, JwtAuthFilter
+│   │   │   │   ├── controller/             # AuthController
+│   │   │   │   ├── model/                  # User entity
+│   │   │   │   ├── repository/             # UserRepository
+│   │   │   │   └── service/                # AuthService
+│   │   │   └── resources/
+│   │   │       └── application.properties
+│   │   └── test/
+│   ├── build.gradle.kts
+│   ├── settings.gradle.kts
+│   ├── gradlew / gradlew.bat
+│   └── README.md
+│
+└── frontend/                               # React app (Create React App)
+    ├── public/
+    ├── src/
+    │   ├── api/                            # axiosClient, authService
+    │   ├── assets/images/
+    │   ├── components/
+    │   │   ├── auth/                       # AuthHead, AuthSide, LoginForm, RegisterForm
+    │   │   ├── events/                     # BookingCard, EventCard, ProfileSettings
+    │   │   └── ui/
+    │   │       └── modals/                 # GenericModal, PaymentModal
+    │   ├── css/
+    │   │   ├── base/                       # reset, typography, variables
+    │   │   ├── components/
+    │   │   │   ├── auth/
+    │   │   │   ├── eventrix/
+    │   │   │   └── global/
+    │   │   └── pages/
+    │   ├── pages/
+    │   │   ├── admin/                      # Dashboard, Events, ManageEvents, Transactions
+    │   │   ├── public/                     # Landing, AboutUs, Support
+    │   │   └── user/                       # Events, ViewEvent, Bookings, Cart
+    │   ├── App.js                          # routes, auth state, role guards
+    │   └── index.js
+    ├── package.json
+    └── README.md
+```
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+| Requirement | Version |
+|---|---|
+| Java (JDK) | 21 |
+| Node.js | 18+ (for React 19 / react-scripts 5) |
+| PostgreSQL | latest |
+| Gradle | not required — wrapper (`gradlew` / `gradlew.bat`) is included |
+
+### 1. Clone the repository
+
+```bash
+git clone <repository-url-here>
+cd eventrix
+```
+
+### 2. Set up the database
+
+Create a PostgreSQL database named `eventrixdb`.
+
+### 3. Configure the backend
+
+```properties
+spring.application.name=backend
+spring.datasource.url=jdbc:postgresql://localhost:5432/eventrixdb
+spring.datasource.username=<your-postgres-username>
+spring.datasource.password=<your-postgres-password>
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+jwt.secret=<your-own-256-bit-secret>
+```
+
+> **Note:** credentials and secrets are currently hardcoded directly in `application.properties` rather than pulled from environment variables, worth investigating.
+
+### 4. Run the backend (Spring Boot)
+
+```bash
+cd backend
+./gradlew bootRun        # macOS/Linux
+gradlew.bat bootRun      # Windows
+```
+
+The API runs on `http://localhost:8080/api` by default.
+
+### 5. Run the frontend (React)
+
+```bash
+cd frontend
+npm install
+npm start
+```
+
+The web app runs on `http://localhost:3000` by default.
+
+### Alternative: run both together (Windows)
+
+```bash
+cd frontend
+npm run start:fullstack
+```
+
+This concurrently starts the backend via `gradlew.bat bootRun` and the frontend via `npm start`.
+
+---
