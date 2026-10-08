@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Open Sans";
+  src: url("/src/assets/fonts/opensans.woff2") format("woff2");
+}
+
+@theme {
+  --background-image-landing: url("/src/assets/images/EVENTRIX-Landing.png");
+  --font-word: "Open Sans", sans-serif;
+}
