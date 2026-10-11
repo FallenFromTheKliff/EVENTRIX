@@ -27,7 +27,7 @@ export default function Landing() {
                 <p className="text-2xl lg:text-3xl text-white/90">
                   Start your journey today!
                 </p>
-                <Link to="/auth" className="text-2xl lg:text-3xl text-white/90 underline cursor-pointer hover:text-yellow-400 transition-colors duration-200">
+                <Link to="/auth" state={{ mode: "register" }} className="text-2xl lg:text-3xl text-white/90 underline cursor-pointer hover:text-yellow-400 transition-colors duration-200">
                   Register here!
                 </Link>
               </div>

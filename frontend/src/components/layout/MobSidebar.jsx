@@ -1,5 +1,5 @@
 import EVENTRIX from "../../assets/images/EVENTRIX-Title.png";
-
+import { Link } from "react-router";
 import { IconArrowRight } from "@tabler/icons-react";
 
 export default function MobSidebar({ isOpen, onClose, activeSection, onSectionClick }) {
@@ -48,9 +48,9 @@ export default function MobSidebar({ isOpen, onClose, activeSection, onSectionCl
           </nav>
           <div className="m-6 h-px w-full bg-gray-700" />
           <div className="w-full pl-6 pr-6">
-            <button onClick={onClose} className="text-xl bg-cyan-500 w-full rounded-lg py-2 cursor-pointer">
+            <Link to="/auth" state={{ mode: "login" }} onClick={onClose} className="text-xl bg-cyan-500 w-full rounded-lg py-2 cursor-pointer">
               LOGIN
-            </button>
+            </Link>
           </div>
         </div>
       </aside>

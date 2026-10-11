@@ -1,0 +1,24 @@
+import { useState } from "react";
+import { IconLoader2 } from "@tabler/icons-react";
+
+export default function useLoadingText() {
+  const [loading, setLoading] = useState(false);
+  const runner = async (action) => {
+    setLoading(true);
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    try {
+      await action();
+    } finally {
+      setLoading(false);
+    }
+  };
+  const texter = (idle, busy) => loading ? (
+    <span>
+      <IconLoader2 size={16} className="animate-spin" />
+      {busy}
+    </span>
+  ) : (
+    <span>{idle}</span>
+  );
+  return { loading, runner, texter };
+}

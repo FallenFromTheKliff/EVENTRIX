@@ -57,7 +57,7 @@ public class UserService implements UserDetailsService {
         user.setProfileImageUrl(request.getImageUrl());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setPhoneNumber(request.getPhoneNumber());
-        user.setRole("ADMIN"); // Default role
+        user.setRole("USER"); // Default role
         return userRepository.save(user);
     }
 

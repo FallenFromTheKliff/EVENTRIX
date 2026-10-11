@@ -47,6 +47,8 @@ export default function Header() {
     window.history.replaceState(null, "", `#${id}`);
     setSideStep(false);
   };
+
+  if (location.pathname === "/auth") return null;
   
   return (
     <nav className="fixed top-0 left-0 z-100 w-full font-word bg-slate-950 text-white">
@@ -82,7 +84,7 @@ export default function Header() {
             FAQs
           </a>
           <span className="text-xl text-gray-500">|</span>
-          <Link to="/auth" className="text-xl bg-cyan-500 rounded-lg px-12 py-2 cursor-pointer">
+          <Link to="/auth" state={{ mode: "login" }} className="text-xl bg-cyan-500 rounded-lg px-12 py-2 cursor-pointer">
             LOGIN
           </Link>
         </div>
