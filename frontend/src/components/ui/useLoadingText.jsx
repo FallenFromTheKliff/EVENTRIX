@@ -13,8 +13,8 @@ export default function useLoadingText() {
     }
   };
   const texter = (idle, busy) => loading ? (
-    <span>
-      <IconLoader2 size={16} className="animate-spin" />
+    <span className="flex flex-row items-center justify-center gap-2">
+      <IconLoader2 size={24} className="animate-spin" />
       {busy}
     </span>
   ) : (

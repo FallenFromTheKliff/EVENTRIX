@@ -51,7 +51,7 @@ export default function Header() {
   if (location.pathname === "/auth") return null;
   
   return (
-    <nav className="fixed top-0 left-0 z-100 w-full font-word bg-slate-950 text-white">
+    <nav className="fixed inset-x-0 top-0 z-100 font-word bg-slate-950 text-white">
       <div className="flex justify-between items-center h-20 px-16">
         <img src={EVENTRIX} alt="EVENTRIX" className="absolute left-1/2 h-10 -translate-x-1/2 lg:static lg:translate-x-0" />
         <div className="hidden lg:flex items-center gap-8">
@@ -84,7 +84,7 @@ export default function Header() {
             FAQs
           </a>
           <span className="text-xl text-gray-500">|</span>
-          <Link to="/auth" state={{ mode: "login" }} className="text-xl bg-cyan-500 rounded-lg px-12 py-2 cursor-pointer">
+          <Link to="/auth" state={{ mode: "login" }} className="text-xl bg-cyan-500 rounded-lg px-12 py-2">
             LOGIN
           </Link>
         </div>

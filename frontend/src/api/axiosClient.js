@@ -5,23 +5,27 @@ const axiosClient = axios.create({
   headers: { "Content-Type": "application/json" }
 });
 
-axiosClient.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
+axiosClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  const isAuthRequest = config.url?.startsWith("/auth/");
+
+  if (token && !isAuthRequest) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
-);
+
+  return config;
+});
 
 axiosClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.warn("Unauthorized Access.");
-    if (error.response && error.response.status === 401) {
+    const isAuthRequest = error.config?.url?.startsWith("/auth/");
+
+    if (error.response?.status === 401 && !isAuthRequest) {
       localStorage.removeItem("token");
+      window.dispatchEvent(new Event("auth:unauthorized"));
     }
+
     return Promise.reject(error);
   }
 );

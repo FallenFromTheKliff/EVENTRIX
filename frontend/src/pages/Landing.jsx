@@ -1,16 +1,18 @@
+import { Link } from "react-router";
+
+import Reveal from "../components/ui/Reveal";
+
 import PosterWeeknd from "../assets/images/Poster-Weeknd.png";
 import PosterTaylor from "../assets/images/Poster-Taylor.png";
 import PosterMJ from "../assets/images/Poster-MJ.png";
 
-import { Link } from "react-router";
-
 export default function Landing() {
   return (
     <main className="min-h-screen bg-landing bg-cover bg-center bg-fixed font-word">
-      <section id="home" className="min-h-screen scroll-mt-20">
-        <div className="flex min-h-screen items-center justify-center px-16 py-24">
+      <section id="home">
+        <div className="flex min-h-screen items-center px-16 py-24">
           <div className="grid w-full items-center gap-8 lg:grid-cols-2">
-            <div className="text-center text-white lg:text-left">
+            <div className="text-center text-white transition duration-500 starting:opacity-0 starting:-translate-x-12 lg:text-left">
               <div className="w-fit mt-16 mx-auto lg:mx-0 lg:mt-0">
                 <h1 className="text-4xl lg:text-6xl">
                   Your next unforgettable
@@ -27,26 +29,26 @@ export default function Landing() {
                 <p className="text-2xl lg:text-3xl text-white/90">
                   Start your journey today!
                 </p>
-                <Link to="/auth" state={{ mode: "register" }} className="text-2xl lg:text-3xl text-white/90 underline cursor-pointer hover:text-yellow-400 transition-colors duration-200">
+                <Link to="/auth" state={{ mode: "register" }} className="text-2xl lg:text-3xl text-white/90 underline hover:text-yellow-400 transition-colors duration-200">
                   Register here!
                 </Link>
               </div>
             </div>
-            <div className="relative flex h-124 lg:h-148 items-center justify-center lg:justify-end lg:p-30">
-              <img src={PosterTaylor} alt="The Weeknd" className="-translate-x-30 absolute h-108 w-80 lg:h-136 lg:w-104 bg-white brightness-60" />
+            <div className="relative flex h-124 lg:h-148 items-center justify-center lg:justify-end lg:p-30 transition-opacity duration-1000 starting:opacity-0">
+              <img src={PosterTaylor} alt="Taylor Swift" className="-translate-x-30 absolute h-108 w-80 lg:h-136 lg:w-104 bg-white brightness-60" />
               <img src={PosterMJ} alt="Michael Jackson" className="z-1 h-120 w-80 lg:h-148 lg:w-104 bg-white shadow-2xl" />
-              <img src={PosterWeeknd} alt="Taylor Swift" className="translate-x-30 absolute h-108 w-80 lg:h-136 lg:w-104 bg-white brightness-60" />
+              <img src={PosterWeeknd} alt="The Weeknd" className="translate-x-30 absolute h-108 w-80 lg:h-136 lg:w-104 bg-white brightness-60" />
             </div>
           </div>
         </div>
       </section>
       <section id="about" className="scroll-mt-20 bg-white px-16 pt-12 pb-6">
-        <div className="text-gray-600">
+        <Reveal className="text-gray-600">
           <h2 className="text-4xl font-bold text-gray-900 sm:text-5xl">
             About Us
           </h2>
           <div className="mt-4 h-1 w-20 bg-cyan-500" />
-          <div className="text-2xl leading-8 mt-10 space-y-6">
+          <div className="text-2xl mt-10 space-y-6">
             <p>
               <strong className="font-semibold text-gray-900">EVENTRIX</strong>{" "}
               is your gateway to unforgettable experiences across the Philippines. We make it easy to explore, discover, and book tickets for concerts, festivals,
@@ -61,15 +63,15 @@ export default function Landing() {
               your next big moment is only a few clicks away.
             </p>
           </div>
-        </div>
+        </Reveal>
       </section>
       <section id="support" className="scroll-mt-20 bg-white px-16 pt-12 pb-6">
-        <div className="text-gray-600">
+        <Reveal className="text-gray-600">
           <h2 className="text-4xl font-bold text-gray-900 sm:text-5xl">
             Support Us
           </h2>
           <div className="mt-4 h-1 w-20 bg-cyan-500" />
-          <div className="text-2xl leading-8 mt-10 space-y-6">
+          <div className="text-2xl mt-10 space-y-6">
             <p>
               <strong className="text-gray-900">Email:</strong>{" "}
               info@eventrix.com
@@ -84,18 +86,18 @@ export default function Landing() {
             </p>
             <p>
               <strong className="text-gray-900">Operating Hours:</strong>{" "}
-              Friday, 9:00 AM - 6:00 PM (UTC-8)
+              Monday - Friday, 9:00 AM - 6:00 PM (UTC+8)
             </p>
           </div>
-        </div>
+        </Reveal>
       </section>
       <section id="questions" className="scroll-mt-20 bg-white px-16 pt-12 pb-18">
-        <div className="text-gray-600">
+        <Reveal className="text-gray-600">
           <h2 className="text-4xl font-bold text-gray-900 sm:text-5xl">
             FAQs
           </h2>
           <div className="mt-4 h-1 w-20 bg-cyan-500" />
-          <div className="text-xl leading-8 mt-10 space-y-6">
+          <div className="text-xl mt-10 space-y-6">
             <p><strong className="text-2xl text-gray-900">Q1: How do I book a ticket on EVENTRIX?</strong></p>
             <p>You can book a ticket on EVENTRIX by visiting our website and browsing the available events!</p>
           </div>
@@ -138,7 +140,7 @@ export default function Landing() {
             <p><strong className="text-2xl text-gray-900">Q10: Who do I contact for further help?</strong></p>
             <p>Our support team is always ready to assist! You can reach us through <strong className="text-gray-900">info@eventrix.com</strong> or physically at <strong className="text-gray-900">EVENTRIX Tower</strong> in Makati City.</p>
           </div>
-        </div>
+        </Reveal>
       </section>
     </main>
   )

@@ -1,23 +1,27 @@
 import EVENTRIX from "../../assets/images/EVENTRIX-Title.png";
+import { useLocation } from "react-router";
 import { IconBrandFacebook, IconBrandInstagram, IconBrandX, IconMail, IconMapPin, IconPhone } from "@tabler/icons-react";
 
 export default function Footer() {
+  const location = useLocation();
+  if (location.pathname === "/auth") return null;
+
   return (
-    <footer className="bg-slate-900 px-16 pt-12 pb-8 fontword text-gray-300">
+    <footer className="bg-slate-900 px-16 pt-12 pb-8 font-word text-gray-300">
       <div className="grid gap-12 lg:grid-cols-2">
         <div>
-          <img src={EVENTRIX} alt="EVENTRIX" className="h-10 w-auto" />
-          <p className="text-lg leading-7 mt-5">
+          <img src={EVENTRIX} alt="EVENTRIX" className="h-10" />
+          <p className="text-lg mt-5">
             Your next unforgettable experience starts here.
           </p>
           <div className="flex items-center gap-4 mt-6">
-            <button className="text-gray-300 transition hover:text-white cursor-pointer">
+            <button className="transition-colors duration-200 hover:text-white cursor-pointer">
               <IconBrandFacebook size={28} stroke={1.8} />
             </button>
-            <button className="text-gray-300 transition hover:text-white cursor-pointer">
+            <button className="transition-colors duration-200 hover:text-white cursor-pointer">
               <IconBrandInstagram size={28} stroke={1.8} />
             </button>
-            <button className="text-gray-300 transition hover:text-white cursor-pointer">
+            <button className="transition-colors duration-200 hover:text-white cursor-pointer">
               <IconBrandX size={28} stroke={1.8} />
             </button>
           </div>
