@@ -27,59 +27,40 @@
 
 ---
 
-## Project Structure
+## PROJECT STRUCTURE
 
 ```
 EVENTRIX/
-├── backend/                                # Spring Boot API
-│   ├── gradle/
-│   │   └── wrapper/
-│   ├── src/
-│   │   ├── main/
-│   │   │   ├── java/com/eventrix/backend/
-│   │   │   │   ├── config/                 # SecurityConfig, JwtService, JwtAuthFilter
-│   │   │   │   ├── controller/             # AuthController
-│   │   │   │   ├── model/                  # User entity
-│   │   │   │   ├── repository/             # UserRepository
-│   │   │   │   └── service/                # AuthService
-│   │   │   └── resources/
-│   │   │       └── application.properties
-│   │   └── test/
-│   ├── build.gradle.kts
-│   ├── settings.gradle.kts
-│   ├── gradlew / gradlew.bat
-│   └── README.md
-│
-└── frontend/                               # React app (Create React App)
+├── .vscode/
+├── backend/
+│   └── src/
+│       ├── main/java/com/example/demo/
+│       │   ├── config/                 # Spring Security setup
+│       │   ├── controller/             # REST endpoints
+│       │   ├── jwt/                    # Token creation/validation
+│       │   ├── model/                  # JPA entities and enums
+│       │   │   ├── dto/                # Request/response shapes
+│       │   │   └── Events/             # Event-related entities
+│       │   ├── repository/
+│       │   └── services/               # Controllers and repositories logic
+│       └── test/
+└── frontend/
     ├── public/
-    ├── src/
-    │   ├── api/                            # axiosClient, authService
-    │   ├── assets/images/
-    │   ├── components/
-    │   │   ├── auth/                       # AuthHead, AuthSide, LoginForm, RegisterForm
-    │   │   ├── events/                     # BookingCard, EventCard, ProfileSettings
-    │   │   └── ui/
-    │   │       └── modals/                 # GenericModal, PaymentModal
-    │   ├── css/
-    │   │   ├── base/                       # reset, typography, variables
-    │   │   ├── components/
-    │   │   │   ├── auth/
-    │   │   │   ├── eventrix/
-    │   │   │   └── global/
-    │   │   └── pages/
-    │   ├── pages/
-    │   │   ├── admin/                      # Dashboard, Events, ManageEvents, Transactions
-    │   │   ├── public/                     # Landing, AboutUs, Support
-    │   │   └── user/                       # Events, ViewEvent, Bookings, Cart
-    │   ├── App.js                          # routes, auth state, role guards
-    │   └── index.js
-    ├── package.json
-    └── README.md
+    └── src/
+        ├── api/                        # Shared Axios client
+        ├── assets/                     # fonts/ and images/
+        ├── components/
+        │   ├── auth/                   # Login and Register forms
+        │   ├── layout/
+        │   └── ui/                     # Reusable pieces
+        ├── context/                    # AuthContext
+        └── pages/
+            └── user/                   # Authenticated USER pages
 ```
 
 ---
 
-## Getting Started
+## GETTING STARTED
 
 ### Prerequisites
 
