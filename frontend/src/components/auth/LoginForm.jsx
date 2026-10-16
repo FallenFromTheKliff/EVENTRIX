@@ -7,24 +7,22 @@ import { useAuth } from "../../context/AuthContext";
 import useLoadingText from "../ui/useLoadingText";
 import ConfirmModal from "../ui/ConfirmModal";
 
-const inputStyle = "w-full bg-white/15 rounded-md p-2 mt-1 focus:outline-2 focus:outline-cyan-500";
+const inputStyle = "w-full bg-white/15 rounded-md p-4 mt-1 focus:outline-2 focus:outline-cyan-500";
 
 export default function LoginForm() {
   const navigate = useNavigate();
   const { login } = useAuth();
   const { loading, runner, texter } = useLoadingText();
-  const { register, handleSubmit, clearErrors, formState: { errors } } = useForm();
+  const { register, handleSubmit, formState: { errors } } = useForm();
   const [showPassword, setShowPassword] = useState(false);
   const [successMessage, setSuccessMessage] = useState(null);
 
   const onSubmission = (data) => runner(async () => {
-    clearErrors("root.serverError");
     try {
       await login(data);
-      navigate("/");
+      navigate("/events");
     } catch (error) {
-      const response = error.response?.data;
-      setSuccessMessage({ type: "error", message: response ? response?.message : "Unable to sign in!" })
+      setSuccessMessage({ type: "error", message: typeof error.response?.data === "string" ? error.response.data : "Unable to sign in!" });
     }
   });
 

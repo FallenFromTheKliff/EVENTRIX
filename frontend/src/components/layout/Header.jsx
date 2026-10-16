@@ -1,101 +1,153 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router";
-import { IconMenu2 } from "@tabler/icons-react";
+import { Link } from "react-router";
+import { IconHeartFilled, IconMenu2, IconShoppingCartFilled, IconUserCircle } from "@tabler/icons-react";
 
+import axiosClient from "../../api/axiosClient";
+import { useAuth } from "../../context/AuthContext";
+
+import { sectionsss } from "../../data/navbox";
 import EVENTRIX from "../../assets/images/EVENTRIX-Title.png";
-import MobSidebar from "./MobSidebar";
+import EVENTRIXNeon from "../../assets/images/EVENTRIX-Title-Neon.png";
+import Placeholder from "../../assets/images/EVENTRIX-Placeholder.jpeg"
 
-export default function Header() {
+import useLoadingText from "../ui/useLoadingText";
+import ConfirmModal from "../ui/ConfirmModal";
+import Sidebar from "./Sidebar";
+
+const colors = { public: "bg-slate-950", USER: "bg-zinc-800" };
+
+export default function Header({ role = "public" }) {
+  const { logout } = useAuth();
+  const { loading, runner, texter } = useLoadingText();
+  
   const [sideStep, setSideStep] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
-  const location = useLocation();
+  const [profile, setProfile] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [confirming, setConfirming] = useState(false);
 
   useEffect(() => {
-    if (location.pathname !== "/") {
-      setActiveSection(null);
-      return;
-    }
+    if (role === "public") return;
+    axiosClient.get("/user/profile").then((response) => setProfile(response.data));
+  }, [role]);
 
-    const sectionIds = ["home", "about", "support", "questions"];
-    const updateObserver = () => {
-      const bottomMargin = window.innerHeight - 80 - 1;
-
-      const sections = sectionIds.map((id) => document.getElementById(id)).filter((section) => section !== null);
-      if (!sections.length) return;
-
-      const observer = new IntersectionObserver(() => {
-          const trackingPosition = window.scrollY + 80;
-          let currentSection = "home";
-          sections.forEach((section) => {
-            const sectionTop = section.getBoundingClientRect().top + window.scrollY;
-            if (sectionTop <= trackingPosition) { currentSection = section.id; }
-          });
-          setActiveSection(currentSection);
-          window.history.replaceState(null, "", `#${currentSection}`);
-        }, { rootMargin: `-${80}px 0px -${bottomMargin}px 0px`, threshold: 0 }
-      );
-      sections.forEach((section) => observer.observe(section));
-      return observer;
-    };
-
-    let observer = updateObserver();
-    return () => { observer.disconnect(); };
-  }, [location.pathname]);
+  useEffect(() => {
+    if (role !== "public") return;
+    const sections = sectionsss.map(({ id }) => document.getElementById(id)).filter(Boolean);
+    const observer = new IntersectionObserver(() => {
+      const trackingPosition = window.scrollY + 80;
+      let currentSection = "home";
+      sections.forEach((section) => {
+        if (section.getBoundingClientRect().top + window.scrollY <= trackingPosition) currentSection = section.id;
+      });
+      setActiveSection(currentSection);
+      window.history.replaceState(null, "", `#${currentSection}`);
+    }, { rootMargin: `-80px 0px -${window.innerHeight - 81}px 0px`, threshold: 0 });
+    sections.forEach((section) => observer.observe(section));
+    return () => observer.disconnect();
+  }, [role]);
 
   const handleSection = (id) => {
     setActiveSection(id);
     window.history.replaceState(null, "", `#${id}`);
     setSideStep(false);
   };
+  const handleLogout = () => runner(logout);
 
-  if (location.pathname === "/auth") return null;
-  
+  const names = profile?.name.split(" ") ?? [];
+  const lastName = names.at(-1);
+  const firstName = names.slice(0, -1).join(" ");
+
+  if (role === "public" && location.pathname !== "/") return null;
+
   return (
-    <nav className="fixed inset-x-0 top-0 z-100 font-word bg-slate-950 text-white">
-      <div className="flex justify-between items-center h-20 px-16">
-        <img src={EVENTRIX} alt="EVENTRIX" className="absolute left-1/2 h-10 -translate-x-1/2 lg:static lg:translate-x-0" />
-        <div className="hidden lg:flex items-center gap-8">
-          <a 
-            href="#home" 
-            onClick={() => handleSection("home")} 
-            className={`text-xl transition-colors duration-200 hover:text-cyan-400 ${activeSection === "home" ? "underline underline-offset-8" : ""}`}
-          >
-            Home
-          </a>
-          <a 
-            href="#about" 
-            onClick={() => handleSection("about")} 
-            className={`text-xl transition-colors duration-200 hover:text-cyan-400 ${activeSection === "about" ? "underline underline-offset-8" : ""}`}
-          >
-            About
-          </a>
-          <a 
-            href="#support" 
-            onClick={() => handleSection("support")} 
-            className={`text-xl transition-colors duration-200 hover:text-cyan-400 ${activeSection === "support" ? "underline underline-offset-8" : ""}`}
-          >
-            Support
-          </a>
-          <a 
-            href="#questions" 
-            onClick={() => handleSection("questions")} 
-            className={`text-xl transition-colors duration-200 hover:text-cyan-400 ${activeSection === "questions" ? "underline underline-offset-8" : ""}`}
-          >
-            FAQs
-          </a>
-          <span className="text-xl text-gray-500">|</span>
-          <Link to="/auth" state={{ mode: "login" }} className="text-xl bg-cyan-500 rounded-lg px-12 py-2">
-            LOGIN
-          </Link>
+    <>
+      <nav className={`fixed inset-x-0 top-0 z-100 ${colors[role]} text-white`}>
+        <div className={`flex justify-between items-center h-20 ${role === "public" ? "px-16" : "px-6 lg:px-12"}`}>
+          {role === "public" ? (
+            <>
+              <img src={EVENTRIX} alt="EVENTRIX" className="absolute left-1/2 h-10 -translate-x-1/2 lg:static lg:translate-x-0" />
+              <div className="hidden lg:flex items-center gap-8">
+                {sectionsss.map(({ id, label }) => (
+                  <a
+                    key={id}
+                    href={`#${id}`}
+                    onClick={() => handleSection(id)}
+                    className={`text-xl transition-colors duration-200 hover:text-cyan-400 ${activeSection === id ? "underline underline-offset-8" : ""}`}
+                  >
+                    {label}
+                  </a>
+                ))}
+                <span className="text-xl text-gray-500">|</span>
+                <Link to="/auth" state={{ mode: "login" }} className="text-xl bg-cyan-500 rounded-lg px-12 py-2">
+                  LOGIN
+                </Link>
+              </div>
+              <button className="lg:hidden cursor-pointer" onClick={() => setSideStep(true)}>
+                <IconMenu2 size={32} />
+              </button>
+            </>
+          ) : (
+            <>
+              <div className="flex items-center gap-4">
+                <button className="lg:hidden cursor-pointer" onClick={() => setSideStep(true)}>
+                  <IconMenu2 size={32} />
+                </button>
+                <img src={EVENTRIXNeon} alt="EVENTRIX" className="h-10" />
+              </div>
+              <div className="flex items-center gap-6">
+                <button className="cursor-pointer transition-colors duration-200 hover:text-cyan-400">
+                  <IconHeartFilled size={32} />
+                </button>
+                <button className="text-cyan-500 cursor-pointer transition-colors duration-200 hover:text-cyan-400">
+                  <IconShoppingCartFilled size={32} />
+                </button>
+                {menuOpen && <button onClick={() => setMenuOpen(false)} className="fixed inset-0 z-10 cursor-default" />}
+                <div className="relative z-20">
+                  <button onClick={() => setMenuOpen(!menuOpen)} className="flex items-center gap-3 cursor-pointer">
+                    {profile?.profileImageUrl ? (
+                      <img src={profile.profileImageUrl} alt="" className="size-14 rounded-full object-cover" />
+                    ) : (
+                      <img src={Placeholder} alt="Gojo" className="size-14 rounded-full object-cover" />
+                    )}
+                    <div className="hidden sm:block max-w-40 text-left">
+                      <p className="truncate text-xl font-bold">{lastName}</p>
+                      <p className="truncate text-gray-300">{firstName}</p>
+                    </div>
+                  </button>
+                  {menuOpen && (
+                    <div className="absolute right-0 top-full bg-zinc-900 mt-3 w-48 overflow-hidden rounded-md border border-zinc-700 shadow-lg shadow-black transition duration-200 starting:opacity-0 starting:-translate-y-2">
+                      <button onClick={() => setMenuOpen(false)} className="w-full px-4 py-3 text-left cursor-pointer transition-colors duration-200 hover:bg-cyan-600">
+                        Profile
+                      </button>
+                      <button
+                        onClick={() => {
+                          setMenuOpen(false);
+                          setConfirming(true);
+                        }}
+                        className="w-full px-4 py-3 text-left cursor-pointer transition-colors duration-200 hover:bg-red-600"
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
         </div>
-        <button className="lg:hidden cursor-pointer" onClick={() => setSideStep(true)}><IconMenu2 size={32} /></button>
-      </div>
-      <MobSidebar
-        isOpen={sideStep}
-        onClose={() => setSideStep(false)}
-        activeSection={activeSection}
-        onSectionClick={handleSection}
-      />
-    </nav>
+        <Sidebar mobile role={role} isOpen={sideStep} onClose={() => setSideStep(false)} activeSection={activeSection} onSectionClick={handleSection} />
+      </nav>
+      {confirming && (
+        <ConfirmModal
+          message="Log out?"
+          description="You will need to sign in again to access your account."
+          confirmText={texter("Yes", "Logging Out")}
+          loading={loading}
+          onConfirm={handleLogout}
+          onClose={() => setConfirming(false)}
+        />
+      )}
+    </>
   )
 }

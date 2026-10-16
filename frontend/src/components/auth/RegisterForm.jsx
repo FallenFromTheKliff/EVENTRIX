@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { IconBrandApple, IconBrandFacebook, IconBrandGoogle, IconEye, IconEyeOff } from "@tabler/icons-react";
 
 import { useAuth } from "../../context/AuthContext";
+
 import useLoadingText from "../ui/useLoadingText";
 import ConfirmModal from "../ui/ConfirmModal";
 
@@ -12,21 +13,19 @@ const inputStyle = "w-full bg-white/15 rounded-md p-2 mt-1 focus:outline-2 focus
 export default function RegisterForm() {
   const { register: registerUser } = useAuth();
   const { loading, runner, texter } = useLoadingText();
-  const { register, handleSubmit, clearErrors, formState: { errors } } = useForm();
+  const { register, handleSubmit, formState: { errors } } = useForm();
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
 
   const onSubmission = (data) => runner(async () => {
-    clearErrors("root.serverError");
     try {
       await registerUser(data);
-      navigate("/");
+      navigate("/events");
     } catch (error) {
-      const response = error.response?.data;
-      setErrorMessage({ type: "error", message: response ? response?.message : "Unable to register account!" });
+      setErrorMessage({ type: "error", message: typeof error.response?.data === "string" ? error.response.data : "Failed to register account!" });
     }
   });
-  
+
   return (
     <div>
       <h2 className="text-center text-2xl font-bold">SIGN UP</h2>

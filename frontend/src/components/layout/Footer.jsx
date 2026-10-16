@@ -1,13 +1,9 @@
 import EVENTRIX from "../../assets/images/EVENTRIX-Title.png";
-import { useLocation } from "react-router";
 import { IconBrandFacebook, IconBrandInstagram, IconBrandX, IconMail, IconMapPin, IconPhone } from "@tabler/icons-react";
 
 export default function Footer() {
-  const location = useLocation();
-  if (location.pathname === "/auth") return null;
-
   return (
-    <footer className="bg-slate-900 px-16 pt-12 pb-8 font-word text-gray-300">
+    <footer className="bg-slate-900 px-16 pt-12 pb-8 text-gray-300">
       <div className="grid gap-12 lg:grid-cols-2">
         <div>
           <img src={EVENTRIX} alt="EVENTRIX" className="h-10" />

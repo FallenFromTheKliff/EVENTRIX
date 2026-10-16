@@ -1,6 +1,8 @@
 import { Link } from "react-router";
 
+import Header from "../components/layout/Header";
 import Reveal from "../components/ui/Reveal";
+import Footer from "../components/layout/Footer";
 
 import PosterWeeknd from "../assets/images/Poster-Weeknd.png";
 import PosterTaylor from "../assets/images/Poster-Taylor.png";
@@ -8,140 +10,144 @@ import PosterMJ from "../assets/images/Poster-MJ.png";
 
 export default function Landing() {
   return (
-    <main className="min-h-screen bg-landing bg-cover bg-center bg-fixed font-word">
-      <section id="home">
-        <div className="flex min-h-screen items-center px-16 py-24">
-          <div className="grid w-full items-center gap-8 lg:grid-cols-2">
-            <div className="text-center text-white transition duration-500 starting:opacity-0 starting:-translate-x-12 lg:text-left">
-              <div className="w-fit mt-16 mx-auto lg:mx-0 lg:mt-0">
-                <h1 className="text-4xl lg:text-6xl">
-                  Your next unforgettable
-                </h1>
-                <h1 className="text-8xl lg:text-9xl lg:-translate-x-2 mt-4">
-                  EXPERIENCE
-                </h1>
-                <h1 className="text-4xl lg:text-6xl mt-4">
-                  is just one click away.
-                </h1>
-                <div className="my-6 h-1 w-full bg-white" />
+    <div>
+      <Header />
+      <main className="min-h-screen bg-landing bg-cover bg-center bg-fixed">
+        <section id="home">
+          <div className="flex min-h-screen items-center px-16 py-24">
+            <div className="grid w-full items-center gap-8 lg:grid-cols-2">
+              <div className="text-center text-white transition duration-500 starting:opacity-0 starting:-translate-x-12 lg:text-left">
+                <div className="w-fit mt-16 mx-auto lg:mx-0 lg:mt-0">
+                  <h1 className="text-4xl lg:text-6xl">
+                    Your next unforgettable
+                  </h1>
+                  <h1 className="text-8xl lg:text-9xl lg:-translate-x-2 mt-4">
+                    EXPERIENCE
+                  </h1>
+                  <h1 className="text-4xl lg:text-6xl mt-4">
+                    is just one click away.
+                  </h1>
+                  <div className="my-6 h-1 w-full bg-white" />
+                </div>
+                <div className="flex flex-col lg:flex-row gap-2">
+                  <p className="text-2xl lg:text-3xl text-white/90">
+                    Start your journey today!
+                  </p>
+                  <Link to="/auth" state={{ mode: "register" }} className="text-2xl lg:text-3xl text-white/90 underline hover:text-yellow-400 transition-colors duration-200">
+                    Register here!
+                  </Link>
+                </div>
               </div>
-              <div className="flex flex-col lg:flex-row gap-2">
-                <p className="text-2xl lg:text-3xl text-white/90">
-                  Start your journey today!
-                </p>
-                <Link to="/auth" state={{ mode: "register" }} className="text-2xl lg:text-3xl text-white/90 underline hover:text-yellow-400 transition-colors duration-200">
-                  Register here!
-                </Link>
+              <div className="relative flex h-124 lg:h-148 items-center justify-center lg:justify-end lg:p-30 transition-opacity duration-1000 starting:opacity-0">
+                <img src={PosterTaylor} alt="Taylor Swift" className="-translate-x-30 absolute h-108 w-80 lg:h-136 lg:w-104 bg-white brightness-60" />
+                <img src={PosterMJ} alt="Michael Jackson" className="z-1 h-120 w-80 lg:h-148 lg:w-104 bg-white shadow-2xl" />
+                <img src={PosterWeeknd} alt="The Weeknd" className="translate-x-30 absolute h-108 w-80 lg:h-136 lg:w-104 bg-white brightness-60" />
               </div>
             </div>
-            <div className="relative flex h-124 lg:h-148 items-center justify-center lg:justify-end lg:p-30 transition-opacity duration-1000 starting:opacity-0">
-              <img src={PosterTaylor} alt="Taylor Swift" className="-translate-x-30 absolute h-108 w-80 lg:h-136 lg:w-104 bg-white brightness-60" />
-              <img src={PosterMJ} alt="Michael Jackson" className="z-1 h-120 w-80 lg:h-148 lg:w-104 bg-white shadow-2xl" />
-              <img src={PosterWeeknd} alt="The Weeknd" className="translate-x-30 absolute h-108 w-80 lg:h-136 lg:w-104 bg-white brightness-60" />
+          </div>
+        </section>
+        <section id="about" className="scroll-mt-20 bg-white px-16 pt-12 pb-6">
+          <Reveal className="text-gray-600">
+            <h2 className="text-4xl font-bold text-gray-900 sm:text-5xl">
+              About Us
+            </h2>
+            <div className="mt-4 h-1 w-20 bg-cyan-500" />
+            <div className="text-2xl mt-10 space-y-6">
+              <p>
+                <strong className="font-semibold text-gray-900">EVENTRIX</strong>{" "}
+                is your gateway to unforgettable experiences across the Philippines. We make it easy to explore, discover, and book tickets for concerts, festivals,
+                theater shows, and live performances happening on stages nationwide!
+              </p>
+              <p>
+                Whether you're a music lover, theater enthusiast, or just looking for something exciting to do, EVENTRIX connects you directly with events that bring
+                people together through art, culture, and entertainment.
+              </p>
+              <p>
+                Our mission is to provide a seamless and secure ticketing experience, from browsing your favorite shows to securing your spot in seconds! With EVENTRIX,
+                your next big moment is only a few clicks away.
+              </p>
             </div>
-          </div>
-        </div>
-      </section>
-      <section id="about" className="scroll-mt-20 bg-white px-16 pt-12 pb-6">
-        <Reveal className="text-gray-600">
-          <h2 className="text-4xl font-bold text-gray-900 sm:text-5xl">
-            About Us
-          </h2>
-          <div className="mt-4 h-1 w-20 bg-cyan-500" />
-          <div className="text-2xl mt-10 space-y-6">
-            <p>
-              <strong className="font-semibold text-gray-900">EVENTRIX</strong>{" "}
-              is your gateway to unforgettable experiences across the Philippines. We make it easy to explore, discover, and book tickets for concerts, festivals,
-              theater shows, and live performances happening on stages nationwide!
-            </p>
-            <p>
-              Whether you're a music lover, theater enthusiast, or just looking for something exciting to do, EVENTRIX connects you directly with events that bring
-              people together through art, culture, and entertainment.
-            </p>
-            <p>
-              Our mission is to provide a seamless and secure ticketing experience, from browsing your favorite shows to securing your spot in seconds! With EVENTRIX,
-              your next big moment is only a few clicks away.
-            </p>
-          </div>
-        </Reveal>
-      </section>
-      <section id="support" className="scroll-mt-20 bg-white px-16 pt-12 pb-6">
-        <Reveal className="text-gray-600">
-          <h2 className="text-4xl font-bold text-gray-900 sm:text-5xl">
-            Support Us
-          </h2>
-          <div className="mt-4 h-1 w-20 bg-cyan-500" />
-          <div className="text-2xl mt-10 space-y-6">
-            <p>
-              <strong className="text-gray-900">Email:</strong>{" "}
-              info@eventrix.com
-            </p>
-            <p>
-              <strong className="text-gray-900">Hotline:</strong>{" "}
-              +63 912 354 6789 (Philippines)
-            </p>
-            <p>
-              <strong className="text-gray-900">Office Address:</strong>{" "}
-              EVENTRIX Tower, Makati City, Philippines
-            </p>
-            <p>
-              <strong className="text-gray-900">Operating Hours:</strong>{" "}
-              Monday - Friday, 9:00 AM - 6:00 PM (UTC+8)
-            </p>
-          </div>
-        </Reveal>
-      </section>
-      <section id="questions" className="scroll-mt-20 bg-white px-16 pt-12 pb-18">
-        <Reveal className="text-gray-600">
-          <h2 className="text-4xl font-bold text-gray-900 sm:text-5xl">
-            FAQs
-          </h2>
-          <div className="mt-4 h-1 w-20 bg-cyan-500" />
-          <div className="text-xl mt-10 space-y-6">
-            <p><strong className="text-2xl text-gray-900">Q1: How do I book a ticket on EVENTRIX?</strong></p>
-            <p>You can book a ticket on EVENTRIX by visiting our website and browsing the available events!</p>
-          </div>
-          <div className="text-xl leading-8 mt-10 space-y-6">
-            <p><strong className="text-2xl text-gray-900">Q2: Can I book multiple tickets at once?</strong></p>
-            <p>Yes, you can select multiple seats or adjust ticket quantities before checking out.</p>
-          </div>
-          <div className="text-xl leading-8 mt-10 space-y-6">
-            <p><strong className="text-2xl text-gray-900">Q3: What payment methods are accepted?</strong></p>
-            <p>We accept most known credit cards, debit cards, and e-wallets such as GCash and PayPal.</p>
-          </div>
-          <div className="text-xl leading-8 mt-10 space-y-6">
-            <p><strong className="text-2xl text-gray-900">Q4: How will I receive my ticket(s)?</strong></p>
-            <p>
-              After a successful booking, your e-ticket will be sent to your registered email address. You can also access it anytime under "My Bookings" in your
-              EVENTRIX account!
-            </p>
-          </div>
-          <div className="text-xl leading-8 mt-10 space-y-6">
-            <p><strong className="text-2xl text-gray-900">Q5: Do I need to print my ticket?</strong></p>
-            <p>Not necessarily, as most events accept digital tickets. You can just show your e-ticket or QR code at the venue entrance!</p>
-          </div>
-          <div className="text-xl leading-8 mt-10 space-y-6">
-            <p><strong className="text-2xl text-gray-900">Q6: Can I transfer my ticket to someone else?</strong></p>
-            <p>EVENTRIX only permits it depending on the policy of the event organizer. Please check the event's terms before completing your purchase.</p>
-          </div>
-          <div className="text-xl leading-8 mt-10 space-y-6">
-            <p><strong className="text-2xl text-gray-900">Q7: Can I cancel or refund my ticket?</strong></p>
-            <p>Cancellations and refunds depend on the rules of the event organizer. Kindly refer to their refund policy before booking.</p>
-          </div>
-          <div className="text-xl leading-8 mt-10 space-y-6">
-            <p><strong className="text-2xl text-gray-900">Q8: What happens if I lose my ticket?</strong></p>
-            <p>Your e-ticket is always available under "My Bookings" in your EVENTRIX account. You can re-download or show it anytime!</p>
-          </div>
-          <div className="text-xl leading-8 mt-10 space-y-6">
-            <p><strong className="text-2xl text-gray-900">Q9: Why didn't I receive my ticket via email?</strong></p>
-            <p>Please check your Spam or Promotions folder first. If it's not there, contact us at <strong className="text-gray-900">info@eventrix.com</strong> with your booking reference number for assistance.</p>
-          </div>
-          <div className="text-xl leading-8 mt-10 space-y-6">
-            <p><strong className="text-2xl text-gray-900">Q10: Who do I contact for further help?</strong></p>
-            <p>Our support team is always ready to assist! You can reach us through <strong className="text-gray-900">info@eventrix.com</strong> or physically at <strong className="text-gray-900">EVENTRIX Tower</strong> in Makati City.</p>
-          </div>
-        </Reveal>
-      </section>
-    </main>
+          </Reveal>
+        </section>
+        <section id="support" className="scroll-mt-20 bg-white px-16 pt-12 pb-6">
+          <Reveal className="text-gray-600">
+            <h2 className="text-4xl font-bold text-gray-900 sm:text-5xl">
+              Support Us
+            </h2>
+            <div className="mt-4 h-1 w-20 bg-cyan-500" />
+            <div className="text-2xl mt-10 space-y-6">
+              <p>
+                <strong className="text-gray-900">Email:</strong>{" "}
+                info@eventrix.com
+              </p>
+              <p>
+                <strong className="text-gray-900">Hotline:</strong>{" "}
+                +63 912 354 6789 (Philippines)
+              </p>
+              <p>
+                <strong className="text-gray-900">Office Address:</strong>{" "}
+                EVENTRIX Tower, Makati City, Philippines
+              </p>
+              <p>
+                <strong className="text-gray-900">Operating Hours:</strong>{" "}
+                Monday - Friday, 9:00 AM - 6:00 PM (UTC+8)
+              </p>
+            </div>
+          </Reveal>
+        </section>
+        <section id="questions" className="scroll-mt-20 bg-white px-16 pt-12 pb-18">
+          <Reveal className="text-gray-600">
+            <h2 className="text-4xl font-bold text-gray-900 sm:text-5xl">
+              FAQs
+            </h2>
+            <div className="mt-4 h-1 w-20 bg-cyan-500" />
+            <div className="text-xl mt-10 space-y-6">
+              <p><strong className="text-2xl text-gray-900">Q1: How do I book a ticket on EVENTRIX?</strong></p>
+              <p>You can book a ticket on EVENTRIX by visiting our website and browsing the available events!</p>
+            </div>
+            <div className="text-xl leading-8 mt-10 space-y-6">
+              <p><strong className="text-2xl text-gray-900">Q2: Can I book multiple tickets at once?</strong></p>
+              <p>Yes, you can select multiple seats or adjust ticket quantities before checking out.</p>
+            </div>
+            <div className="text-xl leading-8 mt-10 space-y-6">
+              <p><strong className="text-2xl text-gray-900">Q3: What payment methods are accepted?</strong></p>
+              <p>We accept most known credit cards, debit cards, and e-wallets such as GCash and PayPal.</p>
+            </div>
+            <div className="text-xl leading-8 mt-10 space-y-6">
+              <p><strong className="text-2xl text-gray-900">Q4: How will I receive my ticket(s)?</strong></p>
+              <p>
+                After a successful booking, your e-ticket will be sent to your registered email address. You can also access it anytime under "My Bookings" in your
+                EVENTRIX account!
+              </p>
+            </div>
+            <div className="text-xl leading-8 mt-10 space-y-6">
+              <p><strong className="text-2xl text-gray-900">Q5: Do I need to print my ticket?</strong></p>
+              <p>Not necessarily, as most events accept digital tickets. You can just show your e-ticket or QR code at the venue entrance!</p>
+            </div>
+            <div className="text-xl leading-8 mt-10 space-y-6">
+              <p><strong className="text-2xl text-gray-900">Q6: Can I transfer my ticket to someone else?</strong></p>
+              <p>EVENTRIX only permits it depending on the policy of the event organizer. Please check the event's terms before completing your purchase.</p>
+            </div>
+            <div className="text-xl leading-8 mt-10 space-y-6">
+              <p><strong className="text-2xl text-gray-900">Q7: Can I cancel or refund my ticket?</strong></p>
+              <p>Cancellations and refunds depend on the rules of the event organizer. Kindly refer to their refund policy before booking.</p>
+            </div>
+            <div className="text-xl leading-8 mt-10 space-y-6">
+              <p><strong className="text-2xl text-gray-900">Q8: What happens if I lose my ticket?</strong></p>
+              <p>Your e-ticket is always available under "My Bookings" in your EVENTRIX account. You can re-download or show it anytime!</p>
+            </div>
+            <div className="text-xl leading-8 mt-10 space-y-6">
+              <p><strong className="text-2xl text-gray-900">Q9: Why didn't I receive my ticket via email?</strong></p>
+              <p>Please check your Spam or Promotions folder first. If it's not there, contact us at <strong className="text-gray-900">info@eventrix.com</strong> with your booking reference number for assistance.</p>
+            </div>
+            <div className="text-xl leading-8 mt-10 space-y-6">
+              <p><strong className="text-2xl text-gray-900">Q10: Who do I contact for further help?</strong></p>
+              <p>Our support team is always ready to assist! You can reach us through <strong className="text-gray-900">info@eventrix.com</strong> or physically at <strong className="text-gray-900">EVENTRIX Tower</strong> in Makati City.</p>
+            </div>
+          </Reveal>
+        </section>
+      </main>
+      <Footer />
+    </div>
   )
 }

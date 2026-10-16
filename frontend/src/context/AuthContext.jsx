@@ -21,7 +21,7 @@ const getUser = (token) => {
   } catch {
     return null;
   }
-};
+}
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
@@ -71,7 +71,7 @@ export function AuthProvider({ children }) {
     <AuthContext.Provider value={{ user, login, register, logout }}>
       {children}
     </AuthContext.Provider>
-  );
+  )
 }
 
 export const useAuth = () => useContext(AuthContext);

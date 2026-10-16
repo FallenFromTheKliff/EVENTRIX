@@ -4,7 +4,7 @@
 
 ---
 
-## Tech Stack
+## TECH STACK
 
 | Category | Technologies |
 |---|---|
@@ -19,7 +19,7 @@
 
 | Role | Modules |
 |---|---|
-| **PUBLIC** | Landing, About Us, Support, Login, Register |
+| **PUBLIC** | Landing, About Us, Support, FAQs, Login, Register |
 | **USER** | Events, View Event, Bookings, Cart |
 | **ADMIN** | Dashboard, Events, Manage Events, Transactions |
 
@@ -35,27 +35,28 @@ EVENTRIX/
 ├── backend/
 │   └── src/
 │       ├── main/java/com/example/demo/
-│       │   ├── config/                 # Spring Security setup
-│       │   ├── controller/             # REST endpoints
-│       │   ├── jwt/                    # Token creation/validation
-│       │   ├── model/                  # JPA entities and enums
-│       │   │   ├── dto/                # Request/response shapes
-│       │   │   └── Events/             # Event-related entities
+│       │   ├── config/                     # Spring Security setup
+│       │   ├── controller/
+│       │   ├── jwt/                        # Token creation/validation
+│       │   ├── model/
+│       │   │   ├── dto/
+│       │   │   └── Events/                 # Event-related entities
 │       │   ├── repository/
-│       │   └── services/               # Controllers and repositories logic
+│       │   └── services/
 │       └── test/
 └── frontend/
     ├── public/
     └── src/
-        ├── api/                        # Shared Axios client
-        ├── assets/                     # fonts/ and images/
+        ├── api/
+        ├── assets/                         # fonts/ and images/
         ├── components/
-        │   ├── auth/                   # Login and Register forms
+        │   ├── auth/
         │   ├── layout/
-        │   └── ui/                     # Reusable pieces
-        ├── context/                    # AuthContext
-        └── pages/
-            └── user/                   # Authenticated USER pages
+        │   └── ui/
+        ├── context/
+        ├── data/                           # navs and roles
+        └── pages/                          # Public and Authenticated pages
+            └── admin/
 ```
 
 ---
@@ -112,10 +113,10 @@ The API runs on `http://localhost:8080/api` by default.
 ```bash
 cd frontend
 npm install
-npm start
+npm run dev
 ```
 
-The web app runs on `http://localhost:3000` by default.
+The web app runs on `http://localhost:5173` by default.
 
 ### Alternative: run both together (Windows)
 
@@ -125,5 +126,11 @@ npm run start:fullstack
 ```
 
 This concurrently starts the backend via `gradlew.bat bootRun` and the frontend via `npm start`.
+
+---
+
+## LICENSE
+
+This project is unlicensed, so whatever ideas you think of are probably going to get you in trouble.
 
 ---
