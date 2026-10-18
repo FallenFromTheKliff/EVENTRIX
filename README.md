@@ -1,6 +1,6 @@
 <h1 align="center">EVENTRIX</h1>
 
-> EVENTRIX is a full-stack Event Management Platform developed as a 4-week sprint final project. The platform lets users browse, book, and pay for events, while giving administrators tools to create, manage, and track events and transactions.
+> EVENTRIX is a full-stack Event Management Platform developed as a 4-week sprint final project. The platform lets users browse, book, and pay for events, while giving administrators tools to manage events, review event reception, and keep track of transactions.
 
 ---
 
@@ -20,10 +20,10 @@
 | Role | Modules |
 |---|---|
 | **PUBLIC** | Landing, About Us, Support, FAQs, Login, Register |
-| **USER** | Events, View Event, Bookings, Cart |
-| **ADMIN** | Dashboard, Events, Manage Events, Transactions |
+| **USER** | Home, View Events, Bookings, Support, Cart |
+| **ADMIN** | Dashboard, Manage Events, Transactions Log |
 
-> Route access is role-gated: **USER** and **ADMIN** routes are protected client-side by JWT role decoding, and enforced server-side via Spring Security (`/api/user/**` requires `USER`, `/api/admin/**` requires `ADMIN`).
+> **Note:** Both USER and ADMIN roles have access to the Profile and Settings modules.
 
 ---
 
@@ -31,13 +31,12 @@
 
 ```
 EVENTRIX/
-├── .vscode/
 ├── backend/
 │   └── src/
 │       ├── main/java/com/example/demo/
 │       │   ├── config/                     # Spring Security setup
 │       │   ├── controller/
-│       │   ├── jwt/                        # Token creation/validation
+│       │   ├── jwt/                        # token creation/validation
 │       │   ├── model/
 │       │   │   ├── dto/
 │       │   │   └── Events/                 # Event-related entities
@@ -54,7 +53,7 @@ EVENTRIX/
         │   ├── layout/
         │   └── ui/
         ├── context/
-        ├── data/                           # navs and roles
+        ├── data/                           # navs and static content
         └── pages/                          # Public and Authenticated pages
             └── admin/
 ```
@@ -96,8 +95,6 @@ spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
 jwt.secret=<your-own-256-bit-secret>
 ```
 
-> **Note:** credentials and secrets are currently hardcoded directly in `application.properties` rather than pulled from environment variables, worth investigating.
-
 ### 4. Run the backend (Spring Boot)
 
 ```bash
@@ -117,15 +114,6 @@ npm run dev
 ```
 
 The web app runs on `http://localhost:5173` by default.
-
-### Alternative: run both together (Windows)
-
-```bash
-cd frontend
-npm run start:fullstack
-```
-
-This concurrently starts the backend via `gradlew.bat bootRun` and the frontend via `npm start`.
 
 ---
 

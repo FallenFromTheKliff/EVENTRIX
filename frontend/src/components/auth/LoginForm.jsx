@@ -7,7 +7,7 @@ import { useAuth } from "../../context/AuthContext";
 import useLoadingText from "../ui/useLoadingText";
 import ConfirmModal from "../ui/ConfirmModal";
 
-const inputStyle = "w-full bg-white/15 rounded-md p-4 mt-1 focus:outline-2 focus:outline-cyan-500";
+const inputStyle = "w-full bg-white/15 rounded-md p-3 mt-1 focus:outline-2 focus:outline-cyan-500";
 
 export default function LoginForm() {
   const navigate = useNavigate();
@@ -57,8 +57,8 @@ export default function LoginForm() {
           </div>
           <p className="text-red-500 text-sm h-5 mt-1">{errors.password?.message}</p>
         </div>
-        <button type="submit" disabled={loading} className="bg-cyan-500 font-bold w-full rounded-md py-2 cursor-pointer transition duration-200 hover:brightness-90 disabled:opacity-50">
-          {texter("Sign In", "Signing In")}
+        <button type="submit" disabled={loading} className="bg-cyan-500 font-bold w-full rounded-md py-4 cursor-pointer transition duration-200 hover:brightness-50 disabled:opacity-50">
+          {texter("SIGN IN", "SIGNING IN...")}
         </button>
         <label className="flex items-center text-sm gap-2">
           <input type="checkbox" className="size-4 accent-cyan-500 cursor-pointer" {...register("rememberMe")} />

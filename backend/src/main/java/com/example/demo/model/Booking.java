@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 
 // NEW: Enum for booking status
 
-
 @Entity
 @Table(name = "booking")
 @Data

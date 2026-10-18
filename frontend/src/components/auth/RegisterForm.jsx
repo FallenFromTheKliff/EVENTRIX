@@ -8,7 +8,7 @@ import { useAuth } from "../../context/AuthContext";
 import useLoadingText from "../ui/useLoadingText";
 import ConfirmModal from "../ui/ConfirmModal";
 
-const inputStyle = "w-full bg-white/15 rounded-md p-2 mt-1 focus:outline-2 focus:outline-yellow-500";
+const inputStyle = "w-full bg-white/15 rounded-md p-3 mt-1 focus:outline-2 focus:outline-yellow-500";
 
 export default function RegisterForm() {
   const { register: registerUser } = useAuth();
@@ -89,8 +89,8 @@ export default function RegisterForm() {
           </div>
           <p className="text-red-500 text-sm min-h-5 mt-1">{errors.password?.message}</p>
         </div>
-        <button type="submit" disabled={loading} className="bg-yellow-500 font-bold w-full rounded-md py-2.5 cursor-pointer transition duration-200 hover:brightness-90 disabled:opacity-50">
-          {texter("Sign Up", "Signing Up")}
+        <button type="submit" disabled={loading} className="bg-yellow-500 font-bold w-full rounded-md py-4 cursor-pointer transition duration-200 hover:brightness-50 disabled:opacity-50">
+          {texter("SIGN UP", "SIGNING UP...")}
         </button>
       </form>
       <hr className="border-gray-500 my-4" />

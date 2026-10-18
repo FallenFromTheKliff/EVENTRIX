@@ -1,13 +1,12 @@
 import { BrowserRouter, Routes, Route } from "react-router";
 
-import Header from "./components/layout/Header";
-import Footer from "./components/layout/Footer";
 import AppLayout from "./components/layout/AppLayout";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import Events from "./pages/Events";
+import SupportFAQs from "./pages/SupportFAQs";
 
 function App() {
   return (
@@ -18,6 +17,7 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route element={<AppLayout />}>
             <Route path="/events" element={<Events />} />
+            <Route path="/support" element={<SupportFAQs />} />
           </Route>
         </Route>
       </Routes>

@@ -1,9 +1,11 @@
 import EVENTRIX from "../../assets/images/EVENTRIX-Title.png";
 import { IconBrandFacebook, IconBrandInstagram, IconBrandX, IconMail, IconMapPin, IconPhone } from "@tabler/icons-react";
 
-export default function Footer() {
+const colors = { public: "bg-slate-900", USER: "bg-zinc-800", ADMIN: "bg-zinc-900" };
+
+export default function Footer({ role = "public" }) {
   return (
-    <footer className="bg-slate-900 px-16 pt-12 pb-8 text-gray-300">
+    <footer className={`${colors[role]} px-16 pt-12 pb-8 text-gray-300`}>
       <div className="grid gap-12 lg:grid-cols-2">
         <div>
           <img src={EVENTRIX} alt="EVENTRIX" className="h-10" />

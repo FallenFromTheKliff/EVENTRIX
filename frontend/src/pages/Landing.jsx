@@ -4,6 +4,8 @@ import Header from "../components/layout/Header";
 import Reveal from "../components/ui/Reveal";
 import Footer from "../components/layout/Footer";
 
+import { contacts, faqs } from "../data/support";
+
 import PosterWeeknd from "../assets/images/Poster-Weeknd.png";
 import PosterTaylor from "../assets/images/Poster-Taylor.png";
 import PosterMJ from "../assets/images/Poster-MJ.png";
@@ -76,22 +78,12 @@ export default function Landing() {
             </h2>
             <div className="mt-4 h-1 w-20 bg-cyan-500" />
             <div className="text-2xl mt-10 space-y-6">
-              <p>
-                <strong className="text-gray-900">Email:</strong>{" "}
-                info@eventrix.com
-              </p>
-              <p>
-                <strong className="text-gray-900">Hotline:</strong>{" "}
-                +63 912 354 6789 (Philippines)
-              </p>
-              <p>
-                <strong className="text-gray-900">Office Address:</strong>{" "}
-                EVENTRIX Tower, Makati City, Philippines
-              </p>
-              <p>
-                <strong className="text-gray-900">Operating Hours:</strong>{" "}
-                Monday - Friday, 9:00 AM - 6:00 PM (UTC+8)
-              </p>
+              {contacts.map(({ label, value }) => (
+                <p key={label}>
+                  <strong className="text-gray-900">{label}</strong>{" "}
+                  {value}
+                </p>
+              ))}
             </div>
           </Reveal>
         </section>
@@ -101,48 +93,13 @@ export default function Landing() {
               FAQs
             </h2>
             <div className="mt-4 h-1 w-20 bg-cyan-500" />
-            <div className="text-xl mt-10 space-y-6">
-              <p><strong className="text-2xl text-gray-900">Q1: How do I book a ticket on EVENTRIX?</strong></p>
-              <p>You can book a ticket on EVENTRIX by visiting our website and browsing the available events!</p>
-            </div>
-            <div className="text-xl leading-8 mt-10 space-y-6">
-              <p><strong className="text-2xl text-gray-900">Q2: Can I book multiple tickets at once?</strong></p>
-              <p>Yes, you can select multiple seats or adjust ticket quantities before checking out.</p>
-            </div>
-            <div className="text-xl leading-8 mt-10 space-y-6">
-              <p><strong className="text-2xl text-gray-900">Q3: What payment methods are accepted?</strong></p>
-              <p>We accept most known credit cards, debit cards, and e-wallets such as GCash and PayPal.</p>
-            </div>
-            <div className="text-xl leading-8 mt-10 space-y-6">
-              <p><strong className="text-2xl text-gray-900">Q4: How will I receive my ticket(s)?</strong></p>
-              <p>
-                After a successful booking, your e-ticket will be sent to your registered email address. You can also access it anytime under "My Bookings" in your
-                EVENTRIX account!
-              </p>
-            </div>
-            <div className="text-xl leading-8 mt-10 space-y-6">
-              <p><strong className="text-2xl text-gray-900">Q5: Do I need to print my ticket?</strong></p>
-              <p>Not necessarily, as most events accept digital tickets. You can just show your e-ticket or QR code at the venue entrance!</p>
-            </div>
-            <div className="text-xl leading-8 mt-10 space-y-6">
-              <p><strong className="text-2xl text-gray-900">Q6: Can I transfer my ticket to someone else?</strong></p>
-              <p>EVENTRIX only permits it depending on the policy of the event organizer. Please check the event's terms before completing your purchase.</p>
-            </div>
-            <div className="text-xl leading-8 mt-10 space-y-6">
-              <p><strong className="text-2xl text-gray-900">Q7: Can I cancel or refund my ticket?</strong></p>
-              <p>Cancellations and refunds depend on the rules of the event organizer. Kindly refer to their refund policy before booking.</p>
-            </div>
-            <div className="text-xl leading-8 mt-10 space-y-6">
-              <p><strong className="text-2xl text-gray-900">Q8: What happens if I lose my ticket?</strong></p>
-              <p>Your e-ticket is always available under "My Bookings" in your EVENTRIX account. You can re-download or show it anytime!</p>
-            </div>
-            <div className="text-xl leading-8 mt-10 space-y-6">
-              <p><strong className="text-2xl text-gray-900">Q9: Why didn't I receive my ticket via email?</strong></p>
-              <p>Please check your Spam or Promotions folder first. If it's not there, contact us at <strong className="text-gray-900">info@eventrix.com</strong> with your booking reference number for assistance.</p>
-            </div>
-            <div className="text-xl leading-8 mt-10 space-y-6">
-              <p><strong className="text-2xl text-gray-900">Q10: Who do I contact for further help?</strong></p>
-              <p>Our support team is always ready to assist! You can reach us through <strong className="text-gray-900">info@eventrix.com</strong> or physically at <strong className="text-gray-900">EVENTRIX Tower</strong> in Makati City.</p>
+            <div className="text-xl leading-8 mt-10 space-y-10">
+              {faqs.map(({ question, answer }, i) => (
+                <div key={question} className="space-y-6">
+                  <p><strong className="text-2xl text-gray-900">Q{i + 1}: {question}</strong></p>
+                  <p>{answer}</p>
+                </div>
+              ))}
             </div>
           </Reveal>
         </section>

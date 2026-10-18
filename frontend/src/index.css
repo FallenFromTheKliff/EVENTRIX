@@ -9,3 +9,8 @@
   --background-image-landing: url("/src/assets/images/EVENTRIX-Landing.png");
   --font-word: "Open Sans", sans-serif;
 }
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-zinc-700) var(--color-zinc-900);
+}

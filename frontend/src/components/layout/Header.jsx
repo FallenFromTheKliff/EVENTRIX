@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router";
-import { IconHeartFilled, IconMenu2, IconShoppingCartFilled, IconUserCircle } from "@tabler/icons-react";
+import { Link, useLocation } from "react-router";
+import { IconChevronDown, IconChevronUp, IconHeartFilled, IconLogout, IconMenu2, IconShoppingCartFilled } from "@tabler/icons-react";
 
 import axiosClient from "../../api/axiosClient";
 import { useAuth } from "../../context/AuthContext";
+import { useEvents } from "../../context/EventContext";
 
-import { sectionsss } from "../../data/navbox";
+import { sectionsss, menusss } from "../../data/navbox";
 import EVENTRIX from "../../assets/images/EVENTRIX-Title.png";
 import EVENTRIXNeon from "../../assets/images/EVENTRIX-Title-Neon.png";
 import Placeholder from "../../assets/images/EVENTRIX-Placeholder.jpeg"
@@ -14,11 +15,13 @@ import useLoadingText from "../ui/useLoadingText";
 import ConfirmModal from "../ui/ConfirmModal";
 import Sidebar from "./Sidebar";
 
-const colors = { public: "bg-slate-950", USER: "bg-zinc-800" };
+const colors = { public: "bg-slate-950", USER: "bg-zinc-800", ADMIN: "bg-cyan-500" };
 
 export default function Header({ role = "public" }) {
   const { logout } = useAuth();
+  const { favoritesOnly, toggleFavoritesOnly } = useEvents();
   const { loading, runner, texter } = useLoadingText();
+  const { pathname } = useLocation();
   
   const [sideStep, setSideStep] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
@@ -54,16 +57,12 @@ export default function Header({ role = "public" }) {
   };
   const handleLogout = () => runner(logout);
 
-  const names = profile?.name.split(" ") ?? [];
-  const lastName = names.at(-1);
-  const firstName = names.slice(0, -1).join(" ");
-
-  if (role === "public" && location.pathname !== "/") return null;
+  if (role === "public" && pathname !== "/") return null;
 
   return (
     <>
       <nav className={`fixed inset-x-0 top-0 z-100 ${colors[role]} text-white`}>
-        <div className={`flex justify-between items-center h-20 ${role === "public" ? "px-16" : "px-6 lg:px-12"}`}>
+        <div className={`flex justify-between items-center h-20 ${role === "public" ? "px-16" : ""}`}>
           {role === "public" ? (
             <>
               <img src={EVENTRIX} alt="EVENTRIX" className="absolute left-1/2 h-10 -translate-x-1/2 lg:static lg:translate-x-0" />
@@ -89,44 +88,52 @@ export default function Header({ role = "public" }) {
             </>
           ) : (
             <>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 pl-6 lg:pl-4">
                 <button className="lg:hidden cursor-pointer" onClick={() => setSideStep(true)}>
                   <IconMenu2 size={32} />
                 </button>
-                <img src={EVENTRIXNeon} alt="EVENTRIX" className="h-10" />
+                {role === "ADMIN" ? (
+                  <img src={EVENTRIX} alt="EVENTRIX" className="h-8 max-lg:hidden" />
+                ) : (
+                  <img src={EVENTRIXNeon} alt="EVENTRIX" className="h-8 max-lg:hidden" />
+                )}
               </div>
-              <div className="flex items-center gap-6">
-                <button className="cursor-pointer transition-colors duration-200 hover:text-cyan-400">
-                  <IconHeartFilled size={32} />
-                </button>
-                <button className="text-cyan-500 cursor-pointer transition-colors duration-200 hover:text-cyan-400">
-                  <IconShoppingCartFilled size={32} />
-                </button>
+              <div className="flex items-center gap-6 pr-6 lg:pr-10">
+                {role === "USER" && (
+                  <>
+                    {pathname === "/events" && (
+                      <button onClick={toggleFavoritesOnly} className={`cursor-pointer transition duration-200 hover:brightness-50 ${favoritesOnly ? "text-red-500" : ""}`}>
+                        <IconHeartFilled size={32} />
+                      </button>
+                    )}
+                    <Link to="/cart" className="transition duration-200 hover:brightness-50">
+                      <IconShoppingCartFilled size={32} />
+                    </Link>
+                  </>
+                )}
                 {menuOpen && <button onClick={() => setMenuOpen(false)} className="fixed inset-0 z-10 cursor-default" />}
                 <div className="relative z-20">
-                  <button onClick={() => setMenuOpen(!menuOpen)} className="flex items-center gap-3 cursor-pointer">
-                    {profile?.profileImageUrl ? (
-                      <img src={profile.profileImageUrl} alt="" className="size-14 rounded-full object-cover" />
-                    ) : (
-                      <img src={Placeholder} alt="Gojo" className="size-14 rounded-full object-cover" />
-                    )}
-                    <div className="hidden sm:block max-w-40 text-left">
-                      <p className="truncate text-xl font-bold">{lastName}</p>
-                      <p className="truncate text-gray-300">{firstName}</p>
-                    </div>
+                  <button onClick={() => setMenuOpen(!menuOpen)} className="flex items-center gap-2 cursor-pointer">
+                    <img src={profile?.profileImageUrl || Placeholder} alt="Gojo" className="size-14 rounded-full object-cover" />
+                    {menuOpen ? <IconChevronUp size={24} /> : <IconChevronDown size={24} />}
                   </button>
                   {menuOpen && (
                     <div className="absolute right-0 top-full bg-zinc-900 mt-3 w-48 overflow-hidden rounded-md border border-zinc-700 shadow-lg shadow-black transition duration-200 starting:opacity-0 starting:-translate-y-2">
-                      <button onClick={() => setMenuOpen(false)} className="w-full px-4 py-3 text-left cursor-pointer transition-colors duration-200 hover:bg-cyan-600">
-                        Profile
-                      </button>
+                      {menusss.map(({ to, label, icon: Icon }) => (
+                        <Link key={to} to={to} onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 transition-colors duration-200 hover:bg-cyan-600">
+                          <Icon size={20} />
+                          {label}
+                        </Link>
+                      ))}
+                      <div className="h-px w-full bg-gray-700" />
                       <button
                         onClick={() => {
                           setMenuOpen(false);
                           setConfirming(true);
                         }}
-                        className="w-full px-4 py-3 text-left cursor-pointer transition-colors duration-200 hover:bg-red-600"
+                        className="flex w-full items-center gap-3 px-4 py-3 cursor-pointer transition-colors duration-200 hover:bg-red-600"
                       >
+                        <IconLogout size={20} />
                         Logout
                       </button>
                     </div>
