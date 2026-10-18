@@ -19,7 +19,7 @@ export default function Sidebar({ role = "public", mobile = false, isOpen, onClo
           key={to}
           to={to}
           onClick={onClose}
-          className={({ isActive }) => `flex items-center gap-4 rounded-md px-8 py-4 text-lg transition-colors duration-200 hover:bg-cyan-600 ${isActive ? "bg-cyan-500" : ""}`}
+          className={({ isActive }) => `flex items-center gap-4 rounded-md px-4 py-4 text-lg transition-colors duration-200 hover:bg-cyan-700 ${isActive ? "bg-cyan-500" : ""}`}
         >
           <Icon size={24} />
           {label}
@@ -27,6 +27,7 @@ export default function Sidebar({ role = "public", mobile = false, isOpen, onClo
       ))}
     </div>
   ));
+  
   if (!mobile) return (
     <nav className={`hidden lg:block ${colors[role]} w-65 shrink-0`}>
       <div className="sticky top-20">{items}</div>
@@ -50,7 +51,7 @@ export default function Sidebar({ role = "public", mobile = false, isOpen, onClo
                     onClick={() => onSectionClick(id)}
                     className={`flex items-center gap-2 transition-colors duration-200 hover:text-cyan-400 ${activeSection === id ? "text-cyan-400" : ""}`}
                   >
-                    {activeSection === id && <IconArrowRight size={28} />}
+                    {activeSection === id && <IconArrowRight size={24} />}
                     {label}
                   </a>
                 ))}

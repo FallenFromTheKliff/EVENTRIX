@@ -14,10 +14,10 @@ export default function AppLayout() {
   return (
     <div className={`flex flex-col ${colors[user.role]} text-white font-word`}>
       <Header role={user.role} />
-      <div className="flex min-h-screen flex-1 pt-20">
+      <div className="flex flex-1 pt-20">
         <Sidebar role={user.role} />
         <main className="flex-1">
-          <div className="mx-auto w-19/20 py-8">
+          <div className="mx-auto min-h-screen w-19/20 py-8">
             <Outlet />
           </div>
           <Footer role={user.role} />

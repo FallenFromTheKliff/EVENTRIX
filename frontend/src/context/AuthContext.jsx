@@ -52,6 +52,7 @@ export function AuthProvider({ children }) {
 
     localStorage.setItem("token", token);
     setUser(authenticatedUser);
+    return authenticatedUser;
   };
 
   const login = (credentials) => authenticator("/auth/login", credentials);

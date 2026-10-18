@@ -14,12 +14,12 @@ public interface EventRepo extends JpaRepository<Event, Long> {
 
     // REFACTORED: Efficient, database-level filtering instead of loading all events into memory.
     // This query handles filtering by category, title (name), and date range.
-    @Query("SELECT e FROM Event e WHERE " +
-            "(:categoryName IS NULL OR e.category.name = :categoryName) AND " +
-            "(:title IS NULL OR LOWER(e.title) LIKE LOWER(CONCAT('%', :title, '%'))) AND " +
-            "(:startDate IS NULL OR e.dateTime >= :startDate) AND " +
-            "(:endDate IS NULL OR e.dateTime <= :endDate) AND " +
-            "e.status = 'ACTIVE'")
+    @Query("SELECT e FROM Event e LEFT JOIN e.category c WHERE " +
+        "(CAST(:categoryName AS string) IS NULL OR c.name = :categoryName) AND " +
+        "(CAST(:title AS string) IS NULL OR LOWER(e.title) LIKE LOWER(CONCAT('%', CAST(:title AS string), '%'))) AND " +
+        "(CAST(:startDate AS LocalDateTime) IS NULL OR e.dateTime >= :startDate) AND " +
+        "(CAST(:endDate AS LocalDateTime) IS NULL OR e.dateTime <= :endDate) AND " +
+        "e.status = 'ACTIVE'")
     List<Event> findActiveEventsWithFilters(
             @Param("categoryName") String categoryName,
             @Param("title") String title,

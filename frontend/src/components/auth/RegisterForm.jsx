@@ -20,7 +20,6 @@ export default function RegisterForm() {
   const onSubmission = (data) => runner(async () => {
     try {
       await registerUser(data);
-      navigate("/events");
     } catch (error) {
       setErrorMessage({ type: "error", message: typeof error.response?.data === "string" ? error.response.data : "Failed to register account!" });
     }
@@ -90,7 +89,7 @@ export default function RegisterForm() {
           <p className="text-red-500 text-sm min-h-5 mt-1">{errors.password?.message}</p>
         </div>
         <button type="submit" disabled={loading} className="bg-yellow-500 font-bold w-full rounded-md py-4 cursor-pointer transition duration-200 hover:brightness-50 disabled:opacity-50">
-          {texter("SIGN UP", "SIGNING UP...")}
+          {texter("SIGN UP", "SIGNING UP")}
         </button>
       </form>
       <hr className="border-gray-500 my-4" />

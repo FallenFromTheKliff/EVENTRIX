@@ -2,6 +2,7 @@ package com.example.demo.model.Events;
 
 import jakarta.persistence.*;
 import lombok.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +23,7 @@ public class Category {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Event> events = new ArrayList<>();

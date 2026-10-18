@@ -5,6 +5,8 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Data
 @Entity
 public class TicketType {
@@ -13,6 +15,7 @@ public class TicketType {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "event_id")
     private Event event;

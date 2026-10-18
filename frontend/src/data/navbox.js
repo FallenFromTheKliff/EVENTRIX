@@ -29,7 +29,7 @@ export const rolesss = {
       category: "Main",
       links: [
         { to: "/dashboard", label: "Dashboard", icon: IconLayoutDashboard },
-        { to: "/transactions", label: "Transaction Logs", icon: IconReceipt }
+        { to: "/transactions", label: "Transactions", icon: IconReceipt }
       ]
     },
     {

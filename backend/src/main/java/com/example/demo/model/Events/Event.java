@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import com.example.demo.model.Booking;
 import com.example.demo.model.EventImage; // NEW: Import
 import com.example.demo.model.EventStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -15,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 // NEW: Enum for event status
-
 
 @Builder
 @Entity
@@ -62,7 +62,7 @@ public class Event {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @Column(name = "image_url") // This will now serve as the thumbnail/main photo
+    @Column(name = "image_url", columnDefinition = "TEXT") // This will now serve as the thumbnail/main photo
     private String imageUrl;
 
     // NEW: Status for archiving events
@@ -75,6 +75,7 @@ public class Event {
     @Builder.Default
     private List<EventImage> previewImages = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Booking> bookings = new ArrayList<>();
 

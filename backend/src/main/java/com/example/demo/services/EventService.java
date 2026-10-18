@@ -80,6 +80,9 @@ public class EventService {
                 .ticketTypes(event.getTicketTypes())
                 .likeCount(eventLikeRepository.countByEventEventId(event.getEventId()))
                 .isLiked(finalLikedEventIds.contains(event.getEventId()))
+                .totalTickets(event.getTotalTickets())
+                .availableTickets(event.getAvailableTickets())
+                .doorsOpen(event.getDoorsOpen())
                 .build()).collect(Collectors.toList());
     }
 
@@ -92,14 +95,16 @@ public class EventService {
     public Event updateEvent(long id, Event eventDetails) {
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
+        int sold = event.getTotalTickets() - event.getAvailableTickets();
         event.setTitle(eventDetails.getTitle());
         event.setDescription(eventDetails.getDescription());
         event.setDateTime(eventDetails.getDateTime());
         event.setLocation(eventDetails.getLocation());
         event.setPrice(eventDetails.getPrice());
         event.setTotalTickets(eventDetails.getTotalTickets());
-        event.setAvailableTickets(eventDetails.getAvailableTickets());
-        event.setCategory(eventDetails.getCategory());
+        event.setAvailableTickets(Math.max(0, eventDetails.getTotalTickets() - sold));
+        event.setDoorsOpen(eventDetails.getDoorsOpen());
+        if (eventDetails.getCategory() != null) event.setCategory(eventDetails.getCategory());
         event.setImageUrl(eventDetails.getImageUrl());
         return eventRepository.save(event);
     }

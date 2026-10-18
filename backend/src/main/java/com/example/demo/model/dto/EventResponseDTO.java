@@ -25,4 +25,7 @@ public class EventResponseDTO {
     private List<TicketType> ticketTypes;
     private long likeCount;
     private boolean isLiked; // Specific to the requesting user
+    private int totalTickets;
+    private int availableTickets;
+    private LocalDateTime doorsOpen;
 }

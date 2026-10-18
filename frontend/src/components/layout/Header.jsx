@@ -149,7 +149,7 @@ export default function Header({ role = "public" }) {
         <ConfirmModal
           message="Log out?"
           description="You will need to sign in again to access your account."
-          confirmText={texter("Yes", "Logging Out")}
+          confirmText={texter("YES", "LOGGING OUT")}
           loading={loading}
           onConfirm={handleLogout}
           onClose={() => setConfirming(false)}

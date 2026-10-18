@@ -19,8 +19,8 @@ export default function LoginForm() {
 
   const onSubmission = (data) => runner(async () => {
     try {
-      await login(data);
-      navigate("/events");
+      const { role } = await login(data);
+      navigate(role === "ADMIN" ? "/dashboard" : "/home");
     } catch (error) {
       setSuccessMessage({ type: "error", message: typeof error.response?.data === "string" ? error.response.data : "Unable to sign in!" });
     }
@@ -58,7 +58,7 @@ export default function LoginForm() {
           <p className="text-red-500 text-sm h-5 mt-1">{errors.password?.message}</p>
         </div>
         <button type="submit" disabled={loading} className="bg-cyan-500 font-bold w-full rounded-md py-4 cursor-pointer transition duration-200 hover:brightness-50 disabled:opacity-50">
-          {texter("SIGN IN", "SIGNING IN...")}
+          {texter("SIGN IN", "SIGNING IN")}
         </button>
         <label className="flex items-center text-sm gap-2">
           <input type="checkbox" className="size-4 accent-cyan-500 cursor-pointer" {...register("rememberMe")} />
