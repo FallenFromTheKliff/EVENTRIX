@@ -5,6 +5,7 @@ import lombok.Data;
 import com.example.demo.model.Events.Category;
 import com.example.demo.model.Events.TicketType;
 import com.example.demo.model.EventImage;
+import com.example.demo.model.EventStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -28,4 +29,5 @@ public class EventResponseDTO {
     private int totalTickets;
     private int availableTickets;
     private LocalDateTime doorsOpen;
+    private EventStatus status;
 }

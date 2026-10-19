@@ -30,7 +30,7 @@ export default function EventCard({ event, role }) {
 
   return (
     <>
-      <div className={`flex flex-col ${colors[role]} overflow-hidden rounded-xl shadow-2xl shadow-black/60`}>
+      <div className={`flex flex-col h-full ${colors[role]} overflow-hidden rounded-xl shadow-2xl shadow-black/60`}>
         <div className="relative">
           <img src={event.thumbnailUrl || Placeholder} alt={event.title} className="h-72 w-full object-cover" />
           {role === "USER" && (

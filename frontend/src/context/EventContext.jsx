@@ -3,31 +3,46 @@ import { createContext, useContext, useEffect, useState } from "react";
 import axiosClient from "../api/axiosClient";
 import { useAuth } from "./AuthContext";
 
-import { monthOf } from "../utils/filters";
+import useDebouncing from "../components/ui/useDebouncing";
+
+import { months } from "../utils/filters";
 
 const EventContext = createContext();
 
-const emptyFilters = { name: "", category: "", date: "" };
+const emptyFilters = { name: "", category: "", date: "", status: "ACTIVE" };
 const toBody = (data) => ({ ...data, doorsOpen: data.doorsOpen || null });
+const toUrl = (user) => user.role === "ADMIN" ? "/admin/events" : "/events";
+const toParams = ({ name, category, date, status }) => {
+  const { startDate, endDate } = months.find((month) => month.value === date) ?? {};
+  return { name: name.trim() || undefined, category: category || undefined, status: status || undefined, startDate, endDate };
+};
 
 export function EventProvider({ children }) {
   const { user } = useAuth();
   const [events, setEvents] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [filters, setFilters] = useState(emptyFilters);
   const [favoritesOnly, setFavoritesOnly] = useState(false);
+  const debouncedFilters = useDebouncing(filters);
 
   useEffect(() => {
     if (!user) return;
-    axiosClient.get("/events").then((response) => setEvents(response.data));
+    axiosClient.get("/events/categories").then((response) => setCategories(response.data));
     return () => {
       setEvents([]);
+      setCategories([]);
       setFilters(emptyFilters);
       setFavoritesOnly(false);
     };
   }, [user]);
 
+  useEffect(() => {
+    if (!user) return;
+    axiosClient.get(toUrl(user), { params: toParams(debouncedFilters) }).then((response) => setEvents(response.data));
+  }, [user, debouncedFilters]);
+
   const fetchEvents = async () => {
-    const response = await axiosClient.get("/events");
+    const response = await axiosClient.get(toUrl(user), { params: toParams(filters) });
     setEvents(response.data);
   };
   const getEvent = (id) => events.find((event) => event.eventId === Number(id));
@@ -58,13 +73,8 @@ export function EventProvider({ children }) {
 
   return (
     <EventContext.Provider value={{
-      events: events.filter((event) => (
-        (!favoritesOnly || event.liked) &&
-        event.title.toLowerCase().includes(filters.name.trim().toLowerCase()) &&
-        (!filters.category || event.category?.name === filters.category) &&
-        (!filters.date || monthOf(event.dateTime) === filters.date)
-      )),
-      categories: [...new Set(events.map((event) => event.category?.name).filter(Boolean))],
+      events: favoritesOnly ? events.filter((event) => event.liked) : events,
+      categories,
       filters,
       handleFilter,
       getEvent,

@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,9 +34,15 @@ public class EventService {
     @Autowired private BookingRepo bookingRepository; // NEW
 
     // REFACTORED: Main method to get events with filtering and user-specific like status.
-    public List<EventResponseDTO> getActiveEvents(String category, String title, LocalDateTime startDate, LocalDateTime endDate, String userEmail) {
-        List<Event> events = eventRepository.findActiveEventsWithFilters(category, title, startDate, endDate);
+    public List<EventResponseDTO> getEvents(String status, String category, String title, LocalDateTime startDate, LocalDateTime endDate, String userEmail) {
+        List<Event> events = eventRepository.findEventsWithFilters(category, title, startDate, endDate).stream()
+                .filter(event -> status == null || event.getStatus().name().equals(status))
+                .collect(Collectors.toList());
         return mapEventsToDTOs(events, userEmail);
+    }
+
+    public List<EventResponseDTO> getActiveEvents(String category, String title, LocalDateTime startDate, LocalDateTime endDate, String userEmail) {
+        return getEvents("ACTIVE", category, title, startDate, endDate, userEmail);
     }
 
     // NEW: Get events a user has liked.
@@ -83,15 +90,18 @@ public class EventService {
                 .totalTickets(event.getTotalTickets())
                 .availableTickets(event.getAvailableTickets())
                 .doorsOpen(event.getDoorsOpen())
+                .status(event.getStatus())
                 .build()).collect(Collectors.toList());
     }
 
     // --- Admin Methods ---
 
     public Event saveEvent(Event event) {
+        event.getTicketTypes().forEach(ticketType -> ticketType.setEvent(event));
         return eventRepository.save(event);
     }
 
+    @Transactional
     public Event updateEvent(long id, Event eventDetails) {
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
@@ -104,9 +114,35 @@ public class EventService {
         event.setTotalTickets(eventDetails.getTotalTickets());
         event.setAvailableTickets(Math.max(0, eventDetails.getTotalTickets() - sold));
         event.setDoorsOpen(eventDetails.getDoorsOpen());
-        if (eventDetails.getCategory() != null) event.setCategory(eventDetails.getCategory());
+        event.setCategory(eventDetails.getCategory());
         event.setImageUrl(eventDetails.getImageUrl());
-        return eventRepository.save(event);
+        syncTicketTypes(event, eventDetails.getTicketTypes());
+        Event saved = eventRepository.save(event);
+        if (eventDetails.getStatus() != null && eventDetails.getStatus() != saved.getStatus()) {
+            return eventDetails.getStatus() == EventStatus.ARCHIVED ? archiveEvent(id) : unarchiveEvent(id);
+        }
+        return saved;
+    }
+
+    private void syncTicketTypes(Event event, List<TicketType> incoming) {
+        Set<Long> keptIds = incoming.stream().map(TicketType::getId).filter(Objects::nonNull).collect(Collectors.toSet());
+        event.getTicketTypes().removeIf(existing -> !keptIds.contains(existing.getId()));
+        for (TicketType details : incoming) {
+            if (details.getId() == null) {
+                details.setEvent(event);
+                event.getTicketTypes().add(details);
+            } else {
+                event.getTicketTypes().stream()
+                        .filter(existing -> existing.getId().equals(details.getId()))
+                        .findFirst()
+                        .ifPresent(existing -> {
+                            existing.setName(details.getName());
+                            existing.setPrice(details.getPrice());
+                            existing.setAvailableQuantity(details.getAvailableQuantity());
+                            existing.setDescription(details.getDescription());
+                        });
+            }
+        }
     }
 
     // REFACTORED: Now checks for ARCHIVED status before deleting.

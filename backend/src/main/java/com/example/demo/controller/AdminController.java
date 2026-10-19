@@ -6,14 +6,17 @@ import com.example.demo.model.Events.CommentReply;
 import com.example.demo.model.Events.Event;
 import com.example.demo.model.Events.EventComment;
 import com.example.demo.model.dto.CommentReplyUpdateDTO;
+import com.example.demo.model.dto.EventResponseDTO;
 import com.example.demo.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -28,6 +31,18 @@ public class AdminController {
     // ... (Category and TicketType management endpoints remain the same) ...
 
     // --- EVENT MANAGEMENT ---
+
+    @GetMapping("/events")
+    public ResponseEntity<List<EventResponseDTO>> getEvents(
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
+            Principal principal) {
+        return ResponseEntity.ok(eventService.getEvents(status, category, name, startDate, endDate, principal.getName()));
+    }
+
     @PostMapping("/events/create")
     public ResponseEntity<Event> createEvent(@RequestBody Event event) {
         return ResponseEntity.ok(eventService.saveEvent(event));

@@ -88,7 +88,7 @@ export default function RegisterForm() {
           </div>
           <p className="text-red-500 text-sm min-h-5 mt-1">{errors.password?.message}</p>
         </div>
-        <button type="submit" disabled={loading} className="bg-yellow-500 font-bold w-full rounded-md py-4 cursor-pointer transition duration-200 hover:brightness-50 disabled:opacity-50">
+        <button type="submit" disabled={loading} className="bg-yellow-500 font-bold w-full rounded-md py-4 transition duration-200 enabled:cursor-pointer enabled:hover:brightness-50 disabled:opacity-50">
           {texter("SIGN UP", "SIGNING UP")}
         </button>
       </form>

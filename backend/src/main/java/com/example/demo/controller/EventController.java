@@ -1,10 +1,12 @@
 package com.example.demo.controller;
 
+import com.example.demo.model.Events.Category;
 import com.example.demo.model.dto.EventResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.example.demo.services.CategoryService;
 import com.example.demo.services.EventService;
 
 import java.security.Principal;
@@ -18,6 +20,9 @@ public class EventController {
     @Autowired
     private EventService eventService;
 
+    @Autowired
+    private CategoryService categoryService;
+
     // REFACTORED: Single endpoint for fetching and filtering events.
     @GetMapping
     public ResponseEntity<List<EventResponseDTO>> getActiveEvents(
@@ -28,6 +33,11 @@ public class EventController {
             Principal principal) {
         String userEmail = (principal != null) ? principal.getName() : null;
         return ResponseEntity.ok(eventService.getActiveEvents(category, name, startDate, endDate, userEmail));
+    }
+
+    @GetMapping("/categories")
+    public ResponseEntity<List<Category>> getCategories() {
+        return ResponseEntity.ok(categoryService.getAllCategories());
     }
 
     // NEW: Endpoint to get events a user has liked.

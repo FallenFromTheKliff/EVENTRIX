@@ -12,7 +12,7 @@ export default function AppLayout() {
   const { user } = useAuth();
 
   return (
-    <div className={`flex flex-col ${colors[user.role]} text-white font-word`}>
+    <div className={`flex flex-col ${colors[user.role]} text-white font-word overflow-x-clip`}>
       <Header role={user.role} />
       <div className="flex flex-1 pt-20">
         <Sidebar role={user.role} />
