@@ -12,8 +12,8 @@ export const adminEventFilters = [
 ]
 
 export const statuses = [
-  { value: "ACTIVE", label: "Active" },
-  { value: "ARCHIVED", label: "Archived" }
+  { value: "ACTIVE", label: "ACTIVE" },
+  { value: "ARCHIVED", label: "ARCHIVED" }
 ]
 
 const now = new Date();

@@ -72,6 +72,7 @@ public class Event {
 
     // NEW: List of preview images
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("id ASC")
     @Builder.Default
     private List<EventImage> previewImages = new ArrayList<>();
 
@@ -90,10 +91,12 @@ public class Event {
     @Builder.Default
     private List<TicketType> ticketTypes = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<EventComment> comments = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<EventLike> likes = new ArrayList<>();

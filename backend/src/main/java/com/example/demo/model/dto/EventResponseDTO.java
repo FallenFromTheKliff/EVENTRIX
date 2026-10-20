@@ -29,5 +29,6 @@ public class EventResponseDTO {
     private int totalTickets;
     private int availableTickets;
     private LocalDateTime doorsOpen;
+    private LocalDateTime showTime;
     private EventStatus status;
 }

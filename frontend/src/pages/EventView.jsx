@@ -1,18 +1,23 @@
+import { useState } from "react";
+
 import { Link, useParams } from "react-router";
 import { IconArrowLeft, IconCalendarEvent, IconClock, IconMapPin, IconTag, IconCurrencyPeso, IconTicket, IconFileText } from "@tabler/icons-react";
 
 import { useEvents } from "../context/EventContext";
 
 import Reveal from "../components/ui/Reveal";
+import PictureSlider from "../components/events/PictureSlider";
 
 import Placeholder from "../assets/images/EVENTRIX-Placeholder.jpeg";
 
 export default function EventView() {
   const { id } = useParams();
   const { getEvent } = useEvents();
+  const [slide, setSlide] = useState(0);
 
   const event = getEvent(id);
   if (!event) return null;
+  const images = event.previewImages?.length ? event.previewImages.map(({ imageUrl }) => imageUrl) : [Placeholder];
 
   return (
     <div>
@@ -27,7 +32,7 @@ export default function EventView() {
       </div>
       <Reveal variant="lazy" className="flex flex-col lg:flex-row bg-zinc-800 min-h-180 overflow-hidden rounded-xl mt-8">
         <div className="relative min-h-112 overflow-hidden lg:w-1/2">
-          <img src={event.thumbnailUrl || Placeholder} alt={event.title} className="absolute inset-0 size-full object-cover" />
+          <PictureSlider images={images} index={slide} alt={event.title} onChange={setSlide} />
         </div>
         <Reveal variant="right" className="relative flex-1 p-8">
           <div className="space-y-4">

@@ -23,7 +23,7 @@ export default function SupportFAQs() {
       <section>
         <div className="flex border-b-4 border-zinc-900">
           <h2 className="-mb-1 border-b-4 border-cyan-500 pb-3 text-3xl font-bold">
-            FAQs
+            <Reveal variant="type">FAQs</Reveal>
           </h2>
         </div>
         <Reveal className="mt-8 space-y-8 text-lg text-gray-300">

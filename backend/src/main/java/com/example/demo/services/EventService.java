@@ -15,7 +15,9 @@ import com.example.demo.model.EventImage;
 import com.example.demo.model.EventStatus;
 import com.example.demo.model.BookingStatus;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -90,6 +92,7 @@ public class EventService {
                 .totalTickets(event.getTotalTickets())
                 .availableTickets(event.getAvailableTickets())
                 .doorsOpen(event.getDoorsOpen())
+                .showTime(event.getShowTime())
                 .status(event.getStatus())
                 .build()).collect(Collectors.toList());
     }
@@ -97,14 +100,17 @@ public class EventService {
     // --- Admin Methods ---
 
     public Event saveEvent(Event event) {
+        checkVenue(event, null);
+        if (event.getPreviewImages().size() > 4) throw new RuntimeException("An event can only have up to 4 images");
         event.getTicketTypes().forEach(ticketType -> ticketType.setEvent(event));
+        event.getPreviewImages().forEach(image -> image.setEvent(event));
         return eventRepository.save(event);
     }
 
     @Transactional
     public Event updateEvent(long id, Event eventDetails) {
-        Event event = eventRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Event not found"));
+        Event event = eventRepository.findById(id).orElseThrow(() -> new RuntimeException("Event not found"));
+        checkVenue(eventDetails, id);
         int sold = event.getTotalTickets() - event.getAvailableTickets();
         event.setTitle(eventDetails.getTitle());
         event.setDescription(eventDetails.getDescription());
@@ -114,9 +120,11 @@ public class EventService {
         event.setTotalTickets(eventDetails.getTotalTickets());
         event.setAvailableTickets(Math.max(0, eventDetails.getTotalTickets() - sold));
         event.setDoorsOpen(eventDetails.getDoorsOpen());
+        event.setShowTime(eventDetails.getShowTime());
         event.setCategory(eventDetails.getCategory());
         event.setImageUrl(eventDetails.getImageUrl());
         syncTicketTypes(event, eventDetails.getTicketTypes());
+        syncPreviewImages(event, eventDetails.getPreviewImages());
         Event saved = eventRepository.save(event);
         if (eventDetails.getStatus() != null && eventDetails.getStatus() != saved.getStatus()) {
             return eventDetails.getStatus() == EventStatus.ARCHIVED ? archiveEvent(id) : unarchiveEvent(id);
@@ -143,6 +151,32 @@ public class EventService {
                         });
             }
         }
+    }
+
+    private void syncPreviewImages(Event event, List<EventImage> incoming) {
+        if (incoming.size() > 4) throw new RuntimeException("An event can only have up to 4 images");
+        Set<Long> keptIds = incoming.stream().map(EventImage::getId).filter(Objects::nonNull).collect(Collectors.toSet());
+        event.getPreviewImages().removeIf(existing -> !keptIds.contains(existing.getId()));
+        for (EventImage details : incoming) {
+            if (details.getId() == null) {
+                details.setEvent(event);
+                event.getPreviewImages().add(details);
+            }
+        }
+    }
+
+    public List<LocalDate> getVenueDates(String location, Long excludeId) {
+        return eventRepository.findVenueDates(location.trim(), excludeId == null ? -1L : excludeId).stream()
+                .map(LocalDateTime::toLocalDate)
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+    private void checkVenue(Event event, Long excludeId) {
+        LocalDate date = event.getDateTime().toLocalDate();
+        boolean taken = getVenueDates(event.getLocation(), excludeId).stream()
+                .anyMatch(booked -> Math.abs(ChronoUnit.DAYS.between(booked, date)) <= 1);
+        if (taken) throw new RuntimeException("This location is unavailable on or beside that date");
     }
 
     // REFACTORED: Now checks for ARCHIVED status before deleting.

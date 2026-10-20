@@ -59,6 +59,7 @@ export function EventProvider({ children }) {
   };
   const toggleFavoritesOnly = () => setFavoritesOnly(!favoritesOnly);
   const addComment = async (id, data) => (await axiosClient.post(`/user/events/${id}/comments`, data)).data;
+  const getVenueDates = async (location, excludeId) => (await axiosClient.get("/admin/events/venue-dates", { params: { location, excludeId } })).data;
 
   const createEvent = (data) => mutator(axiosClient.post("/admin/events/create", toBody(data)));
   const updateEvent = (id, data) => mutator(axiosClient.put(`/admin/events/${id}`, toBody(data)));
@@ -79,7 +80,7 @@ export function EventProvider({ children }) {
       handleFilter,
       getEvent,
       ...(user?.role === "ADMIN"
-        ? { createEvent, updateEvent, deleteEvent, archiveEvent, unarchiveEvent, addImage, deleteImage }
+        ? { createEvent, updateEvent, deleteEvent, archiveEvent, unarchiveEvent, addImage, deleteImage, getVenueDates }
         : { favoritesOnly, toggleFavoritesOnly, toggleFavorite, addComment })
     }}>
       {children}

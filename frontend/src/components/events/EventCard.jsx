@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router";
 
-import { IconHeartFilled } from "@tabler/icons-react";
+import { IconCalendarEvent, IconHeartFilled, IconMapPin } from "@tabler/icons-react";
+import { priceRange } from "../../utils/events";
 
 import { useEvents } from "../../context/EventContext";
 
@@ -43,10 +44,16 @@ export default function EventCard({ event, role }) {
           )}
         </div>
         <div className="space-y-1 p-4">
-          <h3 className="text-xl font-bold">{event.title}</h3>
-          <p className="text-sm text-gray-300">{new Date(event.dateTime).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })}</p>
-          <p className="text-sm text-gray-300">{event.location}</p>
-          <p className="text-lg font-semibold text-cyan-400">₱{event.price}</p>
+          <h3 className="text-2xl font-bold">{event.title}</h3>
+          <p className="flex items-center gap-2 text-sm text-gray-300">
+            <IconCalendarEvent size={18} className="shrink-0 text-cyan-400" />
+            {new Date(event.dateTime).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })}
+          </p>
+          <p className="flex items-center gap-2 text-sm text-gray-300">
+            <IconMapPin size={18} className="shrink-0 text-cyan-400" />
+            {event.location}
+          </p>
+          <p className="text-lg font-semibold text-cyan-400">{priceRange(event.ticketTypes)}</p>
         </div>
         <div className="mt-auto flex gap-3 px-4 pb-4">
           {role === "ADMIN" ? (

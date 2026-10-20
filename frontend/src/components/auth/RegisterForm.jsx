@@ -31,64 +31,78 @@ export default function RegisterForm() {
       <form onSubmit={handleSubmit(onSubmission)} noValidate className="mt-6 space-y-4">
         <div>
           <label htmlFor="name" className="text-sm">Name</label>
-          <input id="name" placeholder="Enter your full name" type="text" className={inputStyle} {...register("name", { required: "Name is required!" })} />
+          <input
+            id="name"
+            placeholder="Enter your full name"
+            type="text"
+            className={inputStyle}
+            {...register("name", { required: "Name is required!" })}
+          />
           <p className="text-red-500 text-sm min-h-5 mt-1">{errors.name?.message}</p>
         </div>
         <div>
           <label htmlFor="email" className="text-sm">Email</label>
-          <input 
-            id="email" 
-            placeholder="Enter a valid email" 
-            type="email" 
-            className={inputStyle} 
+          <input
+            id="email"
+            placeholder="Enter a valid email"
+            type="email"
+            className={inputStyle}
             {...register("email", {
               required: "Email is required!",
               pattern: {
                 value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                 message: "Enter a valid email address!"
               }
-            })} 
+            })}
           />
           <p className="text-red-500 text-sm min-h-5 mt-1">{errors.email?.message}</p>
         </div>
         <div>
           <label htmlFor="phoneNumber" className="text-sm">Contact No.</label>
-          <input 
-            id="phoneNumber" 
+          <input
+            id="phoneNumber"
             placeholder="Must be 11 digits"
-            type="text" 
-            className={inputStyle} 
-            {...register("phoneNumber", { 
+            type="text"
+            className={inputStyle}
+            {...register("phoneNumber", {
               required: "Phone number is required!",
               pattern: { value: /^[0-9]{11}$/, message: "Phone number must be 11 digits!" },
-              onChange: (e) => { e.target.value = e.target.value.replace(/\D/g, ""); } 
-            })} 
+              onChange: (e) => { e.target.value = e.target.value.replace(/\D/g, ""); }
+            })}
           />
           <p className="text-red-500 text-sm min-h-5 mt-1">{errors.phoneNumber?.message}</p>
         </div>
         <div>
           <label htmlFor="password" className="text-sm">Password</label>
           <div className="relative flex">
-            <input 
-              id="password" 
-              placeholder="Must have at least 8 characters" 
-              type={showPassword ? "text" : "password"} 
-              className={`${inputStyle} pr-10`} 
+            <input
+              id="password"
+              placeholder="Must have at least 8 characters"
+              type={showPassword ? "text" : "password"}
+              className={`${inputStyle} pr-10`}
               {...register("password", {
                 required: "Password is required!",
                 minLength: {
                   value: 8,
                   message: "Password must be at least 8 characters!"
                 }
-              })} 
+              })}
             />
-            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute flex items-center text-gray-300 top-1 right-3 bottom-0 cursor-pointer transition-colors duration-200 hover:text-white">
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute flex items-center text-gray-300 top-1 right-3 bottom-0 cursor-pointer transition-colors duration-200 hover:text-white"
+            >
               {showPassword ? <IconEyeOff size={20} /> : <IconEye size={20} />}
             </button>
           </div>
           <p className="text-red-500 text-sm min-h-5 mt-1">{errors.password?.message}</p>
         </div>
-        <button type="submit" disabled={loading} className="bg-yellow-500 font-bold w-full rounded-md py-4 transition duration-200 enabled:cursor-pointer enabled:hover:brightness-50 disabled:opacity-50">
+        <button
+          type="submit"
+          disabled={loading}
+          className="bg-yellow-500 font-bold w-full rounded-md py-4 transition duration-200 enabled:cursor-pointer enabled:hover:brightness-50 disabled:opacity-50"
+        >
           {texter("SIGN UP", "SIGNING UP")}
         </button>
       </form>

@@ -6,7 +6,7 @@ export default function ConfirmModal({ type = "prompt", message, description, co
       <div onClick={(e) => e.stopPropagation()} className="flex w-full max-w-135 flex-col items-center gap-7 rounded-xl bg-slate-900 text-white p-10 shadow-2xl shadow-black transition duration-300 starting:scale-90">
         {type === "success" && <IconCircleCheck size={134} className="text-green-500" />}
         {type === "error" && <IconCircleX size={134} className="text-red-500" />}
-        <div className="w-full space-y-2">
+        <div className={`w-full space-y-2 ${type === "prompt" ? "" : "text-center"}`}>
           <h2 className="text-4xl font-bold">{message}</h2>
           {type === "prompt" && <p className="text-base text-gray-400">{description}</p>}
         </div>

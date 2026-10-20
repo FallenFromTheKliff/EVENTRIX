@@ -26,42 +26,60 @@ export default function LoginForm() {
     }
   });
 
-  return (
+    return (
     <div>
       <h2 className="text-center text-2xl font-bold">SIGN IN</h2>
       <form onSubmit={handleSubmit(onSubmission)} noValidate className="mt-4 space-y-3">
         <div>
           <label htmlFor="email" className="text-sm">Email</label>
-          <input 
-            id="email" 
-            placeholder="Enter your email" 
-            type="email" 
-            className={inputStyle} 
+          <input
+            id="email"
+            placeholder="Enter your email"
+            type="email"
+            className={inputStyle}
             {...register("email", {
               required: "Email is required!",
               pattern: {
                 value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                 message: "Enter a valid email address!"
               }
-            })} 
+            })}
           />
           <p className="text-red-500 text-sm h-5 mt-1">{errors.email?.message}</p>
         </div>
         <div>
           <label htmlFor="password" className="text-sm">Password</label>
           <div className="relative flex">
-            <input id="password" placeholder="Enter your password" type={showPassword ? "text" : "password"} className={`${inputStyle} pr-10`} {...register("password", { required: "Password is required!" })} />
-            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute flex items-center text-gray-300 top-1 right-3 bottom-0 cursor-pointer transition-colors duration-200 hover:text-white">
+            <input
+              id="password"
+              placeholder="Enter your password"
+              type={showPassword ? "text" : "password"}
+              className={`${inputStyle} pr-10`}
+              {...register("password", { required: "Password is required!" })}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute flex items-center text-gray-300 top-1 right-3 bottom-0 cursor-pointer transition-colors duration-200 hover:text-white"
+            >
               {showPassword ? <IconEyeOff size={20} /> : <IconEye size={20} />}
             </button>
           </div>
           <p className="text-red-500 text-sm h-5 mt-1">{errors.password?.message}</p>
         </div>
-        <button type="submit" disabled={loading}className="bg-cyan-500 font-bold w-full rounded-md py-4 transition duration-200 enabled:cursor-pointer enabled:hover:brightness-50 disabled:opacity-50">
+        <button
+          type="submit"
+          disabled={loading}
+          className="bg-cyan-500 font-bold w-full rounded-md py-4 transition duration-200 enabled:cursor-pointer enabled:hover:brightness-50 disabled:opacity-50"
+        >
           {texter("SIGN IN", "SIGNING IN")}
         </button>
         <label className="flex items-center text-sm gap-2">
-          <input type="checkbox" className="size-4 accent-cyan-500 cursor-pointer" {...register("rememberMe")} />
+          <input
+            type="checkbox"
+            className="size-4 accent-cyan-500 cursor-pointer"
+            {...register("rememberMe")}
+          />
           Remember me
         </label>
       </form>

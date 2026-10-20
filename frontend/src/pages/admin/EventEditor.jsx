@@ -1,26 +1,28 @@
 import { useState, useEffect } from "react";
 import { useBlocker, useNavigate, useParams } from "react-router";
 import { useForm, useFieldArray, useWatch } from "react-hook-form";
-import { IconArrowLeft, IconPhoto, IconCategory, IconCalendar, IconClock, IconMapPin, IconFileText, IconTicket, IconCrown, IconCheck, IconCurrencyPeso, IconPlus, IconArchive } from "@tabler/icons-react";
+import { IconArrowLeft, IconPhoto, IconTrash, IconCategory, IconCalendar, IconClock, IconMapPin, IconFileText, IconTicket, IconCurrencyPeso, IconArchive } from "@tabler/icons-react";
 
 import { useEvents } from "../../context/EventContext";
 
-import { imageTypes, steps, emptyEventValues, eventFormValues, filled, doorsLate, selectedTickets as getSelectedTickets, ticketCount as getTicketCount, validTickets, eventPayload } from "../../utils/events";
+import { steps, emptyEventValues, eventFormValues, filled, selectedTickets as getSelectedTickets, ticketCount as getTicketCount, validTickets, eventPayload, dateInPast, dateTaken, doorsOpenAt, nowLocal } from "../../utils/events";
+import { statuses } from "../../utils/filters";
 
 import Reveal from "../../components/ui/Reveal";
+import PictureSlider from "../../components/events/PictureSlider";
+import EventField from "../../components/events/EventField";
+import useDebouncing from "../../components/ui/useDebouncing";
 import useLoadingText from "../../components/ui/useLoadingText";
 import ConfirmModal from "../../components/ui/ConfirmModal";
 
-const inputStyle = "flex-1 bg-white/15 rounded-md p-2 focus:outline-2 focus:outline-cyan-500";
 const buttonStyle = "flex-1 font-bold rounded-md py-3 text-center transition duration-200 enabled:cursor-pointer enabled:hover:brightness-50 disabled:opacity-50";
-const ticketButtonStyle = "relative w-44 flex items-center gap-2 rounded-md px-3 py-3 text-base font-bold cursor-pointer transition duration-200 enabled:hover:brightness-50";
-const ticketButtonColors = { STANDARD: "bg-cyan-500 text-white", VIP: "bg-blue-950 text-yellow-400" };
+const segmentStyle = "-mb-1 border-b-4 pb-3 text-sm transition duration-300";
 
 export default function EventEditor() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const { categories, getEvent, createEvent, updateEvent } = useEvents();
+  const { categories, getEvent, createEvent, updateEvent, getVenueDates } = useEvents();
   const { loading, runner, texter } = useLoadingText();
   const event = getEvent(id);
 
@@ -32,18 +34,24 @@ export default function EventEditor() {
 
   const [step, setStep] = useState(0);
   const [image, setImage] = useState("");
+  const [pictures, setPictures] = useState([]);
+  const [slide, setSlide] = useState(0);
   const [message, setMessage] = useState(null);
+  const [takenDates, setTakenDates] = useState([]);
   const photo = image || event?.thumbnailUrl;
+  const venue = useDebouncing((values.location ?? "").trim());
 
   const tickets = getSelectedTickets(values.ticketTypes);
   const totalTickets = getTicketCount(tickets);
+  const past = !id && dateInPast(values);
+  const taken = dateTaken(values.dateTime, venue ? takenDates : []);
   const ready = [
     filled(values.title),
-    filled(values.location) && filled(values.dateTime) && !doorsLate(values),
+    filled(values.location) && filled(values.dateTime) && filled(values.showTime) && !past && !taken,
     validTickets(tickets)
   ];
 
-  const unsaved = (isDirty || image !== "") && message?.type !== "success";
+  const unsaved = (isDirty || image !== "" || pictures.some(({ id }) => !id) || pictures.length !== (event?.previewImages?.length ?? 0)) && message?.type !== "success";
   const blocker = useBlocker(unsaved);
 
   useEffect(() => {
@@ -58,30 +66,37 @@ export default function EventEditor() {
     setStep(0);
     setImage("");
     setMessage(null);
+    setPictures([]);
+    setSlide(0);
 
     if (!id) reset(emptyEventValues());
   }, [id, reset]);
 
   useEffect(() => {
-    if (id && event) reset(eventFormValues(event));
+    if (id && event) {
+      reset(eventFormValues(event));
+      setPictures(event.previewImages ?? []);
+      setSlide(0);
+    }
   }, [id, event, reset]);
 
-  const handleImage = (e) => {
-    const file = e.target.files[0];
-    e.target.value = "";
-    if (!file) return;
-    if (!imageTypes.includes(file.type)) {
-      setMessage({ type: "error", message: "Only PNG, JPG, and WEBP images are allowed!" });
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = () => setImage(reader.result);
-    reader.readAsDataURL(file);
+  useEffect(() => {
+    if (venue) getVenueDates(venue, id).then(setTakenDates).catch(() => setTakenDates([]));
+  }, [venue, id]);
+
+  const handleError = (text) => setMessage({ type: "error", message: text });
+  const handlePictures = (added) => {
+    setPictures([...pictures, ...added.map((imageUrl) => ({ imageUrl }))]);
+    setSlide(pictures.length);
+  };
+  const handleRemovePicture = () => {
+    setPictures(pictures.filter((_, i) => i !== slide));
+    setSlide(Math.max(0, slide - 1));
   };
 
   const onSubmission = (data) => runner(async () => {
     try {
-      await (id ? updateEvent(id, eventPayload(data, photo)) : createEvent(eventPayload(data, photo)));
+      await (id ? updateEvent(id, eventPayload(data, photo, pictures)) : createEvent(eventPayload(data, photo, pictures)));
       setMessage({ type: "success", message: id ? "Event updated!" : "Event added!" });
     } catch (error) {
       setMessage({ type: "error", message: typeof error.response?.data === "string" ? error.response.data : "Failed to save event!" });
@@ -98,7 +113,11 @@ export default function EventEditor() {
         <h2 className="flex items-center gap-3 -mb-1 border-b-4 border-cyan-500 pb-3 text-3xl font-bold">
           {id ? (
             <>
-              <button onClick={() => navigate("/events")} disabled={loading} className="flex items-center gap-3 transition duration-200 enabled:cursor-pointer enabled:hover:brightness-50">
+              <button
+                onClick={() => navigate("/events")}
+                disabled={loading}
+                className="flex items-center gap-3 transition duration-200 enabled:cursor-pointer enabled:hover:brightness-50"
+              >
                 <IconArrowLeft size={32} />
                 <Reveal variant="type">Edit Event</Reveal>
               </button>
@@ -109,8 +128,17 @@ export default function EventEditor() {
       </div>
       <Reveal variant="lazy" ready={!id || Boolean(event)} className="flex flex-col lg:flex-row bg-zinc-900 overflow-hidden rounded-xl mt-8">
         <div className="relative flex flex-col items-center justify-center bg-gray-100 text-gray-400 min-h-180 overflow-hidden lg:w-1/2">
-          {photo ? (
-            <img src={photo} alt="Event" className="absolute inset-0 size-full object-cover" />
+          {pictures.length ? (
+            <>
+              <PictureSlider images={pictures.map(({ imageUrl }) => imageUrl)} index={slide} alt="Event" onChange={setSlide} />
+              <button
+                type="button"
+                onClick={handleRemovePicture}
+                className="absolute top-3 right-3 bg-black/50 text-white rounded-full p-2 cursor-pointer transition duration-200 hover:brightness-50"
+              >
+                <IconTrash size={24} />
+              </button>
+            </>
           ) : (
             <div className="flex flex-col items-center">
               <IconPhoto size={112} />
@@ -120,11 +148,17 @@ export default function EventEditor() {
           )}
         </div>
         <Reveal variant="right" className="relative flex flex-1 flex-col px-8 pt-8 pb-8">
-          <div className="flex gap-6 border-b border-zinc-700 pb-3">
+          <div className="flex gap-6 border-b-4 border-zinc-800">
             {steps.map((label, i) => (
-              <p key={label} className={`text-sm transition-colors duration-300 ${i === step ? "font-bold text-cyan-400" : "text-gray-500"}`}>
+              <button
+                key={label}
+                type="button"
+                onClick={() => setStep(i)}
+                disabled={!id || loading}
+                className={`${segmentStyle} ${i === step ? "border-cyan-500 font-bold text-white" : "border-transparent text-gray-500"} ${id ? "enabled:cursor-pointer enabled:hover:brightness-50" : ""}`}
+              >
                 {i + 1}. {label}
-              </p>
+              </button>
             ))}
           </div>
           <form noValidate onSubmit={(e) => e.preventDefault()} className="mt-6 flex flex-1 flex-col">
@@ -132,80 +166,68 @@ export default function EventEditor() {
               <div className="flex-1 space-y-4">
                 {step === 0 && (
                   <>
-                    <div className="flex items-center gap-4">
-                      <label htmlFor="title" className="w-28 text-sm">Event Title:</label>
-                      <div className="relative flex-1">
-                        <IconFileText size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-cyan-400" />
-                        <input id="title" type="text" className={`${inputStyle} w-full pl-10`} {...register("title")} />
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <label htmlFor="category" className="w-28 text-sm">Category:</label>
-                      <div className="relative flex-1">
-                        <IconCategory size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-cyan-400" />
-                        <select key={categories.length} id="category" className={`${inputStyle} w-full pl-10 enabled:cursor-pointer`} {...register("category")}>
-                          <option value="" className="bg-zinc-900">No category</option>
-                          {categories.map((category) => (
-                            <option key={category.id} value={category.id} className="bg-zinc-900">{category.name}</option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                    {id && (
-                      <div className="flex items-center gap-4">
-                        <label htmlFor="status" className="w-28 text-sm">Status:</label>
-                        <div className="relative flex-1">
-                          <IconArchive size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-cyan-400" />
-                          <select id="status" className={`${inputStyle} w-full pl-10 enabled:cursor-pointer`} {...register("status")}>
-                            <option value="ACTIVE" className="bg-zinc-900">ACTIVE</option>
-                            <option value="ARCHIVED" className="bg-zinc-900">ARCHIVED</option>
-                          </select>
-                        </div>
-                      </div>
-                    )}
-                    <div>
-                      <label htmlFor="description" className="text-sm">Description:</label>
-                      <div className="relative mt-1">
-                        <IconFileText size={18} className="absolute left-3 top-3 text-cyan-400" />
-                        <textarea id="description" rows={5} className={`${inputStyle} w-full pl-10`} {...register("description")} />
-                      </div>
-                    </div>
+                    <EventField
+                      label="Event Title:"
+                      icon={IconFileText}
+                      placeholder="Enter the event title"
+                      {...register("title")}
+                    />
+                    <EventField
+                      type="select"
+                      label="Category:"
+                      icon={IconCategory}
+                      all="No category"
+                      options={categories.map((category) => ({ value: String(category.id), label: category.name }))}
+                      value={values.category}
+                      onSelect={(value) => setValue("category", value, { shouldDirty: true })}
+                    />
+                    <EventField
+                      type="textarea"
+                      label="Description:"
+                      icon={IconFileText}
+                      placeholder="Enter a short description of the event"
+                      {...register("description")}
+                    />
                   </>
                 )}
                 {step === 1 && (
                   <>
-                    <div className="flex items-center gap-4">
-                      <p className="w-28 text-sm">Event Picture:</p>
-                      <label className={`${buttonStyle} flex cursor-pointer items-center justify-center gap-2 bg-gray-300 text-black hover:brightness-50`}>
-                        <IconPhoto size={20} />
-                        UPLOAD PHOTO
-                        <input type="file" accept={imageTypes.join()} onChange={handleImage} className="hidden" />
-                      </label>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <label htmlFor="location" className="w-28 text-sm">Location:</label>
-                      <div className="relative flex-1">
-                        <IconMapPin size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-cyan-400" />
-                        <input id="location" type="text" className={`${inputStyle} w-full pl-10`} {...register("location")} />
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <label htmlFor="dateTime" className="w-28 text-sm">Date:</label>
-                      <div className="relative flex-1">
-                        <IconCalendar size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-cyan-400" />
-                        <input id="dateTime" type="datetime-local" className={`${inputStyle} w-full pl-10`} {...register("dateTime")} />
-                      </div>
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-4">
-                        <label htmlFor="doorsOpen" className="w-28 text-sm">Doors Open:</label>
-                        <div className="relative flex-1">
-                          <IconClock size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-cyan-400" />
-                          <input id="doorsOpen" type="time" className={`${inputStyle} w-full pl-10`} {...register("doorsOpen")} />
-                        </div>
-                      </div>
-                      {doorsLate(values) && <p className="text-red-500 text-sm mt-1 pl-32">Doors must open before the event starts!</p>}
-                    </div>
+                    <EventField
+                      type="photo"
+                      label="Event Pictures:"
+                      text={`ADD PHOTO (${pictures.length}/4)`}
+                      hint="Up to 4 pictures, each cropped to 800 × 800 px."
+                      limit={4}
+                      count={pictures.length}
+                      width={800}
+                      height={800}
+                      onPick={handlePictures}
+                      onError={handleError}
+                    />
+                    <EventField
+                      label="Location:"
+                      icon={IconMapPin}
+                      placeholder="Enter the event location"
+                      {...register("location")}
+                    />
+                    <EventField
+                      type="date"
+                      label="Date:"
+                      icon={IconCalendar}
+                      min={id ? undefined : nowLocal().slice(0, 10)}
+                      error={past ? "Date cannot be earlier than now!" : taken ? "Location is unavailable on or beside that date!" : ""}
+                      {...register("dateTime")}
+                    />
+                    <EventField type="time" label="Show Time:" icon={IconClock} {...register("showTime")} />
+                    <EventField
+                      type="time"
+                      name="doorsOpen"
+                      label="Doors Open:"
+                      icon={IconClock}
+                      hint="Doors open 2 hours before the show time."
+                      value={doorsOpenAt(values.dateTime, values.showTime).slice(11, 16)}
+                      readOnly
+                    />
                   </>
                 )}
                 {step === 2 && (
@@ -215,51 +237,92 @@ export default function EventEditor() {
                         const enabled = values.ticketTypes[index].enabled;
                         return (
                           <div key={field.id} className="space-y-3">
-                            <button
-                              type="button"
-                              onClick={() => setValue(`ticketTypes.${index}.enabled`, !enabled, { shouldDirty: true })}
-                              className={`${ticketButtonStyle} ${enabled ? ticketButtonColors[field.name] : "bg-zinc-700 text-gray-400"}`}
-                            >
-                              {field.name === "VIP" ? <IconCrown size={22} /> : <IconTicket size={22} />}
-                              {field.name}
-                              {enabled ? <IconCheck size={20} className="absolute right-3" /> : <IconPlus size={20} className="absolute right-3" />}
-                            </button>
+                            <EventField
+                              type="toggle"
+                              label={field.name}
+                              enabled={enabled}
+                              onToggle={() => setValue(`ticketTypes.${index}.enabled`, !enabled, { shouldDirty: true })}
+                            />
                             <div className={`space-y-3 transition-opacity duration-200 ${enabled ? "" : "opacity-50"}`}>
-                              <div className="flex items-center gap-4">
-                                <label htmlFor={`ticketTypes.${index}.price`} className="w-28 text-sm">Price:</label>
-                                <div className="relative flex-1">
-                                  <IconCurrencyPeso size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-cyan-400" />
-                                  <input id={`ticketTypes.${index}.price`} type="number" min="200" step="1" disabled={!enabled} className={`${inputStyle} w-full pl-10 disabled:cursor-not-allowed`} {...register(`ticketTypes.${index}.price`)} />
-                                </div>
-                              </div>
-                              <div className="flex items-center gap-4">
-                                <label htmlFor={`ticketTypes.${index}.availableQuantity`} className="w-28 text-sm">Ticket Quantity:</label>
-                                <input id={`ticketTypes.${index}.availableQuantity`} type="number" min="1" step="1" disabled={!enabled} className={`${inputStyle} disabled:cursor-not-allowed`} {...register(`ticketTypes.${index}.availableQuantity`)} />
-                              </div>
+                              <EventField
+                                type="number"
+                                label="Price:"
+                                icon={IconCurrencyPeso}
+                                placeholder="Must be at least 200"
+                                min="200"
+                                step="1"
+                                disabled={!enabled}
+                                {...register(`ticketTypes.${index}.price`)}
+                              />
+                              <EventField
+                                type="number"
+                                label="Ticket Quantity:"
+                                placeholder="Must be at least 1"
+                                min="1"
+                                step="1"
+                                disabled={!enabled}
+                                {...register(`ticketTypes.${index}.availableQuantity`)}
+                              />
                             </div>
                           </div>
                         );
                       })}
                     </div>
                     <div className="border-t border-zinc-700" />
-                    <div className="flex items-center gap-4">
-                      <label htmlFor="totalTickets" className="w-28 text-sm">No. Tickets:</label>
-                      <div className="relative flex-1">
-                        <IconTicket size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-cyan-400" />
-                        <input id="totalTickets" type="number" className={`${inputStyle} w-full pl-10`} value={totalTickets} readOnly />
-                      </div>
-                    </div>
+                    <EventField
+                      type="number"
+                      name="totalTickets"
+                      label="No. Tickets:"
+                      icon={IconTicket}
+                      value={totalTickets}
+                      readOnly
+                    />
+                  </>
+                )}
+                {step === 3 && (
+                  <>
+                    <EventField
+                      type="photo"
+                      label="Display Picture:"
+                      text="UPLOAD PHOTO"
+                      hint="Recommended: 720 × 576 px (5:4), other sizes are cropped to fit."
+                      width={720}
+                      height={576}
+                      onPick={([picture]) => setImage(picture)}
+                      onError={handleError}
+                    >
+                      {photo && <img src={photo} alt="Display Picture" className="aspect-5/4 h-40 mt-2 ml-32 object-cover rounded-md" />}
+                    </EventField>
+                    {id && (
+                      <EventField
+                        type="select"
+                        label="Status:"
+                        icon={IconArchive}
+                        options={statuses}
+                        value={values.status}
+                        onSelect={(value) => setValue("status", value, { shouldDirty: true })}
+                      />
+                    )}
                   </>
                 )}
               </div>
               <div className="flex gap-6 pt-4">
                 {step > 0 && (
-                  <button type="button" onClick={() => setStep(step - 1)} className={`${buttonStyle} bg-gray-300 text-black`}>
+                  <button
+                    type="button"
+                    onClick={() => setStep(step - 1)}
+                    className={`${buttonStyle} bg-gray-300 text-black`}
+                  >
                     BACK
                   </button>
                 )}
-                <button type="button" onClick={step < 2 ? () => setStep(step + 1) : handleSubmit(onSubmission)} disabled={!ready[step]} className={`${buttonStyle} ${step < 2 ? "bg-cyan-500" : "bg-green-500"}`}>
-                  {step < 2 ? "NEXT" : texter(id ? "SAVE CHANGES" : "ADD EVENT", id ? "SAVING..." : "ADDING...")}
+                <button
+                  type="button"
+                  onClick={step < 3 ? () => setStep(step + 1) : handleSubmit(onSubmission)}
+                  disabled={step < 3 ? !ready[step] : !ready.every(Boolean)}
+                  className={`${buttonStyle} ${step < 3 ? "bg-cyan-500" : "bg-green-500"}`}
+                >
+                  {step < 3 ? "NEXT" : texter(id ? "SAVE CHANGES" : "ADD EVENT", id ? "SAVING..." : "ADDING...")}
                 </button>
               </div>
             </fieldset>

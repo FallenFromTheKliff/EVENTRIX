@@ -29,4 +29,7 @@ public interface EventRepo extends JpaRepository<Event, Long> {
     // NEW: Query to get events liked by a specific user.
     @Query("SELECT e FROM Event e JOIN e.likes l WHERE l.user.id = :userId AND e.status = 'ACTIVE'")
     List<Event> findLikedEventsByUserId(@Param("userId") Long userId);
+
+    @Query("SELECT e.dateTime FROM Event e WHERE LOWER(e.location) = LOWER(:location) AND e.status = com.example.demo.model.EventStatus.ACTIVE AND e.eventId <> :excludeId")
+    List<LocalDateTime> findVenueDates(@Param("location") String location, @Param("excludeId") Long excludeId);
 }

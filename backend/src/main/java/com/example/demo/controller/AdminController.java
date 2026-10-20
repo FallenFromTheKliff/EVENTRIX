@@ -17,6 +17,7 @@ import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -82,6 +83,11 @@ public class AdminController {
     public ResponseEntity<Void> deletePreviewImage(@PathVariable Long imageId) {
         eventService.deletePreviewImage(imageId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/events/venue-dates")
+    public ResponseEntity<List<LocalDate>> getVenueDates(@RequestParam String location, @RequestParam(required = false) Long excludeId) {
+        return ResponseEntity.ok(eventService.getVenueDates(location, excludeId));
     }
 
     // ... (Booking management endpoints are similar, but use updated service) ...

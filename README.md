@@ -20,8 +20,8 @@
 | Role | Modules |
 |---|---|
 | **PUBLIC** | Landing, About Us, Support, FAQs, Login, Register |
-| **USER** | Home, View Events, Bookings, Support, Cart |
-| **ADMIN** | Dashboard, Manage Events, Transactions Log |
+| **USER** | Home, Support, Reviews, View Events, Bookings, Cart |
+| **ADMIN** | Dashboard, Transactions, Add Events, Manage Events |
 
 > **Note:** Both USER and ADMIN roles have access to the Profile and Settings modules.
 
