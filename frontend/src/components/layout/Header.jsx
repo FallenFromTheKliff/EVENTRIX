@@ -5,6 +5,7 @@ import { IconChevronDown, IconChevronUp, IconHeartFilled, IconLogout, IconMenu2,
 import axiosClient from "../../api/axiosClient";
 import { useAuth } from "../../context/AuthContext";
 import { useEvents } from "../../context/EventContext";
+import { useCart } from "../../context/CartContext";
 
 import { sectionsss, menusss } from "../../data/navbox";
 import EVENTRIX from "../../assets/images/EVENTRIX-Title.png";
@@ -20,6 +21,7 @@ const colors = { public: "bg-slate-950", USER: "bg-zinc-800", ADMIN: "bg-cyan-50
 export default function Header({ role = "public" }) {
   const { logout } = useAuth();
   const { favoritesOnly, toggleFavoritesOnly } = useEvents();
+  const { cartItems } = useCart();
   const { loading, runner, texter } = useLoadingText();
   const { pathname } = useLocation();
   
@@ -106,8 +108,9 @@ export default function Header({ role = "public" }) {
                         <IconHeartFilled size={32} />
                       </button>
                     )}
-                    <Link to="/cart" className="transition duration-200 hover:brightness-50">
+                    <Link to="/cart" className="relative transition duration-200 hover:brightness-50">
                       <IconShoppingCartFilled size={32} />
+                      {cartItems.length > 0 && <span className="absolute top-0 right-0 bg-cyan-500 size-3 rounded-full" />}
                     </Link>
                   </>
                 )}

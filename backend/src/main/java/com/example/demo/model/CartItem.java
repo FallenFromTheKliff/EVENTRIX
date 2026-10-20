@@ -3,6 +3,7 @@ package com.example.demo.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.example.demo.model.Events.TicketType;
 
 @Entity
@@ -15,6 +16,7 @@ public class CartItem {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonIgnore
     @ManyToOne(optional = false)
     @JoinColumn(name = "cart_id")
     private Cart cart;

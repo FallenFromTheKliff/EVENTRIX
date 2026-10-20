@@ -39,7 +39,7 @@ export default function Sidebar({ role = "public", mobile = false, isOpen, onClo
       {isOpen && <button onClick={onClose} className="fixed inset-0 z-101 bg-black/80 backdrop-blur-lg lg:hidden" />}
       <aside className={`flex flex-col items-center ${colors[role]} text-white fixed inset-y-0 left-0 z-101 w-72 transition-transform duration-300 ease-in-out ${isOpen ? "translate-x-0" : "-translate-x-full"}`}>
         <div className="flex flex-col items-center h-full">
-          <img src={role === "public" || role === "ADMIN" ? EVENTRIX : EVENTRIXNeon} alt="EVENTRIX" className="w-full pt-6 px-4" />
+          <img src={role === "public" || role === "ADMIN" ? EVENTRIX : EVENTRIXNeon} alt="EVENTRIX" className="w-full pt-6 pb-4 px-4" />
           {role === "public" ? (
             <>
               <div className="mb-6 h-px w-full bg-gray-700" />

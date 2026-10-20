@@ -37,6 +37,7 @@ export default function EventEditor() {
   const [pictures, setPictures] = useState([]);
   const [slide, setSlide] = useState(0);
   const [message, setMessage] = useState(null);
+  const [confirming, setConfirming] = useState(false);
   const [takenDates, setTakenDates] = useState([]);
   const photo = image || event?.thumbnailUrl;
   const venue = useDebouncing((values.location ?? "").trim());
@@ -100,6 +101,8 @@ export default function EventEditor() {
       setMessage({ type: "success", message: id ? "Event updated!" : "Event added!" });
     } catch (error) {
       setMessage({ type: "error", message: typeof error.response?.data === "string" ? error.response.data : "Failed to save event!" });
+    } finally {
+      setConfirming(false);
     }
   });
   const handleClose = () => {
@@ -318,19 +321,36 @@ export default function EventEditor() {
                 )}
                 <button
                   type="button"
-                  onClick={step < 3 ? () => setStep(step + 1) : handleSubmit(onSubmission)}
+                  onClick={step < 3 ? () => setStep(step + 1) : () => setConfirming(true)}
                   disabled={step < 3 ? !ready[step] : !ready.every(Boolean)}
                   className={`${buttonStyle} ${step < 3 ? "bg-cyan-500" : "bg-green-500"}`}
                 >
-                  {step < 3 ? "NEXT" : texter(id ? "SAVE CHANGES" : "ADD EVENT", id ? "SAVING..." : "ADDING...")}
+                  {step < 3 ? "NEXT" : id ? "SAVE CHANGES" : "ADD EVENT"}
                 </button>
               </div>
             </fieldset>
           </form>
         </Reveal>
       </Reveal>
+      {confirming && (
+        <ConfirmModal
+          message={id ? "Save changes?" : "Add event?"}
+          description={id ? "This will update the event with your changes." : "This will publish the event for users to see."}
+          confirmText={texter(id ? "SAVE" : "ADD", id ? "SAVING" : "ADDING")}
+          loading={loading}
+          onConfirm={handleSubmit(onSubmission)}
+          onClose={() => setConfirming(false)}
+        />
+      )}
       {message && <ConfirmModal type={message.type} message={message.message} onClose={handleClose} />}
-      {blocker.state === "blocked" && <ConfirmModal message="Discard changes?" description="Your unsaved changes will be lost." confirmText="DISCARD" onConfirm={blocker.proceed} onClose={blocker.reset} />}
+      {blocker.state === "blocked" && 
+        <ConfirmModal 
+          message="Discard changes?" 
+          description="Your unsaved changes will be lost." 
+          confirmText="DISCARD" 
+          onConfirm={blocker.proceed} 
+          onClose={blocker.reset} 
+        />}
     </div>
   )
 }
