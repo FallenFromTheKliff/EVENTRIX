@@ -1,19 +1,20 @@
-// CartItem.java
 package com.example.demo.model;
 
+import com.example.demo.model.Events.TicketType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.example.demo.model.Events.TicketType;
 
 @Entity
 @Table(name = "cart_items")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class CartItem {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @JsonIgnore
@@ -21,10 +22,12 @@ public class CartItem {
     @JoinColumn(name = "cart_id")
     private Cart cart;
 
-    // store the ticket type chosen
     @ManyToOne(optional = false)
     @JoinColumn(name = "ticket_type_id")
     private TicketType ticketType;
 
     private Integer quantity;
+
+    @Column(name = "booking_reference", unique = true, length = 18)
+    private String bookingReference;
 }

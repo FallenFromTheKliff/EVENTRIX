@@ -113,7 +113,7 @@ export default function EventEditor() {
 
   return (
     <div>
-      <title>{event.title}</title>
+      <title>{id ? event?.title : "Add an Event"}</title>
       <div className="flex border-b-4 border-zinc-900">
         <h2 className="flex items-center gap-3 -mb-1 border-b-4 border-cyan-500 pb-3 text-3xl font-bold">
           {id ? (

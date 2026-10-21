@@ -1,4 +1,5 @@
 import { IconCalendar, IconCategory, IconSearch, IconArchive } from "@tabler/icons-react";
+import { eventStatuses } from "../data/statcheck";
 
 export const eventFilters = [
   { name: "name", type: "search", placeholder: "Search by event name...", icon: IconSearch },
@@ -11,10 +12,7 @@ export const adminEventFilters = [
   { name: "status", type: "select", all: "All Statuses", icon: IconArchive }
 ]
 
-export const statuses = [
-  { value: "ACTIVE", label: "ACTIVE" },
-  { value: "ARCHIVED", label: "ARCHIVED" }
-]
+export const statuses = eventStatuses;
 
 const now = new Date();
 

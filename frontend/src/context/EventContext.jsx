@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
 import axiosClient from "../api/axiosClient";
 import { useAuth } from "./AuthContext";
@@ -46,6 +46,7 @@ export function EventProvider({ children }) {
     setEvents(response.data);
   };
   const getEvent = (slug) => events.find((event) => toSlug(event.title) === slug);
+  const getEventById = async (id) => (await axiosClient.get(`/events/${id}`)).data;
   const handleFilter = (e) => setFilters({ ...filters, [e.target.name]: e.target.value });
   const mutator = async (request) => {
     await request;
@@ -79,6 +80,7 @@ export function EventProvider({ children }) {
       filters,
       handleFilter,
       getEvent,
+      getEventById,
       ...(user?.role === "ADMIN"
         ? { createEvent, updateEvent, deleteEvent, archiveEvent, unarchiveEvent, addImage, deleteImage, getVenueDates }
         : { favoritesOnly, toggleFavoritesOnly, toggleFavorite, addComment })

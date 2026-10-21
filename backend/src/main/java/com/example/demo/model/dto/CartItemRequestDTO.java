@@ -6,4 +6,5 @@ import lombok.Data;
 public class CartItemRequestDTO {
     private Long ticketTypeId;
     private int quantity;
+    private boolean separateItem;
 }

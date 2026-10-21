@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router";
 
-import { IconCalendarEvent, IconHeartFilled, IconMapPin } from "@tabler/icons-react";
-import { priceRange, toSlug } from "../../utils/events";
+import { IconCalendarEvent, IconClock, IconHeartFilled, IconMapPin } from "@tabler/icons-react";
+import { priceRange, toSlug, toTime } from "../../utils/events";
 
 import { useEvents } from "../../context/EventContext";
 import { useCart } from "../../context/CartContext";
@@ -18,7 +18,7 @@ const disabledStyle = "disabled:opacity-50 disabled:cursor-default disabled:hove
 
 export default function EventCard({ event, role }) {
   const { toggleFavorite, deleteEvent } = useEvents();
-  const { addToCart } = useCart();
+  const { quickBuy: addQuickBuyToCart } = useCart();
   const { loading, runner, texter } = useLoadingText();
   const quickBuy = useLoadingText(500);
   const [confirming, setConfirming] = useState(false);
@@ -36,9 +36,17 @@ export default function EventCard({ event, role }) {
 
   const handleQuickBuy = () => {
     if (added) return;
+
     quickBuy.runner(async () => {
       try {
-        await addToCart(event.ticketTypes.find(({ name }) => name?.toUpperCase() === "STANDARD").id, 1);
+        const ticket = event.ticketTypes.find(({ name }) => name?.toUpperCase() === "STANDARD");
+
+        if (!ticket) {
+          setFailed("Standard tickets are unavailable!");
+          return;
+        }
+
+        await addQuickBuyToCart(ticket.id, 1);
         setAdded(true);
         setTimeout(() => setAdded(false), 1000);
       } catch {
@@ -66,6 +74,10 @@ export default function EventCard({ event, role }) {
           <p className="flex items-center gap-2 text-sm text-gray-300">
             <IconCalendarEvent size={18} className="shrink-0 text-cyan-400" />
             {new Date(event.dateTime).toLocaleDateString("en-US", { dateStyle: "full" })}
+          </p>
+          <p className="flex items-center gap-2 text-sm text-gray-300">
+            <IconClock size={18} className="shrink-0 text-cyan-400" />
+            {toTime(event.showTime)}
           </p>
           <p className="flex items-center gap-2 text-sm text-gray-300">
             <IconMapPin size={18} className="shrink-0 text-cyan-400" />
@@ -114,5 +126,5 @@ export default function EventCard({ event, role }) {
       )}
       {failed && <ConfirmModal type="error" message={failed} onClose={() => setFailed("")} />}
     </>
-  )
+  );
 }

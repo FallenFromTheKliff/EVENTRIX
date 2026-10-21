@@ -57,9 +57,7 @@ export const eventFormValues = (event) => ({
   showTime: (event.showTime ?? event.dateTime).slice(11, 16),
   totalTickets: String(event.totalTickets),
   status: event.status,
-  ticketTypes: ticketNames.map((name) =>
-    emptyTicket(name, event.ticketTypes?.find(({ name: type }) => type?.toUpperCase() === name))
-  )
+  ticketTypes: ticketNames.map((name) => emptyTicket(name, findTicket(event.ticketTypes, name)))
 });
 
 export const filled = (value) => String(value ?? "").trim() !== "";
@@ -88,12 +86,24 @@ export const validTickets = (tickets = []) =>
 
 export const priceRange = (ticketTypes = []) =>
   ticketNames
-    .map((name) => ticketTypes.find((ticket) => ticket.name?.toUpperCase() === name))
+    .map((name) => findTicket(ticketTypes, name))
     .filter(Boolean)
     .map(({ price }) => `₱${price}`)
     .join(" - ");
 
-export const emptySelection = { STANDARD: { enabled: false, quantity: "1" }, VIP: { enabled: false, quantity: "1" } };
+export const segmentStyle = "-mb-1 border-b-4 pb-3 transition duration-300";
+export const buttonStyle = "flex-1 font-bold rounded-md py-3 text-center transition duration-200 enabled:cursor-pointer enabled:hover:brightness-50 disabled:opacity-50";
+export const pillStyle = "relative rounded-md bg-white/5 p-3 pl-11 text-gray-300";
+export const iconStyle = "absolute left-3 top-1/2 -translate-y-1/2 text-cyan-400";
+export const tagStyle = "flex w-fit items-center gap-2 rounded-full bg-cyan-500/20 px-3 py-1 text-sm text-cyan-400";
+
+export const emptySelection = Object.fromEntries(ticketNames.map((name) => [name, { enabled: false, quantity: "1" }]));
+
+export const findTicket = (ticketTypes = [], name) => ticketTypes.find((ticket) => ticket.name?.toUpperCase() === name);
+
+export const toDate = (value, dateStyle = "full") => new Date(value).toLocaleDateString("en-US", { dateStyle });
+
+export const toReference = (id) => `EVX${String(id).padStart(8, "0")}`;
 
 export const paymentMethods = [
   { label: "GCASH", image: PaymentGCash, field: "Mobile No.:", placeholder: "Must be 11 digits", pattern: /^[0-9]{11}$/ },
@@ -103,7 +113,7 @@ export const paymentMethods = [
 export const toTime = (value) => value ? new Date(value).toLocaleTimeString("en-US", { timeStyle: "short" }) : "TBA";
 
 export const eventTickets = (ticketTypes, selection, cartItems) => ticketNames.flatMap((name) => {
-  const ticket = ticketTypes.find((type) => type.name?.toUpperCase() === name);
+  const ticket = findTicket(ticketTypes, name);
   return ticket ? [{ ...ticket, ...selection[name], name, carted: cartItems.find((item) => item.ticketType.id === ticket.id)?.quantity ?? 0 }] : [];
 });
 

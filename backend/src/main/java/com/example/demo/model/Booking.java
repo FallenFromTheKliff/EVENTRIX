@@ -1,14 +1,12 @@
 package com.example.demo.model;
 
+import com.example.demo.model.Events.Event;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import com.example.demo.model.Events.Event;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-
-// NEW: Enum for booking status
 
 @Entity
 @Table(name = "booking")
@@ -37,11 +35,13 @@ public class Booking {
     @Column(name = "total_amount", nullable = false, precision = 10, scale = 2)
     private BigDecimal totalAmount;
 
-    // REFACTORED: Use Enum for status
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private BookingStatus status;
 
     @Column(name = "admin_notes", columnDefinition = "TEXT")
     private String adminNotes;
+
+    @Column(name = "booking_reference", unique = true, length = 18)
+    private String bookingReference;
 }

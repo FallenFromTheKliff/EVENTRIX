@@ -1,6 +1,6 @@
 <h1 align="center">EVENTRIX</h1>
 
-> EVENTRIX is a full-stack Event Management Platform developed as a 4-week sprint final project. The platform lets users browse, book, and pay for events, while giving administrators tools to manage events, review event reception, and keep track of transactions.
+> EVENTRIX is a full-stack Event Management Platform developed as a 4-week sprint final project. The platform lets users browse, book, and pay for events, while giving administrators tools to manage events, respond to event receptions, and keep track of transactions.
 
 ---
 
@@ -16,14 +16,17 @@
 ---
 
 ## SYSTEM MODULES
+### General
+
+> **USER** and **ADMIN** roles have access to the Profile and Settings.
+
+### Website
 
 | Role | Modules |
 |---|---|
 | **PUBLIC** | Landing, About Us, Support, FAQs, Login, Register |
-| **USER** | Home, Support, Reviews, View Events, Bookings, Cart |
-| **ADMIN** | Dashboard, Transactions, Add Events, Manage Events |
-
-> **Note:** Both USER and ADMIN roles have access to the Profile and Settings modules.
+| **USER** | Home, Support, Reviews, Events, Bookings, Cart |
+| **ADMIN** | Analytics, Ticket Orders, Transaction History, Reception, Events |
 
 ---
 
@@ -33,29 +36,38 @@
 EVENTRIX/
 ├── backend/
 │   └── src/
-│       ├── main/java/com/example/demo/
-│       │   ├── config/                     # Spring Security setup
-│       │   ├── controller/
-│       │   ├── jwt/                        # token creation/validation
-│       │   ├── model/
-│       │   │   ├── dto/
-│       │   │   └── Events/                 # Event-related entities
-│       │   ├── repository/
-│       │   └── services/
+│       ├── main/
+│       │   ├── java/com/example/demo//java/com/example/demo/
+│       │   │   ├── config/                     # Spring Security setup
+│       │   │   ├── controller/
+│       │   │   ├── jwt/                        # token creation/validation
+│       │   │   ├── model/
+│       │   │   │   ├── dto/
+│       │   │   │   └── Events/
+│       │   │   ├── repository/
+│       │   │   ├── services/
+│       │   └── resources/
+│       │       ├── static/
+│       │       └── templates/
 │       └── test/
+│
 └── frontend/
     ├── public/
     └── src/
-        ├── api/
-        ├── assets/                         # fonts/ and images/
+        ├── api/                                # axios calls
+        ├── assets/
+        │   ├── fonts/
+        │   └── images/
         ├── components/
         │   ├── auth/
+        │   ├── events/
         │   ├── layout/
         │   └── ui/
         ├── context/
-        ├── data/                           # navs and static content
-        └── pages/                          # Public and Authenticated pages
-            └── admin/
+        ├── data/                               # navs and static content
+        ├── pages/
+        │   └── admin/
+        └── utils/
 ```
 
 ---

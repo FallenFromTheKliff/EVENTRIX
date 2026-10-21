@@ -6,7 +6,7 @@ import { IconArrowLeft, IconCalendarEvent, IconClock, IconCurrencyPeso, IconFile
 import { useEvents } from "../context/EventContext";
 import { useCart } from "../context/CartContext";
 
-import { emptySelection, paymentMethods, eventTickets, selectedTickets, totalPrice, validSeats, toTime } from "../utils/events";
+import { emptySelection, paymentMethods, eventTickets, selectedTickets, totalPrice, validSeats, segmentStyle, buttonStyle, pillStyle, iconStyle, tagStyle, toDate, toTime } from "../utils/events";
 
 import Reveal from "../components/ui/Reveal";
 import PictureSlider from "../components/events/PictureSlider";
@@ -16,10 +16,6 @@ import ConfirmModal from "../components/ui/ConfirmModal";
 
 import Placeholder from "../assets/images/EVENTRIX-Placeholder.jpeg";
 
-const segmentStyle = "-mb-1 border-b-4 pb-3 transition duration-300";
-const buttonStyle = "flex-1 font-bold rounded-md py-3 text-center transition duration-200 enabled:cursor-pointer enabled:hover:brightness-50 disabled:opacity-50";
-const pillStyle = "relative rounded-md bg-white/5 p-3 pl-11 text-gray-300";
-const iconStyle = "absolute left-3 top-1/2 -translate-y-1/2 text-cyan-400";
 const methodStyle = "flex flex-1 items-center justify-center bg-white rounded-md py-3 cursor-pointer transition-colors duration-200 hover:bg-gray-300";
 
 export default function EventView() {
@@ -40,6 +36,7 @@ export default function EventView() {
 
   const event = getEvent(slug);
   if (!event) return null;
+
   const images = event.previewImages?.length ? event.previewImages.map(({ imageUrl }) => imageUrl) : [Placeholder];
 
   const tickets = eventTickets(event.ticketTypes, selection, cartItems);
@@ -49,6 +46,18 @@ export default function EventView() {
   const valid = validSeats(chosen);
 
   const updateTicket = (name, change) => setSelection({ ...selection, [name]: { ...selection[name], ...change } });
+
+  const ticketPills = (getText) => (
+    <div className="flex gap-4">
+      {tickets.map((ticket) => (
+        <p key={ticket.name} className={`${pillStyle} flex-1`}>
+          <IconTicket size={20} className={iconStyle} />
+          {ticket.name}: {getText(ticket)}
+        </p>
+      ))}
+    </div>
+  );
+
   const handleAdd = () => runner(async () => {
     try {
       for (const ticket of chosen) await addToCart(ticket.id, Number(ticket.quantity));
@@ -57,7 +66,9 @@ export default function EventView() {
       setMessage({ type: "error", message: "Failed to add to cart!" });
     }
   });
+
   const handlePay = () => runner(() => setMessage({ type: "success", message: "Payment successful!" }));
+
   const handleClose = () => {
     setMessage(null);
     if (message.type === "success") navigate("/events");
@@ -98,10 +109,10 @@ export default function EventView() {
               {segment === "Details" && (
                 <>
                   <h3 className="text-3xl font-bold">{event.title}</h3>
-                  {event.category && <p className="flex w-fit items-center gap-2 rounded-full bg-cyan-500/20 px-3 py-1 text-sm text-cyan-400"><IconTag size={18} />{event.category.name}</p>}
+                  {event.category && <p className={tagStyle}><IconTag size={18} />{event.category.name}</p>}
                   <p className={pillStyle}>
                     <IconCalendarEvent size={20} className={iconStyle} />
-                    {new Date(event.dateTime).toLocaleDateString("en-US", { dateStyle: "full" })}
+                    {toDate(event.dateTime)}
                   </p>
                   <p className={pillStyle}>
                     <IconMapPin size={20} className={iconStyle} />
@@ -117,14 +128,7 @@ export default function EventView() {
                       Show Time: {toTime(event.showTime)}
                     </p>
                   </div>
-                  <div className="flex gap-4">
-                    {tickets.map(({ name, availableQuantity }) => (
-                      <p key={name} className={`${pillStyle} flex-1`}>
-                        <IconTicket size={20} className={iconStyle} />
-                        {name}: {availableQuantity > 0 ? `${availableQuantity} left` : "Sold out"}
-                      </p>
-                    ))}
-                  </div>
+                  {ticketPills(({ availableQuantity }) => availableQuantity > 0 ? `${availableQuantity} left` : "Sold out")}
                   <EventField type="textarea" name="description" label="Description:" icon={IconFileText} value={event.description ?? ""} readOnly />
                 </>
               )}
@@ -182,14 +186,7 @@ export default function EventView() {
                     onChange={(e) => setAccount(e.target.value)}
                   />
                   <div className="border-t border-zinc-700" />
-                  <div className="flex gap-4">
-                    {tickets.map(({ name, carted }) => (
-                      <p key={name} className={`${pillStyle} flex-1`}>
-                        <IconTicket size={20} className={iconStyle} />
-                        {name}: {carted}
-                      </p>
-                    ))}
-                  </div>
+                  {ticketPills(({ carted }) => carted)}
                   <EventField type="number" name="totalPrice" label="Total Price:" icon={IconCurrencyPeso} value={cartTotal} readOnly />
                 </>
               )}
@@ -221,5 +218,5 @@ export default function EventView() {
       </Reveal>
       {message && <ConfirmModal type={message.type} message={message.message} onClose={handleClose} />}
     </div>
-  )
+  );
 }
