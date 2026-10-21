@@ -2,9 +2,10 @@ import { useState } from "react";
 import { Link } from "react-router";
 
 import { IconCalendarEvent, IconHeartFilled, IconMapPin } from "@tabler/icons-react";
-import { priceRange } from "../../utils/events";
+import { priceRange, toSlug } from "../../utils/events";
 
 import { useEvents } from "../../context/EventContext";
+import { useCart } from "../../context/CartContext";
 
 import useLoadingText from "../ui/useLoadingText";
 import ConfirmModal from "../ui/ConfirmModal";
@@ -13,25 +14,42 @@ import Placeholder from "../../assets/images/EVENTRIX-Placeholder.jpeg";
 
 const colors = { USER: "bg-zinc-800", ADMIN: "bg-zinc-900" };
 const buttonStyle = "flex-1 font-bold rounded-md py-2 cursor-pointer transition duration-200 hover:brightness-50";
+const disabledStyle = "disabled:opacity-50 disabled:cursor-default disabled:hover:brightness-100 aria-disabled:opacity-50 aria-disabled:cursor-default aria-disabled:hover:brightness-100";
 
 export default function EventCard({ event, role }) {
   const { toggleFavorite, deleteEvent } = useEvents();
+  const { addToCart } = useCart();
   const { loading, runner, texter } = useLoadingText();
+  const quickBuy = useLoadingText(500);
   const [confirming, setConfirming] = useState(false);
-  const [failed, setFailed] = useState(false);
+  const [failed, setFailed] = useState("");
+  const [added, setAdded] = useState(false);
 
   const handleDelete = () => runner(async () => {
     try {
       await deleteEvent(event.eventId);
     } catch {
       setConfirming(false);
-      setFailed(true);
+      setFailed("Failed to delete event!");
     }
   });
 
+  const handleQuickBuy = () => {
+    if (added) return;
+    quickBuy.runner(async () => {
+      try {
+        await addToCart(event.ticketTypes.find(({ name }) => name?.toUpperCase() === "STANDARD").id, 1);
+        setAdded(true);
+        setTimeout(() => setAdded(false), 1000);
+      } catch {
+        setFailed("Failed to add to cart!");
+      }
+    });
+  };
+
   return (
     <>
-      <div className={`flex flex-col h-full ${colors[role]} overflow-hidden rounded-xl shadow-2xl shadow-black/60`}>
+      <div className={`flex flex-col h-full min-h-136 ${colors[role]} overflow-hidden rounded-xl shadow-2xl shadow-black/60`}>
         <div className="relative">
           <img src={event.thumbnailUrl || Placeholder} alt={event.title} className="h-72 w-full object-cover" />
           {role === "USER" && (
@@ -47,26 +65,41 @@ export default function EventCard({ event, role }) {
           <h3 className="text-2xl font-bold">{event.title}</h3>
           <p className="flex items-center gap-2 text-sm text-gray-300">
             <IconCalendarEvent size={18} className="shrink-0 text-cyan-400" />
-            {new Date(event.dateTime).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })}
+            {new Date(event.dateTime).toLocaleDateString("en-US", { dateStyle: "full" })}
           </p>
           <p className="flex items-center gap-2 text-sm text-gray-300">
             <IconMapPin size={18} className="shrink-0 text-cyan-400" />
             {event.location}
           </p>
-          <p className="text-lg font-semibold text-cyan-400">{priceRange(event.ticketTypes)}</p>
         </div>
-        <div className="mt-auto flex gap-3 px-4 pb-4">
-          {role === "ADMIN" ? (
-            <>
-              <Link to={`/edit-event/${event.eventId}`} className={`${buttonStyle} bg-yellow-500 text-center`}>EDIT</Link>
-              <button onClick={() => setConfirming(true)} className={`${buttonStyle} bg-red-500`}>DELETE</button>
-            </>
-          ) : (
-            <>
-              <Link to={`/events/${event.eventId}`} className={`${buttonStyle} bg-cyan-500 text-center`}>VIEW</Link>
-              <button className={`${buttonStyle} bg-yellow-500`}>QUICK BUY</button>
-            </>
-          )}
+        <div className="mt-auto space-y-3 px-4 pb-4">
+          <p className="text-lg font-semibold text-cyan-400">{priceRange(event.ticketTypes)}</p>
+          <div className="flex gap-3">
+            {role === "ADMIN" ? (
+              <>
+                <Link to={`/edit-event/${toSlug(event.title)}`} className={`${buttonStyle} bg-yellow-500 text-center`}>EDIT</Link>
+                <button onClick={() => setConfirming(true)} className={`${buttonStyle} bg-red-500`}>DELETE</button>
+              </>
+            ) : (
+              <>
+                <Link
+                  to={`/events/${toSlug(event.title)}`}
+                  onClick={(e) => quickBuy.loading && e.preventDefault()}
+                  aria-disabled={quickBuy.loading}
+                  className={`${buttonStyle} ${disabledStyle} bg-cyan-500 text-center`}
+                >
+                  VIEW
+                </Link>
+                <button
+                  onClick={handleQuickBuy}
+                  disabled={quickBuy.loading}
+                  className={`${buttonStyle} ${disabledStyle} bg-yellow-500`}
+                >
+                  {added ? "ADDED!" : quickBuy.texter("QUICK BUY", "ADDING")}
+                </button>
+              </>
+            )}
+          </div>
         </div>
       </div>
       {confirming && (
@@ -79,7 +112,7 @@ export default function EventCard({ event, role }) {
           onClose={() => setConfirming(false)}
         />
       )}
-      {failed && <ConfirmModal type="error" message="Failed to delete event!" onClose={() => setFailed(false)} />}
+      {failed && <ConfirmModal type="error" message={failed} onClose={() => setFailed("")} />}
     </>
   )
 }

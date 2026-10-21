@@ -16,6 +16,7 @@ import EventView from "./pages/EventView";
 import EventEditor from "./pages/admin/EventEditor";
 import Bookings from "./pages/Bookings";
 import Transactions from "./pages/admin/Transactions";
+import Cart from "./pages/Cart";
 
 const router = createBrowserRouter(createRoutesFromElements(
   <>
@@ -29,13 +30,14 @@ const router = createBrowserRouter(createRoutesFromElements(
         <Route path="/support" element={<SupportFAQs />} />
         <Route element={<ProtectedRoute roles={["USER"]} />}>
           <Route path="/home" element={<Home />} />
-          <Route path="/events/:id" element={<EventView />} />
+          <Route path="/events/:slug" element={<EventView />} />
           <Route path="/bookings" element={<Bookings />} />
+          <Route path="/cart" element={<Cart />} />
         </Route>
         <Route element={<ProtectedRoute roles={["ADMIN"]} />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/add-event" element={<EventEditor />} />
-          <Route path="/edit-event/:id" element={<EventEditor />} />
+          <Route path="/edit-event/:slug" element={<EventEditor />} />
           <Route path="/transactions" element={<Transactions />} />
         </Route>
       </Route>

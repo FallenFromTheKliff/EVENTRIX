@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { IconLoader2 } from "@tabler/icons-react";
 
-export default function useLoadingText() {
+export default function useLoadingText(delay = 1000) {
   const [loading, setLoading] = useState(false);
 
   const runner = async (action) => {
     setLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, delay));
     try {
       await action();
     } finally {

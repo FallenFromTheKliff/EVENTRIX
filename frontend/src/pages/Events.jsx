@@ -15,6 +15,7 @@ export default function Events() {
 
   return (
     <div>
+      <title>Events - EVENTRIX</title>
       <div className="flex flex-wrap items-end gap-x-4">
         <h2 className="relative -mb-1 border-b-4 border-cyan-500 pb-3 text-3xl font-bold">
           <Reveal variant="type">{user.role === "ADMIN" ? "Manage Events" : "Ongoing Events"}</Reveal>

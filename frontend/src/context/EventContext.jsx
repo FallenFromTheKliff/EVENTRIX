@@ -3,9 +3,9 @@ import { createContext, useContext, useEffect, useState } from "react";
 import axiosClient from "../api/axiosClient";
 import { useAuth } from "./AuthContext";
 
-import useDebouncing from "../components/ui/useDebouncing";
-
+import { toSlug } from "../utils/events";
 import { months } from "../utils/filters";
+import useDebouncing from "../utils/useDebouncing";
 
 const EventContext = createContext();
 
@@ -45,7 +45,7 @@ export function EventProvider({ children }) {
     const response = await axiosClient.get(toUrl(user), { params: toParams(filters) });
     setEvents(response.data);
   };
-  const getEvent = (id) => events.find((event) => event.eventId === Number(id));
+  const getEvent = (slug) => events.find((event) => toSlug(event.title) === slug);
   const handleFilter = (e) => setFilters({ ...filters, [e.target.name]: e.target.value });
   const mutator = async (request) => {
     await request;

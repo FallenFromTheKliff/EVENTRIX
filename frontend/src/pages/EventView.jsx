@@ -1,12 +1,12 @@
 import { useState } from "react";
 
-import { Link, useParams } from "react-router";
-import { IconArrowLeft, IconBrandPaypal, IconCurrencyPeso, IconFileText, IconMapPin, IconTag, IconTicket, IconWallet } from "@tabler/icons-react";
+import { Link, useLocation, useNavigate, useParams } from "react-router";
+import { IconArrowLeft, IconCalendarEvent, IconClock, IconCurrencyPeso, IconFileText, IconMapPin, IconTag, IconTicket } from "@tabler/icons-react";
 
 import { useEvents } from "../context/EventContext";
 import { useCart } from "../context/CartContext";
 
-import { ticketNames } from "../utils/events";
+import { emptySelection, paymentMethods, eventTickets, selectedTickets, totalPrice, validSeats, toTime } from "../utils/events";
 
 import Reveal from "../components/ui/Reveal";
 import PictureSlider from "../components/events/PictureSlider";
@@ -16,66 +16,61 @@ import ConfirmModal from "../components/ui/ConfirmModal";
 
 import Placeholder from "../assets/images/EVENTRIX-Placeholder.jpeg";
 
-const segments = ["Details", "Seats", "Payment"];
-const segmentStyle = "-mb-1 border-b-4 pb-3 text-sm transition duration-300";
+const segmentStyle = "-mb-1 border-b-4 pb-3 transition duration-300";
+const buttonStyle = "flex-1 font-bold rounded-md py-3 text-center transition duration-200 enabled:cursor-pointer enabled:hover:brightness-50 disabled:opacity-50";
 const pillStyle = "relative rounded-md bg-white/5 p-3 pl-11 text-gray-300";
 const iconStyle = "absolute left-3 top-1/2 -translate-y-1/2 text-cyan-400";
-const methodStyle = "flex flex-1 items-center justify-center gap-2 rounded-md py-3 font-bold cursor-pointer transition duration-200 hover:brightness-50";
-const payStyle = "mt-4 bg-green-500 w-full font-bold rounded-md py-3 transition duration-200 enabled:cursor-pointer enabled:hover:brightness-50 disabled:opacity-50";
-
-const emptySelection = { STANDARD: { enabled: false, quantity: "1" }, VIP: { enabled: false, quantity: "1" } };
-const methods = [
-  { label: "GCASH", icon: IconWallet, color: "bg-blue-600", field: "Mobile No.:", placeholder: "Must be 11 digits", pattern: /^[0-9]{11}$/ },
-  { label: "PAYPAL", icon: IconBrandPaypal, color: "bg-blue-900", field: "Email:", placeholder: "Enter your PayPal email", pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ }
-];
+const methodStyle = "flex flex-1 items-center justify-center bg-white rounded-md py-3 cursor-pointer transition-colors duration-200 hover:bg-gray-300";
 
 export default function EventView() {
-  const { id } = useParams();
+  const { slug } = useParams();
+  const { state } = useLocation();
+  const navigate = useNavigate();
   const { getEvent } = useEvents();
-  const { addToCart } = useCart();
+  const { cartItems, addToCart } = useCart();
   const { loading, runner, texter } = useLoadingText();
 
+  const segments = state?.payment ? ["Payment"] : ["Details", "Seats"];
   const [slide, setSlide] = useState(0);
-  const [segment, setSegment] = useState(0);
+  const [segment, setSegment] = useState(segments[0]);
   const [selection, setSelection] = useState(emptySelection);
-  const [method, setMethod] = useState(methods[0]);
+  const [method, setMethod] = useState(paymentMethods[0]);
   const [account, setAccount] = useState("");
   const [message, setMessage] = useState(null);
 
-  const event = getEvent(id);
+  const event = getEvent(slug);
   if (!event) return null;
   const images = event.previewImages?.length ? event.previewImages.map(({ imageUrl }) => imageUrl) : [Placeholder];
 
-  const tickets = ticketNames
-    .map((name) => ({ ...event.ticketTypes.find((ticket) => ticket.name?.toUpperCase() === name), ...selection[name], name }))
-    .filter((ticket) => ticket.id);
-  const chosen = tickets.filter(({ enabled }) => enabled);
-  const total = chosen.reduce((sum, { price, quantity }) => sum + price * Number(quantity), 0);
-  const valid = chosen.length > 0 && chosen.every(({ quantity, availableQuantity }) => Number.isInteger(Number(quantity)) && Number(quantity) >= 1 && Number(quantity) <= availableQuantity);
+  const tickets = eventTickets(event.ticketTypes, selection, cartItems);
+  const chosen = selectedTickets(tickets);
+  const total = totalPrice(chosen, "quantity");
+  const cartTotal = totalPrice(tickets, "carted");
+  const valid = validSeats(chosen);
 
   const updateTicket = (name, change) => setSelection({ ...selection, [name]: { ...selection[name], ...change } });
-  const handlePay = () => runner(() => setMessage({ type: "success", message: "Payment successful!" }));
-  const handleClose = async () => {
-    const { type } = message;
-    setMessage(null);
-    if (type !== "success") return;
+  const handleAdd = () => runner(async () => {
     try {
       for (const ticket of chosen) await addToCart(ticket.id, Number(ticket.quantity));
-      setSelection(emptySelection);
-      setAccount("");
-      setSegment(0);
+      setMessage({ type: "success", message: "Added to cart!" });
     } catch {
       setMessage({ type: "error", message: "Failed to add to cart!" });
     }
+  });
+  const handlePay = () => runner(() => setMessage({ type: "success", message: "Payment successful!" }));
+  const handleClose = () => {
+    setMessage(null);
+    if (message.type === "success") navigate("/events");
   };
 
   return (
     <div>
+      <title>{event.title}</title>
       <div className="flex border-b-4 border-zinc-900">
         <h2 className="flex items-center gap-3 -mb-1 border-b-4 border-cyan-500 pb-3 text-3xl font-bold">
           <Link to="/events" className="flex items-center gap-3 transition duration-200 hover:brightness-50">
             <IconArrowLeft size={32} />
-            <Reveal variant="type">View Event</Reveal>
+            <Reveal variant="type">Ongoing Events</Reveal>
           </Link>
           <span>/ <Reveal variant="type">{event.title}</Reveal></span>
         </h2>
@@ -86,13 +81,13 @@ export default function EventView() {
         </div>
         <Reveal variant="right" className="relative flex flex-1 flex-col p-8">
           <div className="flex gap-6 border-b-4 border-zinc-900">
-            {segments.map((label, i) => (
+            {segments.map((label) => (
               <button
                 key={label}
                 type="button"
-                onClick={() => setSegment(i)}
+                onClick={() => setSegment(label)}
                 disabled={loading}
-                className={`${segmentStyle} ${i === segment ? "border-cyan-500 font-bold text-white" : "border-transparent text-gray-500"} enabled:cursor-pointer enabled:hover:brightness-50`}
+                className={`${segmentStyle} ${label === segment ? "border-cyan-500 text-white" : "border-transparent text-gray-500"} enabled:cursor-pointer enabled:hover:brightness-50`}
               >
                 {label}
               </button>
@@ -100,54 +95,72 @@ export default function EventView() {
           </div>
           <fieldset disabled={loading} className="mt-6 flex flex-1 min-w-0 flex-col">
             <div className="flex-1 space-y-4">
-              {segment === 0 && (
+              {segment === "Details" && (
                 <>
                   <h3 className="text-3xl font-bold">{event.title}</h3>
                   {event.category && <p className="flex w-fit items-center gap-2 rounded-full bg-cyan-500/20 px-3 py-1 text-sm text-cyan-400"><IconTag size={18} />{event.category.name}</p>}
                   <p className={pillStyle}>
+                    <IconCalendarEvent size={20} className={iconStyle} />
+                    {new Date(event.dateTime).toLocaleDateString("en-US", { dateStyle: "full" })}
+                  </p>
+                  <p className={pillStyle}>
                     <IconMapPin size={20} className={iconStyle} />
                     {event.location}
                   </p>
-                  <p className={`${pillStyle} whitespace-pre-line`}>
-                    <IconFileText size={20} className="absolute left-3 top-3 text-cyan-400" />
-                    {event.description}
-                  </p>
-                  <div className={pillStyle}>
-                    <IconTicket size={20} className={iconStyle} />
-                    <div className="flex flex-wrap gap-x-6">
-                      {tickets.map(({ name, availableQuantity }) => (
-                        <p key={name}>{name}: {availableQuantity > 0 ? `${availableQuantity} left` : "Sold out"}</p>
-                      ))}
-                    </div>
+                  <div className="flex gap-4">
+                    <p className={`${pillStyle} flex-1`}>
+                      <IconClock size={20} className={iconStyle} />
+                      Doors Open: {toTime(event.doorsOpen)}
+                    </p>
+                    <p className={`${pillStyle} flex-1`}>
+                      <IconClock size={20} className={iconStyle} />
+                      Show Time: {toTime(event.showTime)}
+                    </p>
                   </div>
+                  <div className="flex gap-4">
+                    {tickets.map(({ name, availableQuantity }) => (
+                      <p key={name} className={`${pillStyle} flex-1`}>
+                        <IconTicket size={20} className={iconStyle} />
+                        {name}: {availableQuantity > 0 ? `${availableQuantity} left` : "Sold out"}
+                      </p>
+                    ))}
+                  </div>
+                  <EventField type="textarea" name="description" label="Description:" icon={IconFileText} value={event.description ?? ""} readOnly />
                 </>
               )}
-              {segment === 1 && tickets.map(({ name, price, quantity, availableQuantity, enabled }) => (
-                <div key={name} className="space-y-3">
-                  <div className="flex items-center gap-4">
-                    <EventField type="toggle" label={name} enabled={enabled} onToggle={() => updateTicket(name, { enabled: !enabled })} />
-                    <p className="text-xl font-semibold text-cyan-400">₱{price}</p>
-                  </div>
-                  <div className={`transition-opacity duration-200 ${enabled ? "" : "opacity-50"}`}>
-                    <EventField
-                      type="number"
-                      name={`${name}Quantity`}
-                      label="Quantity:"
-                      placeholder="Must be at least 1"
-                      min="1"
-                      max={availableQuantity}
-                      step="1"
-                      disabled={!enabled}
-                      value={quantity}
-                      onChange={(e) => updateTicket(name, { quantity: e.target.value })}
-                    />
-                  </div>
-                </div>
-              ))}
-              {segment === 2 && (
+              {segment === "Seats" && (
+                <>
+                  {tickets.map(({ name, price, quantity, availableQuantity, enabled }) => (
+                    <div key={name} className="space-y-3">
+                      <div className="flex items-center gap-4">
+                        <EventField type="toggle" label={name} enabled={enabled} onToggle={() => updateTicket(name, { enabled: !enabled })} />
+                        <p className="text-xl font-semibold text-cyan-400">₱{price}</p>
+                      </div>
+                      <div className={`space-y-3 transition-opacity duration-200 ${enabled ? "" : "opacity-50"}`}>
+                        <EventField type="number" name={`${name}Left`} label="Seats Left:" value={availableQuantity} readOnly />
+                        <EventField
+                          type="number"
+                          name={`${name}Quantity`}
+                          label="Quantity:"
+                          placeholder="Must be at least 1"
+                          min="1"
+                          max={availableQuantity}
+                          step="1"
+                          disabled={!enabled}
+                          value={quantity}
+                          onChange={(e) => updateTicket(name, { quantity: e.target.value })}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                  <div className="border-t border-zinc-700" />
+                  <EventField type="number" name="totalPrice" label="Total Price:" icon={IconCurrencyPeso} value={total} readOnly />
+                </>
+              )}
+              {segment === "Payment" && (
                 <>
                   <div className="flex gap-4">
-                    {methods.map((item) => (
+                    {paymentMethods.map((item) => (
                       <button
                         key={item.label}
                         type="button"
@@ -155,10 +168,9 @@ export default function EventView() {
                           setMethod(item);
                           setAccount("");
                         }}
-                        className={`${methodStyle} ${method === item ? `${item.color} text-white` : "bg-zinc-700 text-gray-400"}`}
+                        className={`${methodStyle} ${method === item ? "ring-4 ring-cyan-500" : ""}`}
                       >
-                        <item.icon size={22} />
-                        {item.label}
+                        <img src={item.image} alt={item.label} className="h-8" />
                       </button>
                     ))}
                   </div>
@@ -169,25 +181,41 @@ export default function EventView() {
                     value={account}
                     onChange={(e) => setAccount(e.target.value)}
                   />
-                </>
-              )}
-              {segment > 0 && (
-                <>
                   <div className="border-t border-zinc-700" />
-                  <EventField type="number" name="totalPrice" label="Total Price:" icon={IconCurrencyPeso} value={total} readOnly />
+                  <div className="flex gap-4">
+                    {tickets.map(({ name, carted }) => (
+                      <p key={name} className={`${pillStyle} flex-1`}>
+                        <IconTicket size={20} className={iconStyle} />
+                        {name}: {carted}
+                      </p>
+                    ))}
+                  </div>
+                  <EventField type="number" name="totalPrice" label="Total Price:" icon={IconCurrencyPeso} value={cartTotal} readOnly />
                 </>
               )}
             </div>
-            {segment === 2 && (
-              <button
-                type="button"
-                onClick={handlePay}
-                disabled={!valid || !method.pattern.test(account)}
-                className={payStyle}
-              >
-                {texter("PAY", "PAYING")}
-              </button>
-            )}
+            <div className="flex gap-6 pt-4">
+              {segment === "Details" && (
+                <button type="button" onClick={() => setSegment("Seats")} className={`${buttonStyle} bg-cyan-500`}>
+                  NEXT
+                </button>
+              )}
+              {segment === "Seats" && (
+                <>
+                  <button type="button" onClick={() => setSegment("Details")} className={`${buttonStyle} bg-gray-300 text-black`}>
+                    BACK
+                  </button>
+                  <button type="button" onClick={handleAdd} disabled={!valid} className={`${buttonStyle} bg-green-500`}>
+                    {texter("ADD TO CART", "ADDING")}
+                  </button>
+                </>
+              )}
+              {segment === "Payment" && (
+                <button type="button" onClick={handlePay} disabled={cartTotal === 0 || !method.pattern.test(account)} className={`${buttonStyle} bg-green-500`}>
+                  {texter("PAY", "PAYING")}
+                </button>
+              )}
+            </div>
           </fieldset>
         </Reveal>
       </Reveal>

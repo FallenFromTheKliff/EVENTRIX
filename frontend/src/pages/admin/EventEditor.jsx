@@ -11,20 +11,21 @@ import { statuses } from "../../utils/filters";
 import Reveal from "../../components/ui/Reveal";
 import PictureSlider from "../../components/events/PictureSlider";
 import EventField from "../../components/events/EventField";
-import useDebouncing from "../../components/ui/useDebouncing";
+import useDebouncing from "../../utils/useDebouncing";
 import useLoadingText from "../../components/ui/useLoadingText";
 import ConfirmModal from "../../components/ui/ConfirmModal";
 
 const buttonStyle = "flex-1 font-bold rounded-md py-3 text-center transition duration-200 enabled:cursor-pointer enabled:hover:brightness-50 disabled:opacity-50";
-const segmentStyle = "-mb-1 border-b-4 pb-3 text-sm transition duration-300";
+const segmentStyle = "-mb-1 border-b-4 pb-3 transition duration-300";
 
 export default function EventEditor() {
-  const { id } = useParams();
+  const { slug: id } = useParams();
   const navigate = useNavigate();
 
   const { categories, getEvent, createEvent, updateEvent, getVenueDates } = useEvents();
   const { loading, runner, texter } = useLoadingText();
   const event = getEvent(id);
+  const eventId = event?.eventId;
 
   const { register, handleSubmit, control, reset, setValue, formState: { isDirty } } = useForm({
     defaultValues: emptyEventValues()
@@ -82,8 +83,8 @@ export default function EventEditor() {
   }, [id, event, reset]);
 
   useEffect(() => {
-    if (venue) getVenueDates(venue, id).then(setTakenDates).catch(() => setTakenDates([]));
-  }, [venue, id]);
+    if (venue) getVenueDates(venue, eventId).then(setTakenDates).catch(() => setTakenDates([]));
+  }, [venue, eventId]);
 
   const handleError = (text) => setMessage({ type: "error", message: text });
   const handlePictures = (added) => {
@@ -97,7 +98,7 @@ export default function EventEditor() {
 
   const onSubmission = (data) => runner(async () => {
     try {
-      await (id ? updateEvent(id, eventPayload(data, photo, pictures)) : createEvent(eventPayload(data, photo, pictures)));
+      await (id ? updateEvent(eventId, eventPayload(data, photo, pictures)) : createEvent(eventPayload(data, photo, pictures)));
       setMessage({ type: "success", message: id ? "Event updated!" : "Event added!" });
     } catch (error) {
       setMessage({ type: "error", message: typeof error.response?.data === "string" ? error.response.data : "Failed to save event!" });
@@ -112,6 +113,7 @@ export default function EventEditor() {
 
   return (
     <div>
+      <title>{event.title}</title>
       <div className="flex border-b-4 border-zinc-900">
         <h2 className="flex items-center gap-3 -mb-1 border-b-4 border-cyan-500 pb-3 text-3xl font-bold">
           {id ? (
@@ -122,7 +124,7 @@ export default function EventEditor() {
                 className="flex items-center gap-3 transition duration-200 enabled:cursor-pointer enabled:hover:brightness-50"
               >
                 <IconArrowLeft size={32} />
-                <Reveal variant="type">Edit Event</Reveal>
+                <Reveal variant="type">Manage Events</Reveal>
               </button>
               {event && <span>/ <Reveal variant="type">{event.title}</Reveal></span>}
             </>
@@ -158,7 +160,7 @@ export default function EventEditor() {
                 type="button"
                 onClick={() => setStep(i)}
                 disabled={!id || loading}
-                className={`${segmentStyle} ${i === step ? "border-cyan-500 font-bold text-white" : "border-transparent text-gray-500"} ${id ? "enabled:cursor-pointer enabled:hover:brightness-50" : ""}`}
+                className={`${segmentStyle} ${i === step ? "border-cyan-500 text-white" : "border-transparent text-gray-500"} ${id ? "enabled:cursor-pointer enabled:hover:brightness-50" : ""}`}
               >
                 {i + 1}. {label}
               </button>

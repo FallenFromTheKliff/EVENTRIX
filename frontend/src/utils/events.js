@@ -1,3 +1,8 @@
+import PaymentGCash from "../assets/images/Payment-GCash.png";
+import PaymentPayPal from "../assets/images/Payment-PayPal.png";
+
+export const toSlug = (title) => title.toLowerCase().trim().replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-|-$/g, "");
+
 export const imageTypes = ["image/png", "image/jpeg", "image/webp"];
 export const steps = ["Introduction", "Venue", "Tickets", "Display"];
 export const ticketNames = ["STANDARD", "VIP"];
@@ -87,6 +92,30 @@ export const priceRange = (ticketTypes = []) =>
     .filter(Boolean)
     .map(({ price }) => `₱${price}`)
     .join(" - ");
+
+export const emptySelection = { STANDARD: { enabled: false, quantity: "1" }, VIP: { enabled: false, quantity: "1" } };
+
+export const paymentMethods = [
+  { label: "GCASH", image: PaymentGCash, field: "Mobile No.:", placeholder: "Must be 11 digits", pattern: /^[0-9]{11}$/ },
+  { label: "PAYPAL", image: PaymentPayPal, field: "Email:", placeholder: "Enter your PayPal email", pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ }
+];
+
+export const toTime = (value) => value ? new Date(value).toLocaleTimeString("en-US", { timeStyle: "short" }) : "TBA";
+
+export const eventTickets = (ticketTypes, selection, cartItems) => ticketNames.flatMap((name) => {
+  const ticket = ticketTypes.find((type) => type.name?.toUpperCase() === name);
+  return ticket ? [{ ...ticket, ...selection[name], name, carted: cartItems.find((item) => item.ticketType.id === ticket.id)?.quantity ?? 0 }] : [];
+});
+
+export const totalPrice = (tickets = [], key) => tickets.reduce((sum, ticket) => sum + ticket.price * Number(ticket[key]), 0);
+
+export const validSeats = (tickets = []) =>
+  tickets.length > 0 &&
+  tickets.every(({ quantity, availableQuantity }) =>
+    Number.isInteger(Number(quantity)) &&
+    Number(quantity) >= 1 &&
+    Number(quantity) <= availableQuantity
+  );
 
 export const eventPayload = (data, photo, pictures) => {
   const tickets = selectedTickets(data.ticketTypes);
