@@ -1,4 +1,6 @@
-<h1 align="center">EVENTRIX</h1>
+<h1 align="center">
+    <img src="/frontend/src/assets/images/EVENTRIX-Title-Neon.png" alt="EVENTRIX" width="40%" />
+</h1>
 
 > EVENTRIX is a full-stack Event Management Platform developed as a 4-week sprint final project. The platform lets users browse, book, and pay for events, while giving administrators tools to manage events, respond to event receptions, and keep track of transactions.
 

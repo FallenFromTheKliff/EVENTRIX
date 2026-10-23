@@ -3,13 +3,12 @@ import { useState } from "react";
 import { toDate } from "../../utils/events";
 import { bookingStatuses } from "../../data/statcheck";
 
-import EventInfo from "./DetailsModal";
+import DetailsModal from "./DetailsModal";
 import Placeholder from "../../assets/images/EVENTRIX-Placeholder.jpeg";
 
-const bookingGrid = "grid grid-cols-[minmax(0,2fr)_minmax(5rem,1fr)_minmax(7rem,1fr)_minmax(8rem,1.5fr)_7rem] items-center gap-4";
 const bookingButton = "flex w-full items-center justify-center rounded-md py-2 text-center text-sm font-bold transition duration-200 enabled:cursor-pointer enabled:hover:brightness-50 disabled:opacity-50";
 
-export default function BookingCard({ booking, children }) {
+export default function BookingCard({ booking, children, admin = false }) {
   const [open, setOpen] = useState(false);
   const [details, setDetails] = useState(false);
   const { label, color } = bookingStatuses[booking.status] ?? bookingStatuses.PENDING;
@@ -17,18 +16,23 @@ export default function BookingCard({ booking, children }) {
   return (
     <>
       <div className="overflow-hidden rounded-xl bg-zinc-800">
-        <div className={`${bookingGrid} px-6 py-4`}>
-          <h3 className="truncate text-lg font-bold">{booking.eventTitle}</h3>
+        <div className={`grid items-center gap-3 px-5 py-4 ${admin ? "grid-cols-[minmax(0,1.7fr)_4rem_6rem_minmax(0,1.3fr)_minmax(0,1fr)_6rem] text-sm" : "grid-cols-[minmax(0,2fr)_minmax(5rem,1fr)_minmax(7rem,1fr)_minmax(8rem,1.5fr)_7rem] gap-4 px-6"}`}>
+          <h3 className={`truncate ${admin ? "text-base" : "text-lg"} font-bold`}>{booking.eventTitle}</h3>
           <p className="text-center font-bold">{booking.quantity}</p>
-          <p className={`text-center text-sm ${color}`}>{label}</p>
-          <p className="text-center font-bold">
+          <p className={`text-center ${admin ? "text-xs" : "text-sm"} ${color}`}>{label}</p>
+          <p className="truncate text-center font-bold" title={booking.bookingReference}>
             {booking.bookingReference || "—"}
           </p>
+          {admin && (
+            <p className="truncate text-center" title={booking.userEmail || booking.userName}>
+              {booking.userName || booking.userEmail || "—"}
+            </p>
+          )}
           <button
             type="button"
             onClick={() => setOpen((current) => !current)}
             aria-expanded={open}
-            className="w-full rounded-md bg-yellow-500 py-2 text-sm font-bold transition duration-200 cursor-pointer hover:brightness-50"
+            className="w-full rounded-md bg-yellow-500 py-2 text-xs font-bold transition duration-200 cursor-pointer hover:brightness-50"
           >
             {open ? "COLLAPSE" : "VIEW DETAILS"}
           </button>
@@ -81,7 +85,7 @@ export default function BookingCard({ booking, children }) {
           </div>
         </div>
       </div>
-      {details && <EventInfo booking={booking} onClose={() => setDetails(false)} />}
+      {details && <DetailsModal booking={booking} onClose={() => setDetails(false)} />}
     </>
   );
 }
