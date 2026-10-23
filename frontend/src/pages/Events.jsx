@@ -13,6 +13,13 @@ export default function Events() {
   const fields = user.role === "ADMIN" ? adminEventFilters : eventFilters;
   const options = { category: categories.map(({ name }) => ({ value: name, label: name })), date: months, status: statuses };
 
+  const filteredEvents = events.filter((event) =>
+    (!filters.name || event.title.toLowerCase().includes(filters.name.trim().toLowerCase())) &&
+    (!filters.category || event.category?.name === filters.category) &&
+    (!filters.date || event.dateTime?.startsWith(filters.date)) &&
+    (user.role !== "ADMIN" || !filters.status || event.status === filters.status)
+  );
+
   return (
     <div>
       <title>Events - EVENTRIX</title>
@@ -29,12 +36,20 @@ export default function Events() {
         </Reveal>
       </div>
       <div className="grid gap-8 mt-8 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-        {events.map((event) => (
-          <Reveal key={event.eventId} className="h-full">
-            <EventCard event={event} role={user.role} />
-          </Reveal>
-        ))}
+        {events.length === 0 ? (
+          <p className="w-full py-8 text-center text-gray-400">
+            {user.role === "ADMIN" ? "You should start adding events to kick things off" : "It seems there are no events available..."}
+          </p>
+        ) : filteredEvents.length > 0 ? (
+          filteredEvents.map((event) => (
+            <Reveal key={event.eventId} className="h-full">
+              <EventCard event={event} role={user.role} />
+            </Reveal>
+          ))
+        ) : (
+          <p className="w-full py-8 text-center text-gray-400">No events match your filters.</p>
+        )}
       </div>
     </div>
-  )
+  );
 }

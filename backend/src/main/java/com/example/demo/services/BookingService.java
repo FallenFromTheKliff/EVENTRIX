@@ -136,7 +136,7 @@ public class BookingService {
     }
 
     public List<Booking> getTransactionLog() {
-        return bookingRepository.findByStatusIn(Arrays.asList(BookingStatus.COMPLETED, BookingStatus.CANCELLED));
+        return bookingRepository.findByStatusIn(Arrays.asList(BookingStatus.PENDING, BookingStatus.PAID, BookingStatus.CANCELLED));
     }
 
     @Transactional

@@ -1,9 +1,9 @@
 import { useState } from "react";
 
-import { toDate, toReference } from "../../utils/events";
+import { toDate } from "../../utils/events";
 import { bookingStatuses } from "../../data/statcheck";
 
-import EventInfo from "./EventInfo";
+import EventInfo from "./DetailsModal";
 import Placeholder from "../../assets/images/EVENTRIX-Placeholder.jpeg";
 
 const bookingGrid = "grid grid-cols-[minmax(0,2fr)_minmax(5rem,1fr)_minmax(7rem,1fr)_minmax(8rem,1.5fr)_7rem] items-center gap-4";

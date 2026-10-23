@@ -1,18 +1,18 @@
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
 import axiosClient from "../api/axiosClient";
 import { useAuth } from "./AuthContext";
+import { useTransactions } from "./TransactionContext";
 
 const CartContext = createContext();
 
 const getCart = async () => (await axiosClient.get("/user/cart")).data;
-const getBookings = async () => (await axiosClient.get("/user/bookings")).data;
-
-const toBooking = ({ id, bookingReference, quantity, ticketType, eventId, eventTitle, eventImageUrl, eventDateTime, eventLocation }) => ({
+const toBooking = ({ id, bookingReference, quantity, ticketType, eventId, eventTitle, eventCategory, eventImageUrl, eventDateTime, eventLocation }) => ({
   cartItemId: id,
   bookingReference,
   eventId,
   eventTitle,
+  eventCategory,
   eventImageUrl,
   eventDateTime,
   eventLocation,
@@ -24,42 +24,59 @@ const toBooking = ({ id, bookingReference, quantity, ticketType, eventId, eventT
 
 export function CartProvider({ children }) {
   const { user } = useAuth();
+  const { refreshBookings } = useTransactions();
   const [cartItems, setCartItems] = useState([]);
-  const [bookings, setBookings] = useState([]);
+  const [cartLoading, setCartLoading] = useState(false);
+  const [cartError, setCartError] = useState(null);
 
   useEffect(() => {
     let active = true;
 
     if (user?.role !== "USER") {
       setCartItems([]);
-      setBookings([]);
+      setCartLoading(false);
+      setCartError(null);
 
       return () => {
         active = false;
       };
     }
 
+    setCartLoading(true);
+    setCartError(null);
+
     getCart()
       .then((items) => {
         if (active) setCartItems(items);
       })
       .catch(() => {
-        if (active) setCartItems([]);
+        if (active) setCartError("Unable to load your cart.");
+      })
+      .finally(() => {
+        if (active) setCartLoading(false);
       });
 
     return () => {
       active = false;
     };
-  }, [user]);
+  }, [user?.email, user?.role]);
 
-  const refreshBookings = useCallback(async () => {
-    const userBookings = await getBookings();
-    setBookings(userBookings);
-  }, []);
+  const refreshCart = async () => {
+    setCartLoading(true);
+    setCartError(null);
+
+    try {
+      setCartItems(await getCart());
+    } catch {
+      setCartError("Unable to load your cart.");
+    } finally {
+      setCartLoading(false);
+    }
+  };
 
   const addCartItem = async (ticketTypeId, quantity, separateItem) => {
     await axiosClient.post("/user/cart", { ticketTypeId, quantity, separateItem });
-    setCartItems(await getCart());
+    await refreshCart();
   };
 
   const addToCart = async (ticketTypeId, quantity) => {
@@ -72,31 +89,25 @@ export function CartProvider({ children }) {
 
   const removeFromCart = async (itemId) => {
     await axiosClient.delete(`/user/cart/items/${itemId}`);
-    setCartItems(await getCart());
+    await refreshCart();
   };
 
   const checkout = async (payment) => {
     await axiosClient.post("/user/cart/checkout", payment);
-    setCartItems(await getCart());
-    await refreshBookings();
-  };
-
-  const cancelBooking = async (id) => {
-    await axiosClient.delete(`/user/bookings/${id}`);
-    await refreshBookings();
+    await Promise.allSettled([refreshCart(), refreshBookings()]);
   };
 
   return (
     <CartContext.Provider value={{
       cartItems,
       cartBookings: cartItems.map(toBooking),
-      bookings,
+      cartLoading,
+      cartError,
       addToCart,
       quickBuy,
       removeFromCart,
       checkout,
-      cancelBooking,
-      refreshBookings
+      refreshCart
     }}>
       {children}
     </CartContext.Provider>

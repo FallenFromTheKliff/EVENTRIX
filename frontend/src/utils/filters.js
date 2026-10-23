@@ -1,18 +1,43 @@
-import { IconCalendar, IconCategory, IconSearch, IconArchive } from "@tabler/icons-react";
+import { IconCalendar, IconCategory, IconSearch, IconArchive, IconTicket } from "@tabler/icons-react";
 import { eventStatuses } from "../data/statcheck";
+
+export const emptyFilters = { name: "", category: "", ticketType: "", date: "", status: "" };
+export const emptyEventFilters = { name: "", category: "", date: "", status: "ACTIVE" };
+export const emptyCartFilters = { name: "", category: "", ticketType: "", date: "" };
 
 export const eventFilters = [
   { name: "name", type: "search", placeholder: "Search by event name...", icon: IconSearch },
   { name: "category", type: "select", all: "All Categories", icon: IconCategory },
   { name: "date", type: "select", all: "All Dates", icon: IconCalendar }
-]
+];
 
 export const adminEventFilters = [
   ...eventFilters,
   { name: "status", type: "select", all: "All Statuses", icon: IconArchive }
-]
+];
 
 export const statuses = eventStatuses;
+
+export const cartFilters = [
+  { name: "name", type: "search", placeholder: "Search cart...", icon: IconSearch },
+  { name: "category", type: "select", all: "All Categories", icon: IconCategory },
+  { name: "ticketType", type: "select", all: "All Ticket Types", icon: IconTicket },
+  { name: "date", type: "select", all: "All Dates", icon: IconCalendar }
+];
+
+export const bookingFilters = [
+  ...cartFilters,
+  { name: "status", type: "select", all: "All Statuses", icon: IconArchive }
+];
+
+export const bookingStatusOptions = [
+  { value: "PENDING", label: "Pending Payment" },
+  { value: "PAID", label: "Successful" },
+  { value: "PROCESSING", label: "Processing" },
+  { value: "CANCELLED", label: "Cancelled" },
+  { value: "DECLINED", label: "Declined" },
+  { value: "COMPLETED", label: "Completed" }
+];
 
 const now = new Date();
 
@@ -25,4 +50,4 @@ export const months = Array.from({ length: 6 }, (_, i) => {
     startDate: `${prefix}-01T00:00:00`,
     endDate: `${prefix}-${new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate()}T23:59:59`
   };
-})
+});

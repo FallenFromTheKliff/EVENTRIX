@@ -4,7 +4,7 @@ import axiosClient from "../api/axiosClient";
 import { useAuth } from "./AuthContext";
 
 import { toSlug } from "../utils/events";
-import { months } from "../utils/filters";
+import { emptyEventFilters, months } from "../utils/filters";
 import useDebouncing from "../utils/useDebouncing";
 
 const EventContext = createContext();
@@ -21,7 +21,7 @@ export function EventProvider({ children }) {
   const { user } = useAuth();
   const [events, setEvents] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [filters, setFilters] = useState(emptyFilters);
+  const [filters, setFilters] = useState(emptyEventFilters);
   const [favoritesOnly, setFavoritesOnly] = useState(false);
   const debouncedFilters = useDebouncing(filters);
 
