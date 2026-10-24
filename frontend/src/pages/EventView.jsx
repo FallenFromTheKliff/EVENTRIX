@@ -37,14 +37,10 @@ export default function EventView() {
   const event = getEvent(slug);
   if (!event) return null;
 
-  const images = event.previewImages?.length ? event.previewImages.map(({ imageUrl }) => imageUrl) : [Placeholder];
-
   const payingItems = state?.cartItemIds ? cartItems.filter(({ id }) => state.cartItemIds.includes(id)) : cartItems;
   const tickets = eventTickets(event.ticketTypes, selection, payingItems);
   const chosen = selectedTickets(tickets);
-  const total = totalPrice(chosen, "quantity");
   const cartTotal = totalPrice(tickets, "carted");
-  const valid = validSeats(chosen);
 
   const updateTicket = (name, change) => setSelection({ ...selection, [name]: { ...selection[name], ...change } });
 
@@ -61,7 +57,7 @@ export default function EventView() {
 
   const handleAdd = () => runner(async () => {
     try {
-      for (const ticket of chosen) await addToCart(ticket.id, Number(ticket.quantity));
+      await addToCart(chosen.map(({ id, quantity }) => ({ ticketTypeId: id, quantity: Number(quantity) })));
       setMessage({ type: "success", message: "Added to cart!" });
     } catch {
       setMessage({ type: "error", message: "Failed to add to cart!" });
@@ -96,7 +92,7 @@ export default function EventView() {
       </div>
       <Reveal variant="lazy" className="flex flex-col lg:flex-row bg-zinc-800 min-h-180 overflow-hidden rounded-xl mt-8">
         <div className="relative min-h-112 overflow-hidden lg:w-1/2">
-          <PictureSlider images={images} index={slide} alt={event.title} onChange={setSlide} />
+          <PictureSlider images={event.previewImages?.length ? event.previewImages.map(({ imageUrl }) => imageUrl) : [Placeholder]} index={slide} alt={event.title} onChange={setSlide} />
         </div>
         <Reveal variant="right" className="relative flex flex-1 flex-col p-8">
           <div className="flex gap-6 border-b-4 border-zinc-900">
@@ -166,7 +162,7 @@ export default function EventView() {
                     </div>
                   ))}
                   <div className="border-t border-zinc-700" />
-                  <EventField type="number" name="totalPrice" label="Total Price:" icon={IconCurrencyPeso} value={total} readOnly />
+                  <EventField type="number" name="totalPrice" label="Total Price:" icon={IconCurrencyPeso} value={totalPrice(chosen, "quantity")} readOnly />
                 </>
               )}
               {segment === "Payment" && (
@@ -210,7 +206,7 @@ export default function EventView() {
                   <button type="button" onClick={() => setSegment("Details")} className={`${buttonStyle} bg-gray-300 text-black`}>
                     BACK
                   </button>
-                  <button type="button" onClick={handleAdd} disabled={!valid} className={`${buttonStyle} bg-green-500`}>
+                  <button type="button" onClick={handleAdd} disabled={!validSeats(chosen)} className={`${buttonStyle} bg-green-500`}>
                     {texter("ADD TO CART", "ADDING")}
                   </button>
                 </>

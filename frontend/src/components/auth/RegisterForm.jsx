@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { IconBrandApple, IconBrandFacebook, IconBrandGoogle, IconEye, IconEyeOff } from "@tabler/icons-react";
 
@@ -11,19 +11,27 @@ import ConfirmModal from "../ui/ConfirmModal";
 const inputStyle = "w-full bg-white/15 rounded-md p-3 mt-1 focus:outline-2 focus:outline-yellow-500";
 
 export default function RegisterForm() {
+  const navigate = useNavigate();
   const { register: registerUser } = useAuth();
   const { loading, runner, texter } = useLoadingText();
   const { register, handleSubmit, formState: { errors } } = useForm();
+
   const [showPassword, setShowPassword] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(null);
+  const [message, setMessage] = useState(null);
 
   const onSubmission = (data) => runner(async () => {
     try {
       await registerUser(data);
+      setMessage({ type: "success", message: "Account created!" });
     } catch (error) {
-      setErrorMessage({ type: "error", message: typeof error.response?.data === "string" ? error.response.data : "Failed to register account!" });
+      setMessage({ type: "error", message: typeof error.response?.data === "string" ? error.response.data : "Failed to register account!" });
     }
   });
+
+  const handleClose = () => {
+    setMessage(null);
+    if (message.type === "success") navigate("/auth", { state: { mode: "login" }, replace: true });
+  };
 
   return (
     <div>
@@ -125,7 +133,7 @@ export default function RegisterForm() {
           Login here.
         </Link>
       </p>
-      {errorMessage && <ConfirmModal type={errorMessage.type} message={errorMessage.message} onClose={() => setErrorMessage(null)} />}
+      {message && <ConfirmModal type={message.type} message={message.message} onClose={handleClose} />}
     </div>
   )
 }

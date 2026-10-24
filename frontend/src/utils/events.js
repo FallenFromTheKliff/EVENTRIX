@@ -9,6 +9,15 @@ export const ticketNames = ["STANDARD", "VIP"];
 export const defaultTicketPrice = 200;
 export const defaultTicketQuantity = 1;
 
+export const segmentStyle = "-mb-1 border-b-4 pb-3 transition duration-300";
+export const buttonStyle = "flex-1 font-bold rounded-md py-3 text-center transition duration-200 enabled:cursor-pointer enabled:hover:brightness-50 disabled:opacity-50";
+export const pillStyle = "relative rounded-md bg-white/5 p-3 pl-11 text-gray-300";
+export const iconStyle = "absolute left-3 top-1/2 -translate-y-1/2 text-cyan-400";
+export const tagStyle = "flex w-fit items-center gap-2 rounded-full bg-cyan-500/20 px-3 py-1 text-sm text-cyan-400";
+export const bookingButton = "flex w-full items-center justify-center rounded-md py-2 text-center text-sm font-bold transition duration-200 enabled:cursor-pointer enabled:hover:brightness-50 disabled:opacity-50";
+export const bookingColumns = "grid-cols-[minmax(0,2fr)_minmax(5rem,1fr)_minmax(7rem,1fr)_minmax(8rem,1.5fr)_7rem]";
+export const adminColumns = "grid-cols-[minmax(0,1.7fr)_4rem_6rem_minmax(0,1.3fr)_minmax(0,1fr)_6rem]";
+
 export const resizeImage = (file, width, height) => new Promise((resolve, reject) => {
   const url = URL.createObjectURL(file);
   const img = new Image();
@@ -91,19 +100,11 @@ export const priceRange = (ticketTypes = []) =>
     .map(({ price }) => `₱${price}`)
     .join(" - ");
 
-export const segmentStyle = "-mb-1 border-b-4 pb-3 transition duration-300";
-export const buttonStyle = "flex-1 font-bold rounded-md py-3 text-center transition duration-200 enabled:cursor-pointer enabled:hover:brightness-50 disabled:opacity-50";
-export const pillStyle = "relative rounded-md bg-white/5 p-3 pl-11 text-gray-300";
-export const iconStyle = "absolute left-3 top-1/2 -translate-y-1/2 text-cyan-400";
-export const tagStyle = "flex w-fit items-center gap-2 rounded-full bg-cyan-500/20 px-3 py-1 text-sm text-cyan-400";
-
 export const emptySelection = Object.fromEntries(ticketNames.map((name) => [name, { enabled: false, quantity: "1" }]));
 
 export const findTicket = (ticketTypes = [], name) => ticketTypes.find((ticket) => ticket.name?.toUpperCase() === name);
 
 export const toDate = (value, dateStyle = "full") => new Date(value).toLocaleDateString("en-US", { dateStyle });
-
-export const toReference = (id) => `EVX${String(id).padStart(8, "0")}`;
 
 export const paymentMethods = [
   { label: "GCASH", image: PaymentGCash, field: "Mobile No.:", placeholder: "Must be 11 digits", pattern: /^[0-9]{11}$/ },
@@ -136,10 +137,10 @@ export const eventPayload = (data, photo, pictures) => {
     imageUrl: photo,
     price: tickets.length ? Math.min(...tickets.map(({ price }) => Number(price))) : 0,
     category: data.category ? { id: Number(data.category) } : null,
-    previewImages: pictures,
+    previewImages: pictures.map(({ id, imageUrl }) => id ? { id } : { imageUrl }),
     dateTime: `${data.dateTime}T00:00`,
     showTime: `${data.dateTime}T${data.showTime}`,
-    doorsOpen: doorsOpenAt(data.dateTime, data.showTime),
+    doorsOpen: doorsOpenAt(data.dateTime, data.showTime) || null,
     ticketTypes: tickets.map(({ enabled, ticketId, ...ticket }) => ({ ...ticket, id: ticketId })),
     totalTickets: ticketCount(tickets)
   };

@@ -9,7 +9,6 @@ import useDebouncing from "../utils/useDebouncing";
 
 const EventContext = createContext();
 
-const emptyFilters = { name: "", category: "", date: "", status: "ACTIVE" };
 const toBody = (data) => ({ ...data, doorsOpen: data.doorsOpen || null });
 const toUrl = (user) => user.role === "ADMIN" ? "/admin/events" : "/events";
 const toParams = ({ name, category, date, status }) => {
@@ -33,7 +32,7 @@ export function EventProvider({ children }) {
     return () => {
       setEvents([]);
       setCategories([]);
-      setFilters(emptyFilters);
+      setFilters(emptyEventFilters)
       setFavoritesOnly(false);
       setEventsLoading(true);
       setEventsError(null);
@@ -92,8 +91,8 @@ export function EventProvider({ children }) {
   const addComment = async (id, data) => (await axiosClient.post(`/user/events/${id}/comments`, data)).data;
   const getVenueDates = async (location, excludeId) => (await axiosClient.get("/admin/events/venue-dates", { params: { location, excludeId } })).data;
 
-  const createEvent = (data) => mutator(axiosClient.post("/admin/events/create", toBody(data)));
-  const updateEvent = (id, data) => mutator(axiosClient.put(`/admin/events/${id}`, toBody(data)));
+  const createEvent = (data) => mutator(axiosClient.post("/admin/events/create", data));
+  const updateEvent = (id, data) => mutator(axiosClient.put(`/admin/events/${id}`, data));
   const deleteEvent = async (id) => {
     await axiosClient.put(`/admin/events/${id}/archive`);
     await mutator(axiosClient.delete(`/admin/events/${id}`));

@@ -1,12 +1,10 @@
 import { useState } from "react";
 
-import { toDate } from "../../utils/events";
+import { adminColumns, bookingButton, bookingColumns, toDate } from "../../utils/events";
 import { bookingStatuses } from "../../data/statcheck";
 
 import DetailsModal from "./DetailsModal";
 import Placeholder from "../../assets/images/EVENTRIX-Placeholder.jpeg";
-
-const bookingButton = "flex w-full items-center justify-center rounded-md py-2 text-center text-sm font-bold transition duration-200 enabled:cursor-pointer enabled:hover:brightness-50 disabled:opacity-50";
 
 export default function BookingCard({ booking, children, admin = false }) {
   const [open, setOpen] = useState(false);
@@ -16,7 +14,7 @@ export default function BookingCard({ booking, children, admin = false }) {
   return (
     <>
       <div className="overflow-hidden rounded-xl bg-zinc-800">
-        <div className={`grid items-center gap-3 px-5 py-4 ${admin ? "grid-cols-[minmax(0,1.7fr)_4rem_6rem_minmax(0,1.3fr)_minmax(0,1fr)_6rem] text-sm" : "grid-cols-[minmax(0,2fr)_minmax(5rem,1fr)_minmax(7rem,1fr)_minmax(8rem,1.5fr)_7rem] gap-4 px-6"}`}>
+        <div className={`grid items-center gap-3 px-5 py-4 ${admin ? `${adminColumns} text-sm` : `${bookingColumns} gap-4 px-6`}`}>
           <h3 className={`truncate ${admin ? "text-base" : "text-lg"} font-bold`}>{booking.eventTitle}</h3>
           <p className="text-center font-bold">{booking.quantity}</p>
           <p className={`text-center ${admin ? "text-xs" : "text-sm"} ${color}`}>{label}</p>
@@ -74,7 +72,7 @@ export default function BookingCard({ booking, children, admin = false }) {
                       <button
                         type="button"
                         onClick={() => setDetails(true)}
-                        className={`${bookingButton} bg-green-500 hover:brightness-50`}
+                        className={`${bookingButton} bg-green-500`}
                       >
                         VIEW DETAILS
                       </button>

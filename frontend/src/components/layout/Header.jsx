@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router";
 import { IconChevronDown, IconChevronUp, IconHeartFilled, IconLogout, IconMenu2, IconShoppingCartFilled } from "@tabler/icons-react";
 
-import axiosClient from "../../api/axiosClient";
 import { useAuth } from "../../context/AuthContext";
 import { useEvents } from "../../context/EventContext";
 import { useCart } from "../../context/CartContext";
@@ -19,7 +18,7 @@ import Sidebar from "./Sidebar";
 const colors = { public: "bg-slate-950", USER: "bg-zinc-800", ADMIN: "bg-cyan-500" };
 
 export default function Header({ role = "public" }) {
-  const { logout } = useAuth();
+  const { profile, logout } = useAuth();
   const { favoritesOnly, toggleFavoritesOnly } = useEvents();
   const { cartItems } = useCart();
   const { loading, runner, texter } = useLoadingText();
@@ -27,14 +26,8 @@ export default function Header({ role = "public" }) {
   
   const [sideStep, setSideStep] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
-  const [profile, setProfile] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [confirming, setConfirming] = useState(false);
-
-  useEffect(() => {
-    if (role === "public") return;
-    axiosClient.get("/user/profile").then((response) => setProfile(response.data));
-  }, [role]);
 
   useEffect(() => {
     if (role !== "public") return;

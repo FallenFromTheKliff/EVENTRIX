@@ -2,16 +2,20 @@ import { useState } from "react";
 
 import { useTransactions } from "../context/TransactionContext";
 import { useEvents } from "../context/EventContext";
+
+import { bookingButton } from "../utils/events";
 import { emptyFilters, bookingFilters, bookingStatusOptions, months } from "../utils/filters";
 
 import BookingCard from "../components/transactions/BookingCard";
+import BookingHeader from "../components/transactions/BookingHeader";
 import FilterRow from "../components/ui/FilterRow";
 import Reveal from "../components/ui/Reveal";
 import useLoadingText from "../components/ui/useLoadingText";
 import ConfirmModal from "../components/ui/ConfirmModal";
+import Retry from "../components/ui/Retry";
 
 export default function Bookings() {
-  const { bookings = [], bookingsLoading, bookingsError, refreshBookings, cancelBooking } = useTransactions();
+  const { bookings, bookingsLoading, bookingsError, refreshBookings, cancelBooking } = useTransactions();
   const { categories } = useEvents();
   const { loading, runner, texter } = useLoadingText();
   const [filters, setFilters] = useState(emptyFilters);
@@ -63,30 +67,17 @@ export default function Bookings() {
         </div>
         <div className="mt-4 flex flex-1 flex-col space-y-4">
           <Reveal variant="reappear" className="w-full">
-            <div className="hidden w-full grid-cols-[minmax(0,2fr)_minmax(5rem,1fr)_minmax(7rem,1fr)_minmax(8rem,1.5fr)_7rem] items-center gap-4 px-6 py-3 text-sm text-gray-300 md:grid">
-              <p className="text-lg font-semibold">Event</p>
-              <p className="text-center text-lg font-semibold">Tickets</p>
-              <p className="text-center text-lg font-semibold">Status</p>
-              <p className="text-center text-lg font-semibold">Reference ID</p>
-              <div />
-            </div>
+            <BookingHeader />
           </Reveal>
-          {bookingsError && (
-            <div className="my-auto">
-              <p role="alert" className="py-4 text-center text-red-400">{bookingsError}</p>
-              <button type="button" onClick={refreshBookings} className="mx-auto block rounded-md bg-cyan-500 px-4 py-2 font-bold">
-                RETRY
-              </button>
-            </div>
-          )}
-          {bookingsLoading ? (
+          {bookingsError && <Retry message={bookingsError} onRetry={refreshBookings} />}
+          {bookingsLoading && !bookings.length ? (
             <p className="my-auto py-8 text-center text-gray-400">Loading bookings...</p>
           ) : bookingsError ? null : filteredBookings.length ? (
             filteredBookings.map((booking) => (
               <Reveal key={booking.bookingId} className="w-full">
                 <BookingCard booking={booking}>
                   {booking.status === "PENDING" && (
-                    <button type="button" onClick={() => setCancelling(booking.bookingId)} className="w-full rounded-md bg-red-500 py-2 text-xs font-bold transition duration-200 hover:brightness-50">
+                    <button type="button" onClick={() => setCancelling(booking.bookingId)} className={`${bookingButton} bg-red-500`}>
                       CANCEL BOOKING
                     </button>
                   )}

@@ -1,10 +1,9 @@
 import { IconPhoto, IconCrown, IconTicket, IconCheck, IconPlus } from "@tabler/icons-react";
 
-import { imageTypes, resizeImage } from "../../utils/events";
+import { imageTypes, resizeImage, iconStyle } from "../../utils/events";
 
 import DroppingDown from "../ui/DroppingDown";
 
-const inputStyle = "flex-1 bg-white/15 rounded-md p-2 focus:outline-2 focus:outline-cyan-500";
 const ticketButtonStyle = "relative w-44 flex items-center gap-2 rounded-md px-3 py-3 text-base font-bold cursor-pointer transition duration-200 enabled:hover:brightness-50";
 const ticketButtonColors = { STANDARD: "bg-cyan-500 text-white", VIP: "bg-blue-950 text-yellow-400" };
 
@@ -91,7 +90,7 @@ export default function EventForm({ type = "text", label, icon: Icon, hint, erro
       <div className="flex items-center gap-4">
         <label htmlFor={props.name} className="w-28 text-sm">{label}</label>
         <div className="relative flex-1">
-          {Icon && <Icon size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-cyan-400" />}
+          {Icon && <Icon size={18} className={iconStyle} />}
           <input id={props.name} type={type} className={`${inputStyle} w-full disabled:cursor-not-allowed ${Icon ? "pl-10" : ""}`} {...props} />
         </div>
       </div>

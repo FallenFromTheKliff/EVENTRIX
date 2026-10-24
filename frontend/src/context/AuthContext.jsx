@@ -32,6 +32,8 @@ export function AuthProvider({ children }) {
     return restoredUser;
   });
 
+  const [profile, setProfile] = useState(null);
+
   useEffect(() => {
     const clearUser = () => setUser(null);
     window.addEventListener("auth:unauthorized", clearUser);
@@ -40,6 +42,20 @@ export function AuthProvider({ children }) {
       window.removeEventListener("auth:unauthorized", clearUser);
     };
   }, []);
+
+  useEffect(() => {
+    if (!user) return;
+
+    let active = true;
+    axiosClient.get("/user/profile").then((response) => {
+      if (active) setProfile(response.data);
+    });
+
+    return () => {
+      active = false;
+      setProfile(null);
+    };
+  }, [user]);
 
   const authenticator = async (path, data) => {
     const response = await axiosClient.post(path, data);
@@ -56,7 +72,9 @@ export function AuthProvider({ children }) {
   };
 
   const login = (credentials) => authenticator("/auth/login", credentials);
-  const register = (data) => authenticator("/auth/register", data);
+  const register = async (data) => {
+    await axiosClient.post("/auth/register", data);
+  };
   const logout = async () => {
     try {
       if (localStorage.getItem("token")) {
@@ -69,7 +87,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout }}>
+    <AuthContext.Provider value={{ user, profile, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   )

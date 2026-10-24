@@ -5,7 +5,7 @@ import { IconArrowLeft, IconPhoto, IconTrash, IconCategory, IconCalendar, IconCl
 
 import { useEvents } from "../../context/EventContext";
 
-import { steps, emptyEventValues, eventFormValues, filled, selectedTickets as getSelectedTickets, ticketCount as getTicketCount, validTickets, eventPayload, dateInPast, dateTaken, doorsOpenAt, nowLocal } from "../../utils/events";
+import { buttonStyle, segmentStyle, steps, emptyEventValues, eventFormValues, filled, selectedTickets as getSelectedTickets, ticketCount as getTicketCount, validTickets, eventPayload, dateInPast, dateTaken, doorsOpenAt, nowLocal } from "../../utils/events";
 import { statuses } from "../../utils/filters";
 
 import Reveal from "../../components/ui/Reveal";
@@ -14,9 +14,6 @@ import EventField from "../../components/events/EventField";
 import useDebouncing from "../../utils/useDebouncing";
 import useLoadingText from "../../components/ui/useLoadingText";
 import ConfirmModal from "../../components/ui/ConfirmModal";
-
-const buttonStyle = "flex-1 font-bold rounded-md py-3 text-center transition duration-200 enabled:cursor-pointer enabled:hover:brightness-50 disabled:opacity-50";
-const segmentStyle = "-mb-1 border-b-4 pb-3 transition duration-300";
 
 export default function EventEditor() {
   const { slug: id } = useParams();

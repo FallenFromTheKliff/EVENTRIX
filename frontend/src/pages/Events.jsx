@@ -4,6 +4,7 @@ import { useEvents } from "../context/EventContext";
 import EventCard from "../components/events/EventCard";
 import Reveal from "../components/ui/Reveal";
 import FilterRow from "../components/ui/FilterRow";
+import Retry from "../components/ui/Retry";
 
 import { adminEventFilters, eventFilters, months, statuses } from "../utils/filters";
 
@@ -35,14 +36,7 @@ export default function Events() {
           <FilterRow fields={fields.filter(({ type }) => type !== "search")} filters={filters} options={options} onChange={handleFilter} />
         </Reveal>
       </div>
-      {eventsError && (
-        <div className="my-auto">
-          <p role="alert" className="py-4 text-center text-red-400">{eventsError}</p>
-          <button type="button" onClick={refreshEvents} className="mx-auto block rounded-md bg-cyan-500 px-4 py-2 font-bold">
-            RETRY
-          </button>
-        </div>
-      )}
+      {eventsError && <Retry message={eventsError} onRetry={refreshEvents} />}
       {eventsLoading && !events.length ? (
         <p className="my-auto py-8 text-center text-gray-400">Loading events...</p>
       ) : eventsError ? null : filteredEvents.length > 0 ? (

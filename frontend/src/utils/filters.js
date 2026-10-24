@@ -1,5 +1,5 @@
 import { IconCalendar, IconCategory, IconSearch, IconArchive, IconTicket } from "@tabler/icons-react";
-import { eventStatuses } from "../data/statcheck";
+import { bookingStatuses, eventStatuses } from "../data/statcheck";
 
 export const emptyFilters = { name: "", category: "", ticketType: "", date: "", status: "" };
 export const emptyEventFilters = { name: "", category: "", date: "", status: "ACTIVE" };
@@ -30,13 +30,7 @@ export const bookingFilters = [
   { name: "status", type: "select", all: "All Statuses", icon: IconArchive }
 ];
 
-export const bookingStatusOptions = [
-  { value: "PENDING", label: "Pending Payment" },
-  { value: "PAID", label: "Successful" },
-  { value: "PROCESSING", label: "Processing" },
-  { value: "CANCELLED", label: "Cancelled" },
-  { value: "COMPLETED", label: "Completed" }
-];
+export const bookingStatusOptions = ["PENDING", "PAID", "PROCESSING", "CANCELLED", "COMPLETED"].map((value) => ({ value, label: bookingStatuses[value].label }));
 
 const now = new Date();
 

@@ -1,15 +1,9 @@
-import { useState, useEffect } from "react";
-
-import axiosClient from "../api/axiosClient";
+import { useAuth } from "../context/AuthContext";
 
 import Reveal from "../components/ui/Reveal";
 
 export default function Profile() {
-  const [profile, setProfile] = useState(null);
-
-  useEffect(() => {
-    axiosClient.get("/user/profile").then((response) => setProfile(response.data));
-  }, []);
+  const { profile } = useAuth();
 
   return (
     <div>

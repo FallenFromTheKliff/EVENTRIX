@@ -79,8 +79,9 @@ export function CartProvider({ children }) {
     await refreshCart();
   };
 
-  const addToCart = async (ticketTypeId, quantity) => {
-    await addCartItem(ticketTypeId, quantity, false);
+  const addToCart = async (tickets) => {
+    for (const { ticketTypeId, quantity } of tickets) await axiosClient.post("/user/cart", { ticketTypeId, quantity, separateItem: false });
+    await refreshCart();
   };
 
   const quickBuy = async (ticketTypeId, quantity = 1) => {
@@ -94,7 +95,7 @@ export function CartProvider({ children }) {
 
   const removeFromCart = async (itemId) => {
     await axiosClient.delete(`/user/cart/items/${itemId}`);
-    await refreshCart();
+    setCartItems((current) => current.filter((item) => item.id !== itemId));
   };
 
   const checkout = async (payment) => {

@@ -5,24 +5,6 @@ import { useAuth } from "./AuthContext";
 
 const TransactionContext = createContext();
 
-const toTransaction = (booking) => ({
-  bookingId: booking.bookingId,
-  bookingReference: booking.bookingReference,
-  quantity: booking.quantity,
-  totalAmount: booking.totalAmount,
-  bookingDate: booking.bookingDate,
-  status: booking.status,
-  eventTitle: booking.event?.title,
-  eventId: booking.event?.eventId,
-  eventImageUrl: booking.event?.imageUrl,
-  eventDateTime: booking.event?.dateTime,
-  eventLocation: booking.event?.location,
-  eventCategory: booking.event?.category?.name,
-  ticketName: booking.ticketType?.name,
-  userName: booking.user?.name,
-  userEmail: booking.user?.email
-});
-
 export function TransactionProvider({ children }) {
   const { user } = useAuth();
   const [bookings, setBookings] = useState([]);
@@ -107,16 +89,16 @@ export function TransactionProvider({ children }) {
   }, [user?.email, user?.role]);
 
   const updateTransactionStatus = async (bookingId, status, adminNotes = "") => {
-    await axiosClient.put(`/admin/bookings/${bookingId}/status`, null, {
+    const response = await axiosClient.put(`/admin/bookings/${bookingId}/status`, null, {
       params: { status, adminNotes: adminNotes || undefined }
     });
 
-    await refreshTransactions();
+    setTransactions((current) => current.map((item) => item.bookingId === bookingId ? response.data : item));
   };
 
   const cancelBooking = async (bookingId) => {
     await axiosClient.delete(`/user/bookings/${bookingId}`);
-    await refreshBookings();
+    setBookings((current) => current.map((booking) => booking.bookingId === bookingId ? { ...booking, status: "PROCESSING" } : booking));
   };
 
   return (
