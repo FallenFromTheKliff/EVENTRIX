@@ -13,7 +13,7 @@ export const rolesss = {
       category: "Main",
       links: [
         { to: "/home", label: "Home", icon: IconHome },
-        { to: "/reviews", label: "Reviews", icon: IconMessageStar },
+        { to: "/reviews", label: "My Reviews", icon: IconMessageStar },
         { to: "/support", label: "Support", icon: IconHelpCircle }
       ]
     },

@@ -9,7 +9,7 @@ import { adminEventFilters, eventFilters, months, statuses } from "../utils/filt
 
 export default function Events() {
   const { user } = useAuth();
-  const { events, categories, filters, handleFilter } = useEvents();
+  const { events, categories, filters, handleFilter, eventsLoading, eventsError, refreshEvents } = useEvents();
   const fields = user.role === "ADMIN" ? adminEventFilters : eventFilters;
   const options = { category: categories.map(({ name }) => ({ value: name, label: name })), date: months, status: statuses };
 
@@ -35,7 +35,17 @@ export default function Events() {
           <FilterRow fields={fields.filter(({ type }) => type !== "search")} filters={filters} options={options} onChange={handleFilter} />
         </Reveal>
       </div>
-      {filteredEvents.length > 0 ? (
+      {eventsError && (
+        <div className="my-auto">
+          <p role="alert" className="py-4 text-center text-red-400">{eventsError}</p>
+          <button type="button" onClick={refreshEvents} className="mx-auto block rounded-md bg-cyan-500 px-4 py-2 font-bold">
+            RETRY
+          </button>
+        </div>
+      )}
+      {eventsLoading && !events.length ? (
+        <p className="my-auto py-8 text-center text-gray-400">Loading events...</p>
+      ) : eventsError ? null : filteredEvents.length > 0 ? (
         <div className="grid gap-8 mt-8 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
           {filteredEvents.map((event) => (
             <Reveal key={event.eventId} className="h-full">
@@ -46,8 +56,8 @@ export default function Events() {
       ) : (
         <p className="my-auto py-8 text-center text-gray-400">
           {events.length === 0
-            ? (user.role === "ADMIN" ? "You should start adding events to kick things off" : "It seems there are no events available...")
-            : "No events match your filters."}
+            ? (user.role === "ADMIN" ? "You should start adding events to kick things off!" : "It seems there are no events available...")
+            : "No events match your filters..."}
         </p>
       )}
     </div>

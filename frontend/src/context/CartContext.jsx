@@ -26,7 +26,7 @@ export function CartProvider({ children }) {
   const { user } = useAuth();
   const { refreshBookings } = useTransactions();
   const [cartItems, setCartItems] = useState([]);
-  const [cartLoading, setCartLoading] = useState(false);
+  const [cartLoading, setCartLoading] = useState(true);
   const [cartError, setCartError] = useState(null);
 
   useEffect(() => {
@@ -50,7 +50,7 @@ export function CartProvider({ children }) {
         if (active) setCartItems(items);
       })
       .catch(() => {
-        if (active) setCartError("Unable to load your cart.");
+        if (active) setCartError("I think we lost your cart...");
       })
       .finally(() => {
         if (active) setCartLoading(false);
@@ -68,7 +68,7 @@ export function CartProvider({ children }) {
     try {
       setCartItems(await getCart());
     } catch {
-      setCartError("Unable to load your cart.");
+      setCartError("I think we lost your cart...");
     } finally {
       setCartLoading(false);
     }

@@ -18,7 +18,7 @@ public interface BookingRepo extends JpaRepository<Booking, Long> {
     @Query("SELECT b FROM Booking b WHERE " +
             "(:user IS NULL OR b.user = :user) AND " +
             "(:status IS NULL OR b.status = :status) AND " +
-            "(:eventName IS NULL OR LOWER(b.event.title) LIKE LOWER(CONCAT('%', :eventName, '%')))")
+            "(CAST(:eventName AS string) IS NULL OR LOWER(b.event.title) LIKE LOWER(CONCAT('%', CAST(:eventName AS string), '%')))")
     List<Booking> findBookingsWithFilters(
             @Param("user") User user,
             @Param("status") BookingStatus status,

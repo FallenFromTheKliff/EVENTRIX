@@ -27,9 +27,9 @@ export function TransactionProvider({ children }) {
   const { user } = useAuth();
   const [bookings, setBookings] = useState([]);
   const [transactions, setTransactions] = useState([]);
-  const [bookingsLoading, setBookingsLoading] = useState(false);
+  const [bookingsLoading, setBookingsLoading] = useState(true);
   const [bookingsError, setBookingsError] = useState(null);
-  const [transactionsLoading, setTransactionsLoading] = useState(false);
+  const [transactionsLoading, setTransactionsLoading] = useState(true);
   const [transactionsError, setTransactionsError] = useState(null);
 
   const refreshBookings = async () => {
@@ -50,7 +50,7 @@ export function TransactionProvider({ children }) {
     setTransactionsError(null);
 
     try {
-      setTransactions((await axiosClient.get("/admin/transactions")).data.map(toTransaction));
+      setTransactions((await axiosClient.get("/admin/transactions")).data);
     } catch {
       setTransactionsError("Unable to load transaction history.");
     } finally {
@@ -70,7 +70,7 @@ export function TransactionProvider({ children }) {
           if (active) setBookings(response.data);
         })
         .catch(() => {
-          if (active) setBookingsError("Unable to load your bookings.");
+          if (active) setBookingsError("Sorry, we couldn't retrieve your bookings!");
         })
         .finally(() => {
           if (active) setBookingsLoading(false);
@@ -87,10 +87,10 @@ export function TransactionProvider({ children }) {
 
       axiosClient.get("/admin/transactions")
         .then((response) => {
-          if (active) setTransactions(response.data.map(toTransaction));
+          if (active) setTransactions(response.data);
         })
         .catch(() => {
-          if (active) setTransactionsError("Unable to load transaction history.");
+          if (active) setTransactionsError("Oops, we couldn't load the transactions...");
         })
         .finally(() => {
           if (active) setTransactionsLoading(false);

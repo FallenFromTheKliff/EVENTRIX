@@ -94,7 +94,9 @@ export default function Bookings() {
               </Reveal>
             ))
           ) : (
-            <p className="my-auto py-8 text-center text-gray-400">No bookings found.</p>
+            <p className="my-auto py-8 text-center text-gray-400">
+              {bookings.length ? "No bookings match your filters..." : "You haven't booked any events yet..."}
+            </p>
           )}
         </div>
       </section>

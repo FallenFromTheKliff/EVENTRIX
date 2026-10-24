@@ -23,6 +23,8 @@ export function EventProvider({ children }) {
   const [categories, setCategories] = useState([]);
   const [filters, setFilters] = useState(emptyEventFilters);
   const [favoritesOnly, setFavoritesOnly] = useState(false);
+  const [eventsLoading, setEventsLoading] = useState(true);
+  const [eventsError, setEventsError] = useState(null);
   const debouncedFilters = useDebouncing(filters);
 
   useEffect(() => {
@@ -33,24 +35,52 @@ export function EventProvider({ children }) {
       setCategories([]);
       setFilters(emptyFilters);
       setFavoritesOnly(false);
+      setEventsLoading(true);
+      setEventsError(null);
     };
   }, [user]);
 
   useEffect(() => {
     if (!user) return;
-    axiosClient.get(toUrl(user), { params: toParams(debouncedFilters) }).then((response) => setEvents(response.data));
+
+    let active = true;
+    setEventsLoading(true);
+    setEventsError(null);
+
+    axiosClient.get(toUrl(user), { params: toParams(debouncedFilters) })
+      .then((response) => {
+        if (active) setEvents(response.data);
+      })
+      .catch(() => {
+        if (active) setEventsError("Oops, we couldn't load the events...");
+      })
+      .finally(() => {
+        if (active) setEventsLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
   }, [user, debouncedFilters]);
 
-  const fetchEvents = async () => {
-    const response = await axiosClient.get(toUrl(user), { params: toParams(filters) });
-    setEvents(response.data);
+  const refreshEvents = async () => {
+    setEventsLoading(true);
+    setEventsError(null);
+
+    try {
+      setEvents((await axiosClient.get(toUrl(user), { params: toParams(filters) })).data);
+    } catch {
+      setEventsError("Oops, we couldn't load the events...");
+    } finally {
+      setEventsLoading(false);
+    }
   };
   const getEvent = (slug) => events.find((event) => toSlug(event.title) === slug);
   const getEventById = async (id) => (await axiosClient.get(`/events/${id}`)).data;
   const handleFilter = (e) => setFilters({ ...filters, [e.target.name]: e.target.value });
   const mutator = async (request) => {
     await request;
-    await fetchEvents().catch(() => {});
+    await refreshEvents();
   };
 
   const toggleFavorite = async (id) => {
@@ -81,6 +111,9 @@ export function EventProvider({ children }) {
       handleFilter,
       getEvent,
       getEventById,
+      eventsLoading,
+      eventsError,
+      refreshEvents,
       ...(user?.role === "ADMIN"
         ? { createEvent, updateEvent, deleteEvent, archiveEvent, unarchiveEvent, addImage, deleteImage, getVenueDates }
         : { favoritesOnly, toggleFavoritesOnly, toggleFavorite, addComment })
