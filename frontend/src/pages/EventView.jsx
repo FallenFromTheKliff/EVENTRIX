@@ -23,7 +23,7 @@ export default function EventView() {
   const { state } = useLocation();
   const navigate = useNavigate();
   const { getEvent } = useEvents();
-  const { cartItems, addToCart } = useCart();
+  const { cartItems, addToCart, checkout } = useCart();
   const { loading, runner, texter } = useLoadingText();
 
   const segments = state?.payment ? ["Payment"] : ["Details", "Seats"];
@@ -39,7 +39,8 @@ export default function EventView() {
 
   const images = event.previewImages?.length ? event.previewImages.map(({ imageUrl }) => imageUrl) : [Placeholder];
 
-  const tickets = eventTickets(event.ticketTypes, selection, cartItems);
+  const payingItems = state?.cartItemIds ? cartItems.filter(({ id }) => state.cartItemIds.includes(id)) : cartItems;
+  const tickets = eventTickets(event.ticketTypes, selection, payingItems);
   const chosen = selectedTickets(tickets);
   const total = totalPrice(chosen, "quantity");
   const cartTotal = totalPrice(tickets, "carted");
@@ -67,11 +68,18 @@ export default function EventView() {
     }
   });
 
-  const handlePay = () => runner(() => setMessage({ type: "success", message: "Payment successful!" }));
+  const handlePay = () => runner(async () => {
+    try {
+      await checkout({ paymentMethod: method.label, referenceNumber: account, cartItemIds: state.cartItemIds });
+      setMessage({ type: "success", message: "Payment successful!" });
+    } catch {
+      setMessage({ type: "error", message: "Payment failed!" });
+    }
+  });
 
   const handleClose = () => {
     setMessage(null);
-    if (message.type === "success") navigate("/events");
+    if (message.type === "success") navigate(state?.payment ? "/bookings" : "/events");
   };
 
   return (

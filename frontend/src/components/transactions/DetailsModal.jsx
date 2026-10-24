@@ -4,7 +4,7 @@ import { IconCalendarEvent, IconClock, IconFileText, IconMapPin, IconTag } from 
 import { useEvents } from "../../context/EventContext";
 import { iconStyle, pillStyle, tagStyle, toDate, toTime } from "../../utils/events";
 
-import EventField from "./EventField";
+import EventField from "../events/EventField";
 import Placeholder from "../../assets/images/EVENTRIX-Placeholder.jpeg";
 
 export default function DetailsModal({ booking, onClose }) {

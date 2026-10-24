@@ -35,7 +35,6 @@ export const bookingStatusOptions = [
   { value: "PAID", label: "Successful" },
   { value: "PROCESSING", label: "Processing" },
   { value: "CANCELLED", label: "Cancelled" },
-  { value: "DECLINED", label: "Declined" },
   { value: "COMPLETED", label: "Completed" }
 ];
 

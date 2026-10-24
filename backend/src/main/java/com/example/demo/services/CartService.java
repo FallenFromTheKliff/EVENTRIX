@@ -157,7 +157,11 @@ public class CartService {
 
         Cart cart = getOrCreateCart(user);
 
-        if (cart.getItems().isEmpty()) {
+        List<CartItem> selectedItems = cart.getItems().stream()
+                .filter(item -> paymentRequest.getCartItemIds() == null || paymentRequest.getCartItemIds().contains(item.getId()))
+                .toList();
+
+        if (selectedItems.isEmpty()) {
             throw new RuntimeException("Cart is empty");
         }
 
@@ -171,7 +175,7 @@ public class CartService {
         BigDecimal totalAmount = BigDecimal.ZERO;
         List<ReceiptItem> receiptItems = new ArrayList<>();
 
-        for (CartItem item : cart.getItems()) {
+        for (CartItem item : selectedItems) {
             TicketType ticketType = item.getTicketType();
 
             if (ticketType.getAvailableQuantity() < item.getQuantity()) {
@@ -197,6 +201,8 @@ public class CartService {
             booking.setStatus(BookingStatus.PAID);
             booking.setTotalAmount(subtotal);
             booking.setBookingReference(item.getBookingReference());
+            booking.setStatus(BookingStatus.PENDING);
+            booking.setTicketType(ticketType);
 
             bookingRepository.save(booking);
 
@@ -226,7 +232,7 @@ public class CartService {
         payment.setNotes(paymentRequest.getNotes());
         paymentRepository.save(payment);
 
-        cart.getItems().clear();
+        cart.getItems().removeAll(selectedItems);
         cartRepository.save(cart);
 
         return receipt;

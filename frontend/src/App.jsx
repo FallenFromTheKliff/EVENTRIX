@@ -11,6 +11,8 @@ import Settings from "./pages/Settings";
 import Home from "./pages/Home";
 import SupportFAQs from "./pages/SupportFAQs";
 import Dashboard from "./pages/admin/Dashboard";
+import Reviews from "./pages/Reviews";
+import Feedback from "./pages/admin/Feedback";
 import Events from "./pages/Events";
 import EventView from "./pages/EventView";
 import EventEditor from "./pages/admin/EventEditor";
@@ -30,12 +32,14 @@ const router = createBrowserRouter(createRoutesFromElements(
         <Route path="/support" element={<SupportFAQs />} />
         <Route element={<ProtectedRoute roles={["USER"]} />}>
           <Route path="/home" element={<Home />} />
+          <Route path="/reviews" element={<Reviews />} />
           <Route path="/events/:slug" element={<EventView />} />
           <Route path="/bookings" element={<Bookings />} />
           <Route path="/cart" element={<Cart />} />
         </Route>
         <Route element={<ProtectedRoute roles={["ADMIN"]} />}>
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/feedback" element={<Feedback />} />
           <Route path="/add-event" element={<EventEditor />} />
           <Route path="/edit-event/:slug" element={<EventEditor />} />
           <Route path="/transactions" element={<Transactions />} />

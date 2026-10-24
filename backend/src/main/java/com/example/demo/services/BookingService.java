@@ -3,6 +3,7 @@ package com.example.demo.services;
 import com.example.demo.model.Booking;
 import com.example.demo.model.BookingStatus;
 import com.example.demo.model.Events.Event;
+import com.example.demo.model.Events.TicketType;
 import com.example.demo.model.User;
 import com.example.demo.model.dto.BookingRequestDTO;
 import com.example.demo.model.dto.BookingResponseDTO;
@@ -56,6 +57,10 @@ public class BookingService {
                     .eventImageUrl(booking.getEvent().getImageUrl())
                     .eventDateTime(booking.getEvent().getDateTime())
                     .eventLocation(booking.getEvent().getLocation())
+                    .eventCategory(booking.getEvent().getCategory() != null ? booking.getEvent().getCategory().getName() : null)
+                    .ticketName(booking.getTicketType() != null ? booking.getTicketType().getName() : null)
+                    .userName(booking.getUser().getName())
+                    .userEmail(booking.getUser().getEmail())
                     .build();
         }).collect(Collectors.toList());
     }
@@ -123,41 +128,39 @@ public class BookingService {
             throw new IllegalStateException("Only pending or paid bookings can be cancelled");
         }
 
-        if (booking.getStatus() == BookingStatus.PAID) {
-            Event event = booking.getEvent();
-            event.setAvailableTickets(event.getAvailableTickets() + booking.getQuantity());
-            eventRepository.save(event);
+        if (booking.getStatus() != BookingStatus.PENDING) {
+            throw new IllegalStateException("Only pending bookings can be cancelled");
         }
 
-        booking.setStatus(BookingStatus.CANCELLED);
-        booking.setAdminNotes("Cancelled by user");
+        booking.setStatus(BookingStatus.PROCESSING);
+        booking.setAdminNotes("Cancellation requested by user");
 
         return bookingRepository.save(booking);
     }
 
-    public List<Booking> getTransactionLog() {
-        return bookingRepository.findByStatusIn(Arrays.asList(BookingStatus.PENDING, BookingStatus.PAID, BookingStatus.CANCELLED));
+    public List<BookingResponseDTO> getTransactionLog() {
+        return mapBookingsToDTOs(bookingRepository.findByStatusIn(Arrays.asList(BookingStatus.PENDING, BookingStatus.PROCESSING, BookingStatus.PAID, BookingStatus.CANCELLED)));
     }
 
     @Transactional
-    public Booking updateBookingStatus(Long bookingId, BookingStatus status, String adminNotes) {
+    public BookingResponseDTO updateBookingStatus(Long bookingId, BookingStatus status, String adminNotes) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
 
-        Event event = booking.getEvent();
-
-        boolean wasPaid = booking.getStatus() == BookingStatus.PAID;
+        boolean holdsTickets = booking.getStatus() == BookingStatus.PENDING
+                || booking.getStatus() == BookingStatus.PROCESSING
+                || booking.getStatus() == BookingStatus.PAID;
         boolean isCancelledOrDeclined = status == BookingStatus.CANCELLED || status == BookingStatus.DECLINED;
 
-        if (wasPaid && isCancelledOrDeclined) {
-            event.setAvailableTickets(event.getAvailableTickets() + booking.getQuantity());
-            eventRepository.save(event);
+        if (holdsTickets && isCancelledOrDeclined && booking.getTicketType() != null) {
+            TicketType ticketType = booking.getTicketType();
+            ticketType.setAvailableQuantity(ticketType.getAvailableQuantity() + booking.getQuantity());
         }
 
         booking.setStatus(status);
         booking.setAdminNotes(adminNotes);
 
-        return bookingRepository.save(booking);
+        return mapBookingsToDTOs(List.of(bookingRepository.save(booking))).get(0);
     }
 
     public Booking getBookingById(Long id) {

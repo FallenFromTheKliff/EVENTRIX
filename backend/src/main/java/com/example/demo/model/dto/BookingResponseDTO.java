@@ -21,4 +21,8 @@ public class BookingResponseDTO {
     private String eventImageUrl;
     private LocalDateTime eventDateTime;
     private String eventLocation;
+    private String eventCategory;
+    private String ticketName;
+    private String userName;
+    private String userEmail;
 }

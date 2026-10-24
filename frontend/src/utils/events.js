@@ -114,7 +114,7 @@ export const toTime = (value) => value ? new Date(value).toLocaleTimeString("en-
 
 export const eventTickets = (ticketTypes, selection, cartItems) => ticketNames.flatMap((name) => {
   const ticket = findTicket(ticketTypes, name);
-  return ticket ? [{ ...ticket, ...selection[name], name, carted: cartItems.find((item) => item.ticketType.id === ticket.id)?.quantity ?? 0 }] : [];
+  return ticket ? [{ ...ticket, ...selection[name], name, carted: cartItems.filter((item) => item.ticketType.id === ticket.id).reduce((sum, item) => sum + item.quantity, 0) }] : [];
 });
 
 export const totalPrice = (tickets = [], key) => tickets.reduce((sum, ticket) => sum + ticket.price * Number(ticket[key]), 0);

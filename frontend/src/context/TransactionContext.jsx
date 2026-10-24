@@ -18,6 +18,7 @@ const toTransaction = (booking) => ({
   eventDateTime: booking.event?.dateTime,
   eventLocation: booking.event?.location,
   eventCategory: booking.event?.category?.name,
+  ticketName: booking.ticketType?.name,
   userName: booking.user?.name,
   userEmail: booking.user?.email
 });

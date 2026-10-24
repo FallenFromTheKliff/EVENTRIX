@@ -17,7 +17,7 @@ export default function AppLayout() {
       <div className="flex flex-1 pt-20">
         <Sidebar role={user.role} />
         <main className="flex-1">
-          <div className="mx-auto min-h-screen w-19/20 py-8">
+          <div className="flex flex-col mx-auto min-h-screen w-19/20 py-8">
             <Outlet />
           </div>
           <Footer role={user.role} />

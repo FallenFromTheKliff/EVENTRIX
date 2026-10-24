@@ -69,7 +69,8 @@ export default function BookingCard({ booking, children, admin = false }) {
                     <p>₱{Number(booking.totalAmount || 0).toFixed(2)}</p>
                   </div>
                   <div className="flex w-full flex-col justify-center gap-2 md:w-60 md:shrink-0">
-                    {booking.cartItemId ? children : (
+                    {children}
+                    {!booking.cartItemId && (
                       <button
                         type="button"
                         onClick={() => setDetails(true)}

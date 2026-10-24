@@ -34,6 +34,7 @@ public class User {
     @Column(nullable = false)
     private String role; // "USER" or "ADMIN"
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Booking> bookings = new ArrayList<>();
 

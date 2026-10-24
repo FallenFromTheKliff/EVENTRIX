@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 
 const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789#$%&@";
-const hiddenStyles = { up: "opacity-0 translate-y-10", right: "opacity-0 translate-x-10", slide: "opacity-0 translate-x-32" };
+const hiddenStyles = { up: "opacity-0 translate-y-10", right: "opacity-0 translate-x-10", slide: "opacity-0 translate-x-32", reappear: "opacity-0" };
 const scramble = (text, solved) => [...text].map((char, i) => i < solved || char === " " ? char : letters[Math.floor(Math.random() * letters.length)]).join("");
 
 export default function Reveal({ children, className = "", variant = "up", ready = true }) {

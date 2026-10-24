@@ -21,7 +21,7 @@ export default function Events() {
   );
 
   return (
-    <div>
+    <div className="flex flex-1 flex-col">
       <title>Events - EVENTRIX</title>
       <div className="flex flex-wrap items-end gap-x-4">
         <h2 className="relative -mb-1 border-b-4 border-cyan-500 pb-3 text-3xl font-bold">
@@ -35,21 +35,21 @@ export default function Events() {
           <FilterRow fields={fields.filter(({ type }) => type !== "search")} filters={filters} options={options} onChange={handleFilter} />
         </Reveal>
       </div>
-      <div className="grid gap-8 mt-8 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-        {events.length === 0 ? (
-          <p className="w-full py-8 text-center text-gray-400">
-            {user.role === "ADMIN" ? "You should start adding events to kick things off" : "It seems there are no events available..."}
-          </p>
-        ) : filteredEvents.length > 0 ? (
-          filteredEvents.map((event) => (
+      {filteredEvents.length > 0 ? (
+        <div className="grid gap-8 mt-8 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+          {filteredEvents.map((event) => (
             <Reveal key={event.eventId} className="h-full">
               <EventCard event={event} role={user.role} />
             </Reveal>
-          ))
-        ) : (
-          <p className="w-full py-8 text-center text-gray-400">No events match your filters.</p>
-        )}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <p className="my-auto py-8 text-center text-gray-400">
+          {events.length === 0
+            ? (user.role === "ADMIN" ? "You should start adding events to kick things off" : "It seems there are no events available...")
+            : "No events match your filters."}
+        </p>
+      )}
     </div>
   );
 }

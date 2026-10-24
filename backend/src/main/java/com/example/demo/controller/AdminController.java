@@ -7,6 +7,7 @@ import com.example.demo.model.Events.Event;
 import com.example.demo.model.Events.EventComment;
 import com.example.demo.model.dto.CommentReplyUpdateDTO;
 import com.example.demo.model.dto.EventResponseDTO;
+import com.example.demo.model.dto.BookingResponseDTO;
 import com.example.demo.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -92,7 +93,7 @@ public class AdminController {
 
     // ... (Booking management endpoints are similar, but use updated service) ...
     @PutMapping("/bookings/{id}/status")
-    public ResponseEntity<Booking> updateBookingStatus(
+    public ResponseEntity<BookingResponseDTO> updateBookingStatus(
             @PathVariable Long id,
             @RequestParam BookingStatus status,
             @RequestParam(required = false) String adminNotes) {
@@ -101,7 +102,7 @@ public class AdminController {
 
     // NEW: Transaction Log
     @GetMapping("/transactions")
-    public ResponseEntity<List<Booking>> getTransactionLog() {
+    public ResponseEntity<List<BookingResponseDTO>> getTransactionLog() {
         return ResponseEntity.ok(bookingService.getTransactionLog());
     }
 

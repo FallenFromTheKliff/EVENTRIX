@@ -18,6 +18,7 @@ public class CartItemResponseDTO {
     private String eventImageUrl;
     private LocalDateTime eventDateTime;
     private String eventLocation;
+    private String eventCategory;
     private String bookingReference;
 
     public static CartItemResponseDTO from(CartItem item) {
@@ -37,6 +38,7 @@ public class CartItemResponseDTO {
             event.getImageUrl(),
             event.getDateTime(),
             event.getLocation(),
+            event.getCategory() != null ? event.getCategory().getName() : null,
             item.getBookingReference()
         );
     }

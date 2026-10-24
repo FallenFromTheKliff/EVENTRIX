@@ -1,6 +1,7 @@
 package com.example.demo.model;
 
 import com.example.demo.model.Events.Event;
+import com.example.demo.model.Events.TicketType;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,6 +29,10 @@ public class Booking {
 
     @Column(name = "booking_date", nullable = false)
     private LocalDateTime bookingDate;
+
+    @ManyToOne
+    @JoinColumn(name = "ticket_type_id")
+    private TicketType ticketType;
 
     @Column(nullable = false)
     private int quantity;
