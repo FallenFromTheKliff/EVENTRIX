@@ -50,7 +50,7 @@ export function CartProvider({ children }) {
         if (active) setCartItems(items);
       })
       .catch(() => {
-        if (active) setCartError("I think we lost your cart...");
+        if (active) setCartError("I think we lost your cart... Try refreshing the page!");
       })
       .finally(() => {
         if (active) setCartLoading(false);
@@ -68,7 +68,7 @@ export function CartProvider({ children }) {
     try {
       setCartItems(await getCart());
     } catch {
-      setCartError("I think we lost your cart...");
+      setCartError("I think we lost your cart... Try refreshing the page!");
     } finally {
       setCartLoading(false);
     }
@@ -113,8 +113,7 @@ export function CartProvider({ children }) {
       quickBuy,
       updateCartItem,
       removeFromCart,
-      checkout,
-      refreshCart
+      checkout
     }}>
       {children}
     </CartContext.Provider>

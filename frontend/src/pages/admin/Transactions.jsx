@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { useTransactions } from "../../context/TransactionContext";
 
-import { bookingButton } from "../../utils/events";
+import { messageStyle, bookingButton } from "../../utils/events";
 import { cartFilters as transactionFilters, emptyFilters, months } from "../../utils/filters";
 
 import BookingCard from "../../components/transactions/BookingCard";
@@ -65,8 +65,10 @@ export default function Transactions() {
         <div className="mt-4 flex flex-1 flex-col space-y-4">
           {transactionsError && <Retry message={transactionsError} onRetry={refreshTransactions} />}
           {transactionsLoading && !transactions.length ? (
-            <p className="my-auto py-8 text-center text-gray-400">Loading transactions...</p>
-          ) : transactionsError ? null : filteredTransactions.length ? (
+            <p className={messageStyle}>Loading transactions...</p>
+          ) : transactionsError ? (
+            <p className={messageStyle}>{transactionsError}</p>
+          ) : filteredTransactions.length ? (
             <>
               <Reveal variant="reappear" className="w-full">
                 <BookingHeader admin />

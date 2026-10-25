@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useTransactions } from "../context/TransactionContext";
 import { useEvents } from "../context/EventContext";
 
-import { bookingButton } from "../utils/events";
+import { messageStyle, bookingButton } from "../utils/events";
 import { emptyFilters, bookingFilters, bookingStatusOptions, months } from "../utils/filters";
 
 import BookingCard from "../components/transactions/BookingCard";
@@ -12,7 +12,6 @@ import FilterRow from "../components/ui/FilterRow";
 import Reveal from "../components/ui/Reveal";
 import useLoadingText from "../components/ui/useLoadingText";
 import ConfirmModal from "../components/ui/ConfirmModal";
-import Retry from "../components/ui/Retry";
 
 export default function Bookings() {
   const { bookings, bookingsLoading, bookingsError, refreshBookings, cancelBooking } = useTransactions();
@@ -71,8 +70,10 @@ export default function Bookings() {
           </Reveal>
           {bookingsError && <Retry message={bookingsError} onRetry={refreshBookings} />}
           {bookingsLoading && !bookings.length ? (
-            <p className="my-auto py-8 text-center text-gray-400">Loading bookings...</p>
-          ) : bookingsError ? null : filteredBookings.length ? (
+            <p className={messageStyle}>Loading bookings...</p>
+          ) : bookingsError ? (
+            <p className={messageStyle}>{bookingsError}</p>
+          ) : filteredBookings.length ? (
             filteredBookings.map((booking) => (
               <Reveal key={booking.bookingId} className="w-full">
                 <BookingCard booking={booking}>

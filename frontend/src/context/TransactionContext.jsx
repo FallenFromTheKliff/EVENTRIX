@@ -21,22 +21,9 @@ export function TransactionProvider({ children }) {
     try {
       setBookings((await axiosClient.get("/user/bookings")).data);
     } catch {
-      setBookingsError("Unable to load your bookings.");
+      setBookingsError("Sorry, we couldn't retrieve your bookings! Try refreshing the page.");
     } finally {
       setBookingsLoading(false);
-    }
-  };
-
-  const refreshTransactions = async () => {
-    setTransactionsLoading(true);
-    setTransactionsError(null);
-
-    try {
-      setTransactions((await axiosClient.get("/admin/transactions")).data);
-    } catch {
-      setTransactionsError("Unable to load transaction history.");
-    } finally {
-      setTransactionsLoading(false);
     }
   };
 
@@ -52,7 +39,7 @@ export function TransactionProvider({ children }) {
           if (active) setBookings(response.data);
         })
         .catch(() => {
-          if (active) setBookingsError("Sorry, we couldn't retrieve your bookings!");
+          if (active) setBookingsError("Sorry, we couldn't retrieve your bookings! Try refreshing the page.");
         })
         .finally(() => {
           if (active) setBookingsLoading(false);
@@ -72,7 +59,7 @@ export function TransactionProvider({ children }) {
           if (active) setTransactions(response.data);
         })
         .catch(() => {
-          if (active) setTransactionsError("Oops, we couldn't load the transactions...");
+          if (active) setTransactionsError("Oops, we couldn't load the transactions... Try refreshing the page!");
         })
         .finally(() => {
           if (active) setTransactionsLoading(false);

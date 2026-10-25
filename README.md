@@ -12,23 +12,24 @@
 |---|---|
 | **Languages** | ![Java](https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white) ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black) ![CSS](https://img.shields.io/badge/CSS-1572B6?style=for-the-badge&logo=css&logoColor=white) |
 | **Frontend** | ![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white) ![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black) ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white) |
-| **Backend & Database** | ![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white) ![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white) ![Spring Security](https://img.shields.io/badge/Spring_Security-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white) ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white) |
-| **Tools & Build** | ![Gradle](https://img.shields.io/badge/Gradle-02303A?style=for-the-badge&logo=gradle&logoColor=white) ![npm](https://img.shields.io/badge/npm-CB3837?style=for-the-badge&logo=npm&logoColor=white) |
+| **Backend & Database** | ![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white) ![Spring Security](https://img.shields.io/badge/Spring_Security-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white) ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white) |
+| **Tools & Build** | ![Gradle](https://img.shields.io/badge/Gradle-02303A?style=for-the-badge&logo=gradle&logoColor=white) ![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white) ![npm](https://img.shields.io/badge/npm-CB3837?style=for-the-badge&logo=npm&logoColor=white) |
 
 ---
 
 ## SYSTEM MODULES
+
 ### General
 
-> **USER** and **ADMIN** roles have access to the Profile and Settings.
+> **USER** and **ADMIN** roles have access to the Profile, Events, and Settings.
 
 ### Website
 
 | Role | Modules |
 |---|---|
 | **PUBLIC** | Landing, About Us, Support, FAQs, Login, Register |
-| **USER** | Home, Support, Reviews, Events, Bookings, Cart |
-| **ADMIN** | Analytics, Ticket Orders, Transaction History, Reception, Events |
+| **USER** | Home, Support, Reviews, Bookings, Cart |
+| **ADMIN** | Dashboard, Reception, Transaction History |
 
 ---
 
@@ -39,7 +40,7 @@ EVENTRIX/
 ├── backend/
 │   └── src/
 │       ├── main/
-│       │   ├── java/com/example/demo//java/com/example/demo/
+│       │   ├── java/com/example/demo/java/com/example/demo/
 │       │   │   ├── config/                     # Spring Security setup
 │       │   │   ├── controller/
 │       │   │   ├── jwt/                        # token creation/validation
@@ -81,7 +82,7 @@ EVENTRIX/
 | Requirement | Version |
 |---|---|
 | Java (JDK) | 21 |
-| Node.js | 18+ (for React 19 / react-scripts 5) |
+| Node.js | 20.19+ or 22.12+ (required by Vite 8) |
 | PostgreSQL | latest |
 | Gradle | not required — wrapper (`gradlew` / `gradlew.bat`) is included |
 
@@ -89,7 +90,7 @@ EVENTRIX/
 
 ```bash
 git clone <repository-url-here>
-cd eventrix
+cd EVENTRIX
 ```
 
 ### 2. Set up the database
@@ -97,6 +98,8 @@ cd eventrix
 Create a PostgreSQL database named `eventrixdb`.
 
 ### 3. Configure the backend
+
+Create `backend/src/main/resources/application.properties` (it is gitignored, so it never gets committed):
 
 ```properties
 spring.application.name=backend
@@ -106,7 +109,7 @@ spring.datasource.password=<your-postgres-password>
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
-jwt.secret=<your-own-256-bit-secret>
+jwt.secret=<your-own-secret-of-at-least-32-characters>
 ```
 
 ### 4. Run the backend (Spring Boot)
@@ -117,7 +120,7 @@ cd backend
 gradlew.bat bootRun      # Windows
 ```
 
-The API runs on `http://localhost:8080/api` by default.
+The API runs on `http://localhost:8080/api` by default, and the tables are created on the first run.
 
 ### 5. Run the frontend (React)
 

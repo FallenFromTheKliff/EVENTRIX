@@ -1,13 +1,13 @@
 import Reveal from "../../components/ui/Reveal";
 
-export default function Feedback() {
+export default function Reception() {
   return (
     <div>
-      <title>Feedback - EVENTRIX</title>
+      <title>Reception - EVENTRIX</title>
       <section>
         <div className="flex border-b-4 border-zinc-900">
           <h2 className="-mb-1 border-b-4 border-cyan-500 pb-3 text-3xl font-bold">
-            <Reveal variant="type">Event Feedback</Reveal>
+            <Reveal variant="type">Event Reception</Reveal>
           </h2>
         </div>
       </section>

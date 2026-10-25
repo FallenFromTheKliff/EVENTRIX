@@ -14,6 +14,7 @@ export const buttonStyle = "flex-1 font-bold rounded-md py-3 text-center transit
 export const pillStyle = "relative rounded-md bg-white/5 p-3 pl-11 text-gray-300";
 export const iconStyle = "absolute left-3 top-1/2 -translate-y-1/2 text-cyan-400";
 export const tagStyle = "flex w-fit items-center gap-2 rounded-full bg-cyan-500/20 px-3 py-1 text-sm text-cyan-400";
+export const messageStyle = "my-auto py-8 text-center text-lg text-white";
 export const bookingButton = "flex w-full items-center justify-center rounded-md py-2 text-center text-sm font-bold transition duration-200 enabled:cursor-pointer enabled:hover:brightness-50 disabled:opacity-50";
 export const bookingColumns = "grid-cols-[minmax(0,2fr)_minmax(5rem,1fr)_minmax(7rem,1fr)_minmax(8rem,1.5fr)_7rem]";
 export const adminColumns = "grid-cols-[minmax(0,1.7fr)_4rem_6rem_minmax(0,1.3fr)_minmax(0,1fr)_6rem]";

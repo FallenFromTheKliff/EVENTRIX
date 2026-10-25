@@ -12,7 +12,7 @@ import Home from "./pages/Home";
 import SupportFAQs from "./pages/SupportFAQs";
 import Dashboard from "./pages/admin/Dashboard";
 import Reviews from "./pages/Reviews";
-import Feedback from "./pages/admin/Feedback";
+import Reception from "./pages/admin/Reception";
 import Events from "./pages/Events";
 import EventView from "./pages/EventView";
 import EventEditor from "./pages/admin/EventEditor";
@@ -39,10 +39,10 @@ const router = createBrowserRouter(createRoutesFromElements(
         </Route>
         <Route element={<ProtectedRoute roles={["ADMIN"]} />}>
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/feedback" element={<Feedback />} />
+          <Route path="/reception" element={<Reception />} />
+          <Route path="/transactions" element={<Transactions />} />
           <Route path="/add-event" element={<EventEditor />} />
           <Route path="/edit-event/:slug" element={<EventEditor />} />
-          <Route path="/transactions" element={<Transactions />} />
         </Route>
       </Route>
     </Route>

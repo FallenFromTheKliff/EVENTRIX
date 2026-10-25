@@ -3,7 +3,7 @@ import { Link } from "react-router";
 
 import { useCart } from "../context/CartContext";
 import { useEvents } from "../context/EventContext";
-import { toSlug, bookingButton } from "../utils/events";
+import { toSlug, messageStyle, bookingButton } from "../utils/events";
 import { cartFilters, emptyCartFilters, months } from "../utils/filters";
 
 import BookingCard from "../components/transactions/BookingCard";
@@ -11,7 +11,6 @@ import BookingHeader from "../components/transactions/BookingHeader";
 import FilterRow from "../components/ui/FilterRow";
 import Reveal from "../components/ui/Reveal";
 import ConfirmModal from "../components/ui/ConfirmModal";
-import Retry from "../components/ui/Retry";
 
 const stepButton = "flex-1 rounded-md bg-zinc-700 py-2 text-sm font-bold transition duration-200 enabled:cursor-pointer enabled:hover:brightness-50 disabled:opacity-50";
 
@@ -82,8 +81,10 @@ export default function Cart() {
           </Reveal>
           {cartError && <Retry message={cartError} onRetry={refreshCart} />}
           {cartLoading && !cartBookings.length ? (
-            <p className="my-auto py-8 text-center text-gray-400">Loading cart...</p>
-          ) : cartError ? null : filteredBookings.length > 0 ? (
+            <p className={messageStyle}>Loading cart...</p>
+          ) : cartError ? (
+            <p className={messageStyle}>{cartError}</p>
+          ) : filteredBookings.length > 0 ? (
             filteredBookings.map((booking) => (
               <Reveal key={booking.cartItemId} className="w-full">
                 <BookingCard booking={booking}>

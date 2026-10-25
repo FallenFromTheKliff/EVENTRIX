@@ -4,7 +4,6 @@ import { useEvents } from "../context/EventContext";
 import EventCard from "../components/events/EventCard";
 import Reveal from "../components/ui/Reveal";
 import FilterRow from "../components/ui/FilterRow";
-import Retry from "../components/ui/Retry";
 
 import { adminEventFilters, eventFilters, months, statuses } from "../utils/filters";
 
@@ -38,8 +37,10 @@ export default function Events() {
       </div>
       {eventsError && <Retry message={eventsError} onRetry={refreshEvents} />}
       {eventsLoading && !events.length ? (
-        <p className="my-auto py-8 text-center text-gray-400">Loading events...</p>
-      ) : eventsError ? null : filteredEvents.length > 0 ? (
+        <p className={messageStyle}>Loading events...</p>
+      ) : eventsError ? (
+        <p className={messageStyle}>{eventsError}</p>
+      ) : filteredEvents.length > 0 ? (
         <div className="grid gap-8 mt-8 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
           {filteredEvents.map((event) => (
             <Reveal key={event.eventId} className="h-full">

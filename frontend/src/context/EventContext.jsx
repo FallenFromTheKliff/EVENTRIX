@@ -51,7 +51,7 @@ export function EventProvider({ children }) {
         if (active) setEvents(response.data);
       })
       .catch(() => {
-        if (active) setEventsError("Oops, we couldn't load the events...");
+        if (active) setEventsError("Oops, we couldn't load the events... Try refreshing the page!");
       })
       .finally(() => {
         if (active) setEventsLoading(false);
@@ -69,7 +69,7 @@ export function EventProvider({ children }) {
     try {
       setEvents((await axiosClient.get(toUrl(user), { params: toParams(filters) })).data);
     } catch {
-      setEventsError("Oops, we couldn't load the events...");
+      setEventsError("Oops, we couldn't load the events... Try refreshing the page!");
     } finally {
       setEventsLoading(false);
     }
@@ -112,7 +112,6 @@ export function EventProvider({ children }) {
       getEventById,
       eventsLoading,
       eventsError,
-      refreshEvents,
       ...(user?.role === "ADMIN"
         ? { createEvent, updateEvent, deleteEvent, archiveEvent, unarchiveEvent, addImage, deleteImage, getVenueDates }
         : { favoritesOnly, toggleFavoritesOnly, toggleFavorite, addComment })
