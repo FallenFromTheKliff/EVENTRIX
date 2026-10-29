@@ -9,6 +9,7 @@ import com.example.demo.repository.BookingRepo;
 import com.example.demo.repository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -19,14 +20,12 @@ public class BookingService {
     @Autowired private UserRepo userRepository;
 
     public List<BookingResponseDTO> getFilteredBookingsForUser(String userEmail, BookingStatus status, String eventName) {
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.getByEmail(userEmail);
         return bookingRepository.findBookingsWithFilters(user, status, eventName).stream().map(this::toDTO).toList();
     }
 
     public List<BookingResponseDTO> getTransactionLog() {
-        return bookingRepository.findByStatusIn(List.of(BookingStatus.PENDING, BookingStatus.PROCESSING, BookingStatus.PAID, BookingStatus.CANCELLED))
-                .stream().map(this::toDTO).toList();
+        return bookingRepository.findAll(Sort.by(Sort.Direction.DESC, "bookingDate")).stream().map(this::toDTO).toList();
     }
 
     @Transactional
@@ -63,7 +62,7 @@ public class BookingService {
             ticketType.setAvailableQuantity(ticketType.getAvailableQuantity() + booking.getQuantity());
         }
         booking.setStatus(status);
-        booking.setAdminNotes(adminNotes);
+        if (adminNotes != null) booking.setAdminNotes(adminNotes);
         return toDTO(bookingRepository.save(booking));
     }
 

@@ -1,11 +1,13 @@
 package com.example.demo.services;
 
 import com.example.demo.model.*;
+import com.example.demo.model.Events.Event;
 import com.example.demo.model.Events.TicketType;
 import com.example.demo.model.dto.CartItemRequestDTO;
 import com.example.demo.model.dto.CartItemResponseDTO;
 import com.example.demo.model.dto.CartItemUpdateDTO;
 import com.example.demo.model.dto.PaymentRequestDTO;
+import com.example.demo.model.dto.ReceiptResponseDTO;
 import com.example.demo.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,8 +35,7 @@ public class CartService {
 
     @Transactional
     public CartItemResponseDTO addToCart(String userEmail, CartItemRequestDTO dto) {
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.getByEmail(userEmail);
 
         Cart cart = getOrCreateCart(user);
 
@@ -80,8 +81,7 @@ public class CartService {
 
     @Transactional
     public List<CartItemResponseDTO> getCartItems(String userEmail) {
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.getByEmail(userEmail);
 
         List<CartItem> items = getOrCreateCart(user).getItems();
 
@@ -98,8 +98,7 @@ public class CartService {
 
     @Transactional
     public CartItemResponseDTO updateCartItem(String userEmail, Long itemId, CartItemUpdateDTO dto) {
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.getByEmail(userEmail);
 
         Cart cart = getOrCreateCart(user);
 
@@ -135,8 +134,7 @@ public class CartService {
 
     @Transactional
     public void removeCartItem(String userEmail, Long itemId) {
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.getByEmail(userEmail);
 
         Cart cart = getOrCreateCart(user);
 
@@ -150,79 +148,60 @@ public class CartService {
         cartRepository.save(cart);
     }
 
-    @Transactional
-    public Receipt checkoutCart(String userEmail, PaymentRequestDTO paymentRequest) {
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
+        @Transactional
+    public ReceiptResponseDTO checkoutCart(String userEmail, PaymentRequestDTO paymentRequest) {
+        User user = userRepository.getByEmail(userEmail);
         Cart cart = getOrCreateCart(user);
-
         List<CartItem> selectedItems = cart.getItems().stream()
                 .filter(item -> paymentRequest.getCartItemIds() == null || paymentRequest.getCartItemIds().contains(item.getId()))
                 .toList();
-
         if (selectedItems.isEmpty()) {
             throw new RuntimeException("Cart is empty");
         }
-
         Receipt receipt = Receipt.builder()
                 .user(user)
-                .items(new ArrayList<>())
+                .createdAt(LocalDateTime.now())
                 .build();
-
-        receiptRepository.save(receipt);
-
         BigDecimal totalAmount = BigDecimal.ZERO;
-        List<ReceiptItem> receiptItems = new ArrayList<>();
-
         for (CartItem item : selectedItems) {
             TicketType ticketType = item.getTicketType();
-
+            Event event = ticketType.getEvent();
             if (ticketType.getAvailableQuantity() < item.getQuantity()) {
                 throw new RuntimeException("Not enough tickets for " + ticketType.getName());
             }
-
             ticketType.setAvailableQuantity(ticketType.getAvailableQuantity() - item.getQuantity());
             ticketTypeRepository.save(ticketType);
-
             BigDecimal subtotal = ticketType.getPrice().multiply(BigDecimal.valueOf(item.getQuantity()));
             totalAmount = totalAmount.add(subtotal);
-
             if (item.getBookingReference() == null || item.getBookingReference().isBlank()) {
                 item.setBookingReference(BookingReferenceGenerator.generate());
                 cartItemRepository.save(item);
             }
-
             Booking booking = new Booking();
             booking.setUser(user);
-            booking.setEvent(ticketType.getEvent());
+            booking.setEvent(event);
             booking.setBookingDate(LocalDateTime.now());
             booking.setQuantity(item.getQuantity());
-            booking.setStatus(BookingStatus.PAID);
             booking.setTotalAmount(subtotal);
             booking.setBookingReference(item.getBookingReference());
             booking.setStatus(BookingStatus.PENDING);
             booking.setTicketType(ticketType);
-
             bookingRepository.save(booking);
-
-            ReceiptItem receiptItem = ReceiptItem.builder()
+            receipt.getItems().add(ReceiptItem.builder()
                     .receipt(receipt)
+                    .bookingReference(item.getBookingReference())
+                    .eventTitle(event.getTitle())
+                    .eventLocation(event.getLocation())
+                    .eventDateTime(event.getDateTime())
                     .ticketTypeId(ticketType.getId())
                     .ticketTypeName(ticketType.getName())
                     .unitPriceSnapshot(ticketType.getPrice())
                     .quantity(item.getQuantity())
                     .subtotal(subtotal)
-                    .build();
-
-            receiptItems.add(receiptItem);
+                    .build());
         }
-
-        receipt.setItems(receiptItems);
         receipt.setTotalAmount(totalAmount);
-        receipt.setCreatedAt(LocalDateTime.now());
         receiptRepository.save(receipt);
-
         PaymentDetails payment = new PaymentDetails();
         payment.setUser(user);
         payment.setReceipt(receipt);
@@ -231,10 +210,9 @@ public class CartService {
         payment.setReferenceNumber(paymentRequest.getReferenceNumber());
         payment.setNotes(paymentRequest.getNotes());
         paymentRepository.save(payment);
-
+        receipt.setPaymentDetails(payment);
         cart.getItems().removeAll(selectedItems);
         cartRepository.save(cart);
-
-        return receipt;
+        return ReceiptResponseDTO.from(receipt);
     }
 }

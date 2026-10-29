@@ -17,15 +17,14 @@ public class Receipt {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // purchaser
     @ManyToOne(optional = false)
     @JoinColumn(name = "user_id")
     private User user;
 
-    // optional link to payment details table (if you already have it)
-    @OneToOne
-    @JoinColumn(name = "payment_details_id")
-    private PaymentDetails paymentDetails; // assume exists elsewhere
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @OneToOne(mappedBy = "receipt")
+    private PaymentDetails paymentDetails;
 
     @Column(name = "total_amount", precision = 10, scale = 2)
     private BigDecimal totalAmount;

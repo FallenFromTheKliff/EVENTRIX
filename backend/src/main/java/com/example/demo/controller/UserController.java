@@ -8,6 +8,7 @@ import com.example.demo.services.CartService;
 import com.example.demo.services.EventCommentService;
 import com.example.demo.services.EventService;
 import com.example.demo.services.ReviewService;
+import com.example.demo.services.ReceiptService;
 import com.example.demo.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,7 @@ public class UserController {
     @Autowired private UserService userService;
     @Autowired private CartService cartService;
     @Autowired private ReviewService reviewService;
+    @Autowired private ReceiptService receiptService;
     @Autowired private JwtUtil jwtUtil;
 
     @GetMapping("/profile")
@@ -64,6 +66,11 @@ public class UserController {
     @PutMapping("/bookings/{id}/complete")
     public ResponseEntity<BookingResponseDTO> completeBooking(@PathVariable Long id, Principal principal) {
         return ResponseEntity.ok(bookingService.completeBooking(id, principal.getName()));
+    }
+
+    @GetMapping("/bookings/{id}/receipt")
+    public ResponseEntity<?> getBookingReceipt(@PathVariable Long id, Principal principal) {
+        return ResponseEntity.ok(receiptService.getUserBookingReceipt(id, principal.getName()));
     }
 
     @GetMapping("/cart")
@@ -115,5 +122,10 @@ public class UserController {
     @PutMapping("/reviews/{id}")
     public ResponseEntity<?> updateReview(@PathVariable Long id, @RequestBody ReviewRequestDTO dto, Principal principal) {
         return ResponseEntity.ok(reviewService.updateReview(id, principal.getName(), dto));
+    }
+
+    @GetMapping("/receipts")
+    public ResponseEntity<?> getUserReceipts(Principal principal) {
+        return ResponseEntity.ok(receiptService.getUserReceipts(principal.getName()));
     }
 }

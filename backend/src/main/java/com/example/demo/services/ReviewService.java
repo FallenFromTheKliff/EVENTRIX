@@ -41,8 +41,7 @@ public class ReviewService {
     }
 
     public List<ReviewResponseDTO> getUserReviews(String userEmail) {
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.getByEmail(userEmail);
         return reviewRepository.findByUserUserIdOrderByCreatedAtDesc(user.getUserId()).stream().map(this::toDTO).toList();
     }
 
@@ -50,8 +49,7 @@ public class ReviewService {
     public ReviewResponseDTO addReview(long eventId, String userEmail, ReviewRequestDTO dto) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.getByEmail(userEmail);
         if (!bookingRepository.existsByUserAndEventAndStatus(user, event, BookingStatus.COMPLETED)) {
             throw new RuntimeException("You can only review events you have a completed booking for.");
         }
@@ -89,8 +87,7 @@ public class ReviewService {
         if (dto.getContent() == null || dto.getContent().isBlank()) {
             throw new RuntimeException("Reply cannot be empty.");
         }
-        User admin = userRepository.findByEmail(adminEmail)
-                .orElseThrow(() -> new RuntimeException("Admin user not found"));
+        User admin = userRepository.getByEmail(adminEmail);
         review.setReply(dto.getContent());
         review.setRepliedBy(admin);
         review.setRepliedAt(LocalDateTime.now());

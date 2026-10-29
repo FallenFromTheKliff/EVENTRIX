@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "receipt_items")
@@ -16,16 +17,21 @@ public class ReceiptItem {
     private Long id;
 
     @JsonIgnore
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     @ManyToOne(optional = false)
     @JoinColumn(name = "receipt_id")
     private Receipt receipt;
 
-    // snapshot of which ticket type was purchased
-    private Long ticketTypeId;        // store id to avoid FK issues if tickettype removed later
-    private String ticketTypeName;    // snapshot "VIP" or "General"
+    private String bookingReference;
+    private String eventTitle;
+    private String eventLocation;
+    private LocalDateTime eventDateTime;
+    private Long ticketTypeId;
+    private String ticketTypeName;
 
     @Column(precision = 10, scale = 2)
-    private BigDecimal unitPriceSnapshot; // price at time of purchase
+    private BigDecimal unitPriceSnapshot;
 
     private Integer quantity;
 

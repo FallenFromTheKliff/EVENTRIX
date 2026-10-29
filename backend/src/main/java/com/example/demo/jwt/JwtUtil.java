@@ -13,7 +13,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
@@ -22,8 +21,6 @@ public class JwtUtil {
 
     @Value("${jwt.secret}")
     private String secret;
-
-    private final Set<String> invalidatedTokens = ConcurrentHashMap.newKeySet();
 
     private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
@@ -55,9 +52,7 @@ public class JwtUtil {
     }
 
     //Invalidate a token
-    public void invalidateToken(String token) {
-        invalidatedTokens.add(token);
-    }
+    private final Map<String, Date> invalidatedTokens = new ConcurrentHashMap<>();
 
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
@@ -80,7 +75,13 @@ public class JwtUtil {
         return (
                 username.equals(userDetails.getUsername()) &&
                         !isTokenExpired(token) &&
-                        !invalidatedTokens.contains(token)
+                        !invalidatedTokens.containsKey(token)
         );
+    }
+
+    public void invalidateToken(String token) {
+        Date now = new Date();
+        invalidatedTokens.values().removeIf(expiry -> expiry.before(now));
+        invalidatedTokens.put(token, extractExpiration(token));
     }
 }

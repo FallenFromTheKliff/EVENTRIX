@@ -6,9 +6,9 @@ import com.example.demo.model.Events.Event;
 import com.example.demo.model.Events.EventComment;
 import com.example.demo.model.dto.CommentReplyUpdateDTO;
 import com.example.demo.model.dto.EventResponseDTO;
-import com.example.demo.model.dto.ReviewRequestDTO;
 import com.example.demo.model.dto.ReviewResponseDTO;
 import com.example.demo.model.dto.BookingResponseDTO;
+import com.example.demo.model.dto.ReceiptResponseDTO;
 import com.example.demo.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +30,7 @@ public class AdminController {
     @Autowired private EventCommentService commentService;
     @Autowired private AnalyticsService analyticsService;
     @Autowired private ReviewService reviewService;
+    @Autowired private ReceiptService receiptService;
 
     // ... (Category and TicketType management endpoints remain the same) ...
 
@@ -99,6 +100,11 @@ public class AdminController {
             @RequestParam BookingStatus status,
             @RequestParam(required = false) String adminNotes) {
         return ResponseEntity.ok(bookingService.updateBookingStatus(id, status, adminNotes));
+    }
+
+    @GetMapping("/bookings/{id}/receipt")
+    public ResponseEntity<ReceiptResponseDTO> getBookingReceipt(@PathVariable Long id) {
+        return ResponseEntity.ok(receiptService.getBookingReceipt(id));
     }
 
     // NEW: Transaction Log

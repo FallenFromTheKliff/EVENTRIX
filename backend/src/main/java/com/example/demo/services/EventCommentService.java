@@ -44,8 +44,7 @@ public class EventCommentService {
     public CommentResponseDTO addComment(long eventId, String userEmail, CommentRequestDTO dto) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.getByEmail(userEmail);
         if (!bookingRepository.existsByUserAndEventAndStatus(user, event, BookingStatus.COMPLETED)) {
             throw new RuntimeException("You can only comment on events you have a completed booking for.");
         }
@@ -66,8 +65,7 @@ public class EventCommentService {
     public CommentReply addReply(Long commentId, CommentReply replyData, String adminEmail) {
         EventComment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("Comment not found"));
-        User adminUser = userRepository.findByEmail(adminEmail)
-                .orElseThrow(() -> new RuntimeException("Admin user not found"));
+        User adminUser = userRepository.getByEmail(adminEmail);
         replyData.setComment(comment);
         replyData.setUser(adminUser);
         replyData.setCreatedAt(LocalDateTime.now());

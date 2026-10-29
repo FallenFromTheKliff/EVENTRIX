@@ -1,6 +1,7 @@
 package com.example.demo.repository;
 
 import com.example.demo.model.Events.Event;
+import com.example.demo.model.EventStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -18,12 +19,14 @@ public interface EventRepo extends JpaRepository<Event, Long> {
         "(CAST(:categoryName AS string) IS NULL OR c.name = :categoryName) AND " +
         "(CAST(:title AS string) IS NULL OR LOWER(e.title) LIKE LOWER(CONCAT('%', CAST(:title AS string), '%'))) AND " +
         "(CAST(:startDate AS LocalDateTime) IS NULL OR e.dateTime >= :startDate) AND " +
-        "(CAST(:endDate AS LocalDateTime) IS NULL OR e.dateTime <= :endDate)")
+        "(CAST(:endDate AS LocalDateTime) IS NULL OR e.dateTime <= :endDate) AND " +
+        "(:status IS NULL OR e.status = :status)")
     List<Event> findEventsWithFilters(
             @Param("categoryName") String categoryName,
             @Param("title") String title,
             @Param("startDate") LocalDateTime startDate,
-            @Param("endDate") LocalDateTime endDate
+            @Param("endDate") LocalDateTime endDate,
+            @Param("status") EventStatus status
     );
 
     // NEW: Query to get events liked by a specific user.

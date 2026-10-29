@@ -1,6 +1,7 @@
 package com.example.demo.model.Events;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.BatchSize;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -49,9 +50,6 @@ public class Event {
     @Column(name = "total_tickets", nullable = false)
     private int totalTickets;
 
-    @Column(name = "available_tickets")
-    private int availableTickets;
-
     @Column(name = "doors_open")
     private LocalDateTime doorsOpen;
 
@@ -73,6 +71,7 @@ public class Event {
     // NEW: List of preview images
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("id ASC")
+    @BatchSize(size = 20)
     @Builder.Default
     private List<EventImage> previewImages = new ArrayList<>();
 
@@ -80,14 +79,8 @@ public class Event {
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Booking> bookings = new ArrayList<>();
 
-    @PrePersist
-    public void setAvailableTickets() {
-        if (this.availableTickets == 0 && this.totalTickets > 0) {
-            this.availableTickets = this.totalTickets;
-        }
-    }
-
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+    @BatchSize(size = 20)
     @Builder.Default
     private List<TicketType> ticketTypes = new ArrayList<>();
 

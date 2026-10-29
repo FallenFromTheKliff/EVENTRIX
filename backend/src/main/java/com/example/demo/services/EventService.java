@@ -1,6 +1,5 @@
 package com.example.demo.services;
 
-import com.example.demo.model.BookingStatus;
 import com.example.demo.model.EventImage;
 import com.example.demo.model.EventStatus;
 import com.example.demo.model.User;
@@ -17,7 +16,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -25,17 +26,16 @@ import java.util.stream.Collectors;
 
 @Service
 public class EventService {
+    private static final Set<String> TICKET_NAMES = Set.of("STANDARD", "VIP");
+
     @Autowired private EventRepo eventRepository;
     @Autowired private EventLikeRepo eventLikeRepository;
     @Autowired private UserRepo userRepository;
     @Autowired private EventImageRepo eventImageRepository;
-    @Autowired private BookingRepo bookingRepository;
 
     public List<EventResponseDTO> getEvents(String status, String category, String title, LocalDateTime startDate, LocalDateTime endDate, String userEmail) {
-        List<Event> events = eventRepository.findEventsWithFilters(category, title, startDate, endDate).stream()
-                .filter(event -> status == null || event.getStatus().name().equals(status))
-                .collect(Collectors.toList());
-        return mapEventsToDTOs(events, userEmail);
+        EventStatus eventStatus = status == null ? null : EventStatus.valueOf(status);
+        return mapEventsToDTOs(eventRepository.findEventsWithFilters(category, title, startDate, endDate, eventStatus), userEmail);
     }
 
     public List<EventResponseDTO> getActiveEvents(String category, String title, LocalDateTime startDate, LocalDateTime endDate, String userEmail) {
@@ -43,8 +43,7 @@ public class EventService {
     }
 
     public List<EventResponseDTO> getLikedEvents(String userEmail) {
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.getByEmail(userEmail);
         return mapEventsToDTOs(eventRepository.findLikedEventsByUserId(user.getUserId()), userEmail);
     }
 
@@ -58,14 +57,12 @@ public class EventService {
         if (events.isEmpty()) {
             return Collections.emptyList();
         }
-        Set<Long> likedEventIds = Collections.emptySet();
-        if (userEmail != null) {
-            User user = userRepository.findByEmail(userEmail)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
-            List<Long> eventIds = events.stream().map(Event::getEventId).collect(Collectors.toList());
-            likedEventIds = eventLikeRepository.findLikedEventIdsByUserId(user.getUserId(), eventIds);
-        }
-        final Set<Long> finalLikedEventIds = likedEventIds;
+        List<Long> eventIds = events.stream().map(Event::getEventId).toList();
+        Map<Long, Long> likeCounts = eventLikeRepository.countByEventIds(eventIds).stream()
+                .collect(Collectors.toMap(row -> (Long) row[0], row -> (Long) row[1]));
+        Set<Long> likedEventIds = userEmail == null
+                ? Collections.emptySet()
+                : eventLikeRepository.findLikedEventIdsByUserId(userRepository.getByEmail(userEmail).getUserId(), eventIds);
         return events.stream().map(event -> EventResponseDTO.builder()
                 .eventId(event.getEventId())
                 .title(event.getTitle())
@@ -77,17 +74,17 @@ public class EventService {
                 .category(event.getCategory())
                 .previewImages(event.getPreviewImages())
                 .ticketTypes(event.getTicketTypes())
-                .likeCount(eventLikeRepository.countByEventEventId(event.getEventId()))
-                .isLiked(finalLikedEventIds.contains(event.getEventId()))
+                .likeCount(likeCounts.getOrDefault(event.getEventId(), 0L))
+                .isLiked(likedEventIds.contains(event.getEventId()))
                 .totalTickets(event.getTotalTickets())
-                .availableTickets(event.getAvailableTickets())
                 .doorsOpen(event.getDoorsOpen())
                 .showTime(event.getShowTime())
                 .status(event.getStatus())
-                .build()).collect(Collectors.toList());
+                .build()).toList();
     }
 
     public Event saveEvent(Event event) {
+        checkTicketTypes(event.getTicketTypes());
         checkVenue(event, null);
         if (event.getPreviewImages().size() > 4) throw new RuntimeException("An event can only have up to 4 images");
         event.getTicketTypes().forEach(ticketType -> ticketType.setEvent(event));
@@ -98,15 +95,14 @@ public class EventService {
     @Transactional
     public Event updateEvent(long id, Event eventDetails) {
         Event event = eventRepository.findById(id).orElseThrow(() -> new RuntimeException("Event not found"));
+        checkTicketTypes(eventDetails.getTicketTypes());
         checkVenue(eventDetails, id);
-        int sold = event.getTotalTickets() - event.getAvailableTickets();
         event.setTitle(eventDetails.getTitle());
         event.setDescription(eventDetails.getDescription());
         event.setDateTime(eventDetails.getDateTime());
         event.setLocation(eventDetails.getLocation());
         event.setPrice(eventDetails.getPrice());
         event.setTotalTickets(eventDetails.getTotalTickets());
-        event.setAvailableTickets(Math.max(0, eventDetails.getTotalTickets() - sold));
         event.setDoorsOpen(eventDetails.getDoorsOpen());
         event.setShowTime(eventDetails.getShowTime());
         event.setCategory(eventDetails.getCategory());
@@ -118,6 +114,17 @@ public class EventService {
             return eventDetails.getStatus() == EventStatus.ARCHIVED ? archiveEvent(id) : unarchiveEvent(id);
         }
         return saved;
+    }
+
+    private void checkTicketTypes(List<TicketType> ticketTypes) {
+        Set<String> seen = new HashSet<>();
+        for (TicketType ticketType : ticketTypes) {
+            String name = ticketType.getName() == null ? "" : ticketType.getName().trim().toUpperCase();
+            if (!TICKET_NAMES.contains(name) || !seen.add(name)) {
+                throw new RuntimeException("Ticket types must be unique and either STANDARD or VIP.");
+            }
+            ticketType.setName(name);
+        }
     }
 
     private void syncTicketTypes(Event event, List<TicketType> incoming) {
@@ -181,7 +188,7 @@ public class EventService {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
         event.setStatus(EventStatus.ARCHIVED);
-        event.setAvailableTickets(0);
+        event.getTicketTypes().forEach(ticketType -> ticketType.setAvailableQuantity(0));
         return eventRepository.save(event);
     }
 
@@ -190,18 +197,13 @@ public class EventService {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
         event.setStatus(EventStatus.ACTIVE);
-        int bookedTickets = event.getBookings().stream()
-                .filter(b -> b.getStatus() == BookingStatus.PAID)
-                .mapToInt(b -> b.getQuantity())
-                .sum();
-        event.setAvailableTickets(event.getTotalTickets() - bookedTickets);
         return eventRepository.save(event);
     }
 
     @Transactional
     public String toggleLike(long eventId, String userEmail) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new RuntimeException("Event not found"));
-        User user = userRepository.findByEmail(userEmail).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.getByEmail(userEmail);
         Optional<EventLike> existing = eventLikeRepository.findByUserUserIdAndEventEventId(user.getUserId(), eventId);
         if (existing.isPresent()) {
             eventLikeRepository.delete(existing.get());

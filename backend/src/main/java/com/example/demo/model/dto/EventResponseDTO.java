@@ -27,7 +27,6 @@ public class EventResponseDTO {
     private long likeCount;
     private boolean isLiked; // Specific to the requesting user
     private int totalTickets;
-    private int availableTickets;
     private LocalDateTime doorsOpen;
     private LocalDateTime showTime;
     private EventStatus status;
