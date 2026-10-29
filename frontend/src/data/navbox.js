@@ -30,7 +30,7 @@ export const rolesss = {
       category: "Main",
       links: [
         { to: "/dashboard", label: "Dashboard", icon: IconLayoutDashboard },
-        { to: "/feedback", label: "Feedback", icon: IconMessage },
+        { to: "/reception", label: "Reception", icon: IconMessage },
         { to: "/transactions", label: "Transactions", icon: IconReceipt }
       ]
     },

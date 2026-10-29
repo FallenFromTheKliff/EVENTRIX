@@ -1,13 +1,18 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.Events.Category;
+import com.example.demo.model.Events.Trait;
 import com.example.demo.model.dto.EventResponseDTO;
+import com.example.demo.model.dto.CommentResponseDTO;
+import com.example.demo.model.dto.ReviewResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.example.demo.services.CategoryService;
 import com.example.demo.services.EventService;
+import com.example.demo.services.EventCommentService;
+import com.example.demo.services.ReviewService;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
@@ -22,6 +27,12 @@ public class EventController {
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private EventCommentService commentService;
+
+    @Autowired
+    private ReviewService reviewService;
 
     // REFACTORED: Single endpoint for fetching and filtering events.
     @GetMapping
@@ -49,9 +60,25 @@ public class EventController {
         return ResponseEntity.ok(eventService.getLikedEvents(principal.getName()));
     }
 
+    @GetMapping("/traits")
+    public ResponseEntity<List<Trait>> getTraits() {
+        return ResponseEntity.ok(reviewService.getAllTraits());
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<EventResponseDTO> getEventById(@PathVariable Long id, Principal principal) {
         String userEmail = (principal != null) ? principal.getName() : null;
         return ResponseEntity.ok(eventService.getEventById(id, userEmail));
     }
+
+    @GetMapping("/{id}/reviews")
+    public ResponseEntity<List<ReviewResponseDTO>> getEventReviews(@PathVariable Long id, Principal principal) {
+        String userEmail = (principal != null) ? principal.getName() : null;
+        return ResponseEntity.ok(reviewService.getEventReviews(id, userEmail));
+    }
+
+    @GetMapping("/{id}/comments")
+    public ResponseEntity<List<CommentResponseDTO>> getEventComments(@PathVariable Long id, Principal principal) {
+        String userEmail = (principal != null) ? principal.getName() : null;
+        return ResponseEntity.ok(commentService.getComments(id, userEmail));    }
 }

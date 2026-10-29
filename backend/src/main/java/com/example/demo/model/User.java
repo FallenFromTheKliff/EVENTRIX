@@ -5,6 +5,8 @@ import lombok.NoArgsConstructor;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,4 +42,16 @@ public class User {
 
     @Column(name = "profile_image_url", columnDefinition = "text")
     private String profileImageUrl;
+
+    @Column
+    private String gender;
+
+    @Column
+    private String city;
+
+    @Column(columnDefinition = "TEXT")
+    private String about;
+
+    @Column(name = "created_at", columnDefinition = "timestamp default now()")
+    private LocalDateTime createdAt = LocalDateTime.now();
 }

@@ -4,6 +4,10 @@ import com.example.demo.model.User;
 import com.example.demo.model.dto.RegisterRequestDTO;
 import com.example.demo.model.dto.UserProfileDTO;
 import com.example.demo.model.dto.UserUpdateDTO;
+import com.example.demo.model.BookingStatus;
+import com.example.demo.model.dto.UserStatsDTO;
+import com.example.demo.repository.BookingRepo;
+import com.example.demo.repository.ReviewRepo;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.example.demo.repository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +25,9 @@ public class UserService implements UserDetailsService {
 
     @Autowired private UserRepo userRepository;
     @Autowired private PasswordEncoder passwordEncoder;
+    @Autowired private BookingRepo bookingRepository;
+    @Autowired private ReviewRepo eventCommentRepository;
+    @Autowired private ReviewRepo reviewRepository;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -43,6 +50,9 @@ public class UserService implements UserDetailsService {
                 .phoneNumber(user.getPhoneNumber())
                 .role(user.getRole())
                 .profileImageUrl(user.getProfileImageUrl())
+                .gender(user.getGender())
+                .city(user.getCity())
+                .about(user.getAbout())
                 .build();
     }
 
@@ -68,13 +78,25 @@ public class UserService implements UserDetailsService {
 
         if (updatedUser.getName() != null) user.setName(updatedUser.getName());
         if (updatedUser.getPhoneNumber() != null) user.setPhoneNumber(updatedUser.getPhoneNumber());
-        if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty())
-            user.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
-        if (updatedUser.getProfileImageUrl() != null)
-            user.setProfileImageUrl(updatedUser.getProfileImageUrl());
+        if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) user.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+        if (updatedUser.getProfileImageUrl() != null) user.setProfileImageUrl(updatedUser.getProfileImageUrl());
+        if (updatedUser.getGender() != null) user.setGender(updatedUser.getGender());
+        if (updatedUser.getCity() != null) user.setCity(updatedUser.getCity());
+        if (updatedUser.getAbout() != null) user.setAbout(updatedUser.getAbout());
 
         User savedUser = userRepository.save(user);
         return getUserProfile(savedUser.getEmail());
+    }
+
+    public UserStatsDTO getUserStats(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        Double average = reviewRepository.findAverageStarsByUserId(user.getUserId());
+        return UserStatsDTO.builder()
+                .totalBookings(bookingRepository.countByUserAndStatusNotIn(user, List.of(BookingStatus.CANCELLED, BookingStatus.DECLINED)))
+                .averageStars(average == null ? 0.0 : average)
+                .joinedAt(user.getCreatedAt())
+                .build();
     }
 
     // --- Admin Methods ---

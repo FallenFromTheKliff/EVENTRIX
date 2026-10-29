@@ -12,4 +12,7 @@ public class UserProfileDTO {
     private String phoneNumber;
     private String role;
     private String profileImageUrl;
+    private String gender;
+    private String city;
+    private String about;
 }

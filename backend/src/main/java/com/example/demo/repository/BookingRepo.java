@@ -30,4 +30,6 @@ public interface BookingRepo extends JpaRepository<Booking, Long> {
 
     // For admin transaction log
     List<Booking> findByStatusIn(List<BookingStatus> statuses);
+
+    long countByUserAndStatusNotIn(User user, List<BookingStatus> statuses);
 }

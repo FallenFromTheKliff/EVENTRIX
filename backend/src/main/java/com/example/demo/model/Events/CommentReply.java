@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import com.example.demo.model.User;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDateTime;
 
 @Entity
@@ -18,6 +19,7 @@ public class CommentReply {
     private Long id;
 
     // reply is linked to the comment
+    @JsonIgnore
     @ManyToOne(optional = false)
     @JoinColumn(name = "comment_id")
     private EventComment comment;

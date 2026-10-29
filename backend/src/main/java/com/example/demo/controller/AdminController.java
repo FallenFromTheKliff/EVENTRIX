@@ -1,12 +1,13 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.Booking;
 import com.example.demo.model.BookingStatus;
 import com.example.demo.model.Events.CommentReply;
 import com.example.demo.model.Events.Event;
 import com.example.demo.model.Events.EventComment;
 import com.example.demo.model.dto.CommentReplyUpdateDTO;
 import com.example.demo.model.dto.EventResponseDTO;
+import com.example.demo.model.dto.ReviewRequestDTO;
+import com.example.demo.model.dto.ReviewResponseDTO;
 import com.example.demo.model.dto.BookingResponseDTO;
 import com.example.demo.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +28,8 @@ public class AdminController {
     @Autowired private EventService eventService;
     @Autowired private BookingService bookingService;
     @Autowired private EventCommentService commentService;
-    @Autowired private CategoryService categoryService;
     @Autowired private AnalyticsService analyticsService;
+    @Autowired private ReviewService reviewService;
 
     // ... (Category and TicketType management endpoints remain the same) ...
 
@@ -139,5 +140,15 @@ public class AdminController {
     @GetMapping("/analytics/sales")
     public ResponseEntity<?> getSalesOverTime() {
         return ResponseEntity.ok(analyticsService.getSalesOverTime());
+    }
+
+    @GetMapping("/reviews")
+    public ResponseEntity<List<ReviewResponseDTO>> getAllReviews() {
+        return ResponseEntity.ok(reviewService.getAllReviews());
+    }
+
+    @PostMapping("/reviews/{reviewId}/reply")
+    public ResponseEntity<ReviewResponseDTO> replyToReview(@PathVariable Long reviewId, @RequestBody CommentReplyUpdateDTO dto, Principal principal) {
+        return ResponseEntity.ok(reviewService.replyToReview(reviewId, dto, principal.getName()));
     }
 }

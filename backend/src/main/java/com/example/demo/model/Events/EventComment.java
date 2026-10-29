@@ -30,8 +30,6 @@ public class EventComment {
     @Column(columnDefinition = "text")
     private String content;
 
-    private Integer rating; // optional 1-5
-
     private LocalDateTime createdAt = LocalDateTime.now();
 
     // Admin replies (multiple replies allowed)
