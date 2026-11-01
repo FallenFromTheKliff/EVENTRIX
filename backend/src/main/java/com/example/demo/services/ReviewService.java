@@ -4,7 +4,7 @@ import com.example.demo.model.BookingStatus;
 import com.example.demo.model.User;
 import com.example.demo.model.Events.Event;
 import com.example.demo.model.Events.Review;
-import com.example.demo.model.Events.Trait;
+import com.example.demo.model.Details;
 import com.example.demo.model.dto.CommentReplyUpdateDTO;
 import com.example.demo.model.dto.ReviewRequestDTO;
 import com.example.demo.model.dto.ReviewResponseDTO;
@@ -20,14 +20,9 @@ import java.util.List;
 @Service
 public class ReviewService {
     @Autowired private ReviewRepo reviewRepository;
-    @Autowired private TraitRepo traitRepository;
     @Autowired private EventRepo eventRepository;
     @Autowired private UserRepo userRepository;
     @Autowired private BookingRepo bookingRepository;
-
-    public List<Trait> getAllTraits() {
-        return traitRepository.findAll();
-    }
 
     public List<ReviewResponseDTO> getAllReviews() {
         return reviewRepository.findAll().stream().map(this::toDTO).toList();
@@ -98,9 +93,12 @@ public class ReviewService {
         if (dto.getStars() < 1 || dto.getStars() > 5) {
             throw new RuntimeException("Stars must be between 1 and 5.");
         }
+        String trait = dto.getTrait();
+        if (trait == null || !(Details.POSITIVE_TRAITS.contains(trait) || Details.NEGATIVE_TRAITS.contains(trait))) {
+            throw new RuntimeException("Choose a trait from the list.");
+        }
         review.setStars(dto.getStars());
-        review.setTrait(traitRepository.findById(dto.getTraitId())
-                .orElseThrow(() -> new RuntimeException("Trait not found")));
+        review.setTrait(trait);
         review.setNotes(dto.getNotes());
     }
 
@@ -111,7 +109,7 @@ public class ReviewService {
                 .eventTitle(review.getEvent().getTitle())
                 .userName(review.getUser().getName())
                 .stars(review.getStars())
-                .trait(review.getTrait().getName())
+                .trait(review.getTrait())
                 .notes(review.getNotes())
                 .createdAt(review.getCreatedAt())
                 .reply(review.getReply())

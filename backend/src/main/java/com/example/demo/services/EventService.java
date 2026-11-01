@@ -3,6 +3,7 @@ package com.example.demo.services;
 import com.example.demo.model.EventImage;
 import com.example.demo.model.EventStatus;
 import com.example.demo.model.User;
+import com.example.demo.model.Details;
 import com.example.demo.model.Events.Event;
 import com.example.demo.model.Events.EventLike;
 import com.example.demo.model.Events.TicketType;
@@ -26,12 +27,10 @@ import java.util.stream.Collectors;
 
 @Service
 public class EventService {
-    private static final Set<String> TICKET_NAMES = Set.of("STANDARD", "VIP");
 
     @Autowired private EventRepo eventRepository;
     @Autowired private EventLikeRepo eventLikeRepository;
     @Autowired private UserRepo userRepository;
-    @Autowired private EventImageRepo eventImageRepository;
 
     public List<EventResponseDTO> getEvents(String status, String category, String title, LocalDateTime startDate, LocalDateTime endDate, String userEmail) {
         EventStatus eventStatus = status == null ? null : EventStatus.valueOf(status);
@@ -84,6 +83,7 @@ public class EventService {
     }
 
     public Event saveEvent(Event event) {
+        checkDetails(event);
         checkTicketTypes(event.getTicketTypes());
         checkVenue(event, null);
         if (event.getPreviewImages().size() > 4) throw new RuntimeException("An event can only have up to 4 images");
@@ -95,6 +95,7 @@ public class EventService {
     @Transactional
     public Event updateEvent(long id, Event eventDetails) {
         Event event = eventRepository.findById(id).orElseThrow(() -> new RuntimeException("Event not found"));
+        checkDetails(eventDetails);
         checkTicketTypes(eventDetails.getTicketTypes());
         checkVenue(eventDetails, id);
         event.setTitle(eventDetails.getTitle());
@@ -120,7 +121,7 @@ public class EventService {
         Set<String> seen = new HashSet<>();
         for (TicketType ticketType : ticketTypes) {
             String name = ticketType.getName() == null ? "" : ticketType.getName().trim().toUpperCase();
-            if (!TICKET_NAMES.contains(name) || !seen.add(name)) {
+            if (!Details.TICKET_NAMES.contains(name) || !seen.add(name)) {
                 throw new RuntimeException("Ticket types must be unique and either STANDARD or VIP.");
             }
             ticketType.setName(name);
@@ -213,20 +214,12 @@ public class EventService {
         return "LIKED";
     }
 
-    public EventImage addPreviewImage(long eventId, String imageUrl, String caption) {
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new RuntimeException("Event not found"));
-        EventImage image = EventImage.builder()
-                .event(event)
-                .imageUrl(imageUrl)
-                .caption(caption)
-                .build();
-        return eventImageRepository.save(image);
-    }
-
-    public void deletePreviewImage(long imageId) {
-        if (!eventImageRepository.existsById(imageId)) {
-            throw new RuntimeException("Image not found");
+    private void checkDetails(Event event) {
+        if (event.getCategory() != null && !Details.CATEGORIES.contains(event.getCategory())) {
+            throw new RuntimeException("Choose a category from the list.");
         }
-        eventImageRepository.deleteById(imageId);
+        if (event.getLocation() == null || !Details.CITIES.contains(event.getLocation())) {
+            throw new RuntimeException("Choose a location from the list.");
+        }
     }
 }

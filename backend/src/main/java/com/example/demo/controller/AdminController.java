@@ -32,8 +32,6 @@ public class AdminController {
     @Autowired private ReviewService reviewService;
     @Autowired private ReceiptService receiptService;
 
-    // ... (Category and TicketType management endpoints remain the same) ...
-
     // --- EVENT MANAGEMENT ---
 
     @GetMapping("/events")
@@ -72,20 +70,6 @@ public class AdminController {
     @PutMapping("/events/{id}/unarchive")
     public ResponseEntity<Event> unarchiveEvent(@PathVariable Long id) {
         return ResponseEntity.ok(eventService.unarchiveEvent(id));
-    }
-
-    // NEW: Event Image Management
-    @PostMapping("/events/{eventId}/images")
-    public ResponseEntity<?> addPreviewImage(@PathVariable Long eventId, @RequestBody Map<String, String> payload) {
-        String imageUrl = payload.get("imageUrl");
-        String caption = payload.get("caption");
-        return ResponseEntity.ok(eventService.addPreviewImage(eventId, imageUrl, caption));
-    }
-
-    @DeleteMapping("/images/{imageId}")
-    public ResponseEntity<Void> deletePreviewImage(@PathVariable Long imageId) {
-        eventService.deletePreviewImage(imageId);
-        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/events/venue-dates")

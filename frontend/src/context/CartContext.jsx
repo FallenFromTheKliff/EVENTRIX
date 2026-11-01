@@ -26,24 +26,13 @@ export function CartProvider({ children }) {
   const { user } = useAuth();
   const { refreshBookings } = useTransactions();
   const [cartItems, setCartItems] = useState([]);
-  const [cartLoading, setCartLoading] = useState(true);
+  const [cartLoading, setCartLoading] = useState(user?.role === "USER");
   const [cartError, setCartError] = useState(null);
 
   useEffect(() => {
+    if (user?.role !== "USER") return;
+
     let active = true;
-
-    if (user?.role !== "USER") {
-      setCartItems([]);
-      setCartLoading(false);
-      setCartError(null);
-
-      return () => {
-        active = false;
-      };
-    }
-
-    setCartLoading(true);
-    setCartError(null);
 
     getCart()
       .then((items) => {

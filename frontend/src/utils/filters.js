@@ -1,5 +1,6 @@
 import { IconCalendar, IconCategory, IconSearch, IconArchive, IconTicket } from "@tabler/icons-react";
 import { bookingStatuses, eventStatuses } from "../data/statcheck";
+import { months as monthNames } from "../data/details";
 
 export const emptyFilters = { name: "", category: "", ticketType: "", date: "", status: "" };
 export const emptyEventFilters = { name: "", category: "", date: "", status: "ACTIVE" };
@@ -36,10 +37,10 @@ const now = new Date();
 
 export const months = Array.from({ length: 6 }, (_, i) => {
   const date = new Date(now.getFullYear(), now.getMonth() + i, 1);
-  const prefix = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+  const prefix = `${date.getFullYear()}-${monthNames[date.getMonth()].value}`;
   return {
     value: prefix,
-    label: date.toLocaleString("en-US", { month: "long", year: "numeric" }),
+    label: `${monthNames[date.getMonth()].label} ${date.getFullYear()}`,
     startDate: `${prefix}-01T00:00:00`,
     endDate: `${prefix}-${new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate()}T23:59:59`
   };

@@ -1,7 +1,5 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.Events.Category;
-import com.example.demo.model.Events.Trait;
 import com.example.demo.model.dto.EventResponseDTO;
 import com.example.demo.model.dto.CommentResponseDTO;
 import com.example.demo.model.dto.ReviewResponseDTO;
@@ -9,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.example.demo.services.CategoryService;
 import com.example.demo.services.EventService;
 import com.example.demo.services.EventCommentService;
 import com.example.demo.services.ReviewService;
@@ -24,9 +21,6 @@ public class EventController {
 
     @Autowired
     private EventService eventService;
-
-    @Autowired
-    private CategoryService categoryService;
 
     @Autowired
     private EventCommentService commentService;
@@ -46,11 +40,6 @@ public class EventController {
         return ResponseEntity.ok(eventService.getActiveEvents(category, name, startDate, endDate, userEmail));
     }
 
-    @GetMapping("/categories")
-    public ResponseEntity<List<Category>> getCategories() {
-        return ResponseEntity.ok(categoryService.getAllCategories());
-    }
-
     // NEW: Endpoint to get events a user has liked.
     @GetMapping("/favorites")
     public ResponseEntity<List<EventResponseDTO>> getFavoritedEvents(Principal principal) {
@@ -58,11 +47,6 @@ public class EventController {
             return ResponseEntity.status(401).build(); // Unauthorized
         }
         return ResponseEntity.ok(eventService.getLikedEvents(principal.getName()));
-    }
-
-    @GetMapping("/traits")
-    public ResponseEntity<List<Trait>> getTraits() {
-        return ResponseEntity.ok(reviewService.getAllTraits());
     }
 
     @GetMapping("/{id}")

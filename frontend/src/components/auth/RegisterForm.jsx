@@ -8,7 +8,7 @@ import { useAuth } from "../../context/AuthContext";
 import useLoadingText from "../ui/useLoadingText";
 import ConfirmModal from "../ui/ConfirmModal";
 
-const inputStyle = "w-full bg-white/15 rounded-md p-3 mt-1 focus:outline-2 focus:outline-yellow-500";
+import { registerInputStyle } from "../../utils/events";
 
 export default function RegisterForm() {
   const navigate = useNavigate();
@@ -30,7 +30,7 @@ export default function RegisterForm() {
 
   const handleClose = () => {
     setMessage(null);
-    if (message.type === "success") navigate("/auth", { state: { mode: "login" }, replace: true });
+    if (message?.type === "success") navigate("/auth", { state: { mode: "login" }, replace: true });
   };
 
   return (
@@ -43,7 +43,7 @@ export default function RegisterForm() {
             id="name"
             placeholder="Enter your full name"
             type="text"
-            className={inputStyle}
+            className={`${registerInputStyle} mt-1`}
             {...register("name", { required: "Name is required!" })}
           />
           <p className="text-red-500 text-sm min-h-5 mt-1">{errors.name?.message}</p>
@@ -54,7 +54,7 @@ export default function RegisterForm() {
             id="email"
             placeholder="Enter a valid email"
             type="email"
-            className={inputStyle}
+            className={`${registerInputStyle} mt-1`}
             {...register("email", {
               required: "Email is required!",
               pattern: {
@@ -71,7 +71,8 @@ export default function RegisterForm() {
             id="phoneNumber"
             placeholder="Must be 11 digits"
             type="text"
-            className={inputStyle}
+            maxLength={11}
+            className={`${registerInputStyle} mt-1`}
             {...register("phoneNumber", {
               required: "Phone number is required!",
               pattern: { value: /^[0-9]{11}$/, message: "Phone number must be 11 digits!" },
@@ -87,7 +88,7 @@ export default function RegisterForm() {
               id="password"
               placeholder="Must have at least 8 characters"
               type={showPassword ? "text" : "password"}
-              className={`${inputStyle} pr-10`}
+              className={`${registerInputStyle} mt-1 pr-10`}
               {...register("password", {
                 required: "Password is required!",
                 minLength: {

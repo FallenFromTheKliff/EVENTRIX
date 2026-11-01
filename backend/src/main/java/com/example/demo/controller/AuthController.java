@@ -1,7 +1,6 @@
 package com.example.demo.controller;
 
 import com.example.demo.jwt.JwtUtil;
-import com.example.demo.model.User;
 import com.example.demo.model.dto.AuthRequestDTO;
 import com.example.demo.model.dto.AuthResponseDTO;
 import com.example.demo.model.dto.RegisterRequestDTO;
@@ -78,10 +77,7 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Email is already in use.");
         }
 
-        User newUser = userService.registerNewUser(registerRequest);
-        UserDetails userDetails = userService.loadUserByUsername(newUser.getEmail());
-        String jwt = jwtUtil.generateToken(userDetails);
-
-        return ResponseEntity.ok(new AuthResponseDTO(jwt));
+        userService.registerNewUser(registerRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

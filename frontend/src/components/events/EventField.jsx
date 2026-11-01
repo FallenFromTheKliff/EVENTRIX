@@ -1,13 +1,17 @@
-import { IconPhoto, IconCrown, IconTicket, IconCheck, IconPlus } from "@tabler/icons-react";
+import { useState } from "react";
 
-import { imageTypes, resizeImage, iconStyle } from "../../utils/events";
+import { IconPhoto, IconCrown, IconTicket, IconCheck, IconPlus, IconEye, IconEyeOff } from "@tabler/icons-react";
+
+import { imageTypes, resizeImage, inputStyle, iconStyle } from "../../utils/events";
 
 import DroppingDown from "../ui/DroppingDown";
 
 const ticketButtonStyle = "relative w-44 flex items-center gap-2 rounded-md px-3 py-3 text-base font-bold cursor-pointer transition duration-200 enabled:hover:brightness-50";
 const ticketButtonColors = { STANDARD: "bg-cyan-500 text-white", VIP: "bg-blue-950 text-yellow-400" };
 
-export default function EventForm({ type = "text", label, icon: Icon, hint, error, children, options, all, onSelect, text, limit = 1, count = 0, width, height, onPick, onError, enabled, onToggle, ...props }) {
+export default function EventField({ type = "text", label, icon: Icon, hint, error, children, options, all, onSelect, text, limit = 1, count = 0, width, height, onPick, onError, enabled, onToggle, ...props }) {
+  const [show, setShow] = useState(false);
+  
   if (type === "toggle") return (
     <button
       type="button"
@@ -91,7 +95,12 @@ export default function EventForm({ type = "text", label, icon: Icon, hint, erro
         <label htmlFor={props.name} className="w-28 text-sm">{label}</label>
         <div className="relative flex-1">
           {Icon && <Icon size={18} className={iconStyle} />}
-          <input id={props.name} type={type} className={`${inputStyle} w-full disabled:cursor-not-allowed ${Icon ? "pl-10" : ""}`} {...props} />
+          <input id={props.name} type={type === "password" && show ? "text" : type} className={`${inputStyle} w-full disabled:cursor-not-allowed ${Icon ? "pl-10" : ""} ${type === "password" ? "pr-10" : ""}`} {...props} />
+          {type === "password" && (
+            <button type="button" onClick={() => setShow(!show)} className="absolute inset-y-0 right-3 flex items-center text-gray-300 cursor-pointer transition-colors duration-200 hover:text-white">
+              {show ? <IconEyeOff size={20} /> : <IconEye size={20} />}
+            </button>
+          )}
         </div>
       </div>
       {hint && <p className="text-sm text-gray-400 mt-1 pl-32">{hint}</p>}

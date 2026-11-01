@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { useTransactions } from "../../context/TransactionContext";
 
-import { messageStyle, bookingButton } from "../../utils/events";
+import { messageStyle, bookingButton, ticketTypes } from "../../utils/events";
 import { cartFilters as transactionFilters, emptyFilters, months } from "../../utils/filters";
 
 import BookingCard from "../../components/transactions/BookingCard";
@@ -11,10 +11,9 @@ import FilterRow from "../../components/ui/FilterRow";
 import Reveal from "../../components/ui/Reveal";
 import useLoadingText from "../../components/ui/useLoadingText";
 import ConfirmModal from "../../components/ui/ConfirmModal";
-import Retry from "../../components/ui/Retry";
 
 export default function Transactions() {
-  const { transactions, transactionsLoading, transactionsError, refreshTransactions, updateTransactionStatus } = useTransactions();
+  const { transactions, transactionsLoading, transactionsError, updateTransactionStatus } = useTransactions();
   const { loading, runner, texter } = useLoadingText();
   const [filters, setFilters] = useState(emptyFilters);
   const [action, setAction] = useState(null);
@@ -24,7 +23,7 @@ export default function Transactions() {
 
   const options = {
     category: [...new Set(transactions.map((item) => item.eventCategory).filter(Boolean))].map((name) => ({ value: name, label: name })),
-    ticketType: [...new Set(transactions.map((item) => item.ticketName).filter(Boolean))].map((name) => ({ value: name, label: name })),
+    ticketType: ticketTypes,
     date: months
   };
 
@@ -63,7 +62,6 @@ export default function Transactions() {
           </Reveal>
         </div>
         <div className="mt-4 flex flex-1 flex-col space-y-4">
-          {transactionsError && <Retry message={transactionsError} onRetry={refreshTransactions} />}
           {transactionsLoading && !transactions.length ? (
             <p className={messageStyle}>Loading transactions...</p>
           ) : transactionsError ? (

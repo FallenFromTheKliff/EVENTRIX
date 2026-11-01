@@ -27,9 +27,8 @@ public class Review {
     @Column(nullable = false)
     private int stars;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "trait_id")
-    private Trait trait;
+    @Column(nullable = false)
+    private String trait;
 
     @Column(columnDefinition = "text")
     private String notes;

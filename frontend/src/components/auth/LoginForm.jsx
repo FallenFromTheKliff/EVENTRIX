@@ -7,7 +7,7 @@ import { useAuth } from "../../context/AuthContext";
 import useLoadingText from "../ui/useLoadingText";
 import ConfirmModal from "../ui/ConfirmModal";
 
-const inputStyle = "w-full bg-white/15 rounded-md p-3 mt-1 focus:outline-2 focus:outline-cyan-500";
+import { inputStyle } from "../../utils/events";
 
 export default function LoginForm() {
   const navigate = useNavigate();
@@ -36,7 +36,7 @@ export default function LoginForm() {
             id="email"
             placeholder="Enter your email"
             type="email"
-            className={inputStyle}
+            className={`${inputStyle} mt-1`}
             {...register("email", {
               required: "Email is required!",
               pattern: {
@@ -54,7 +54,7 @@ export default function LoginForm() {
               id="password"
               placeholder="Enter your password"
               type={showPassword ? "text" : "password"}
-              className={`${inputStyle} pr-10`}
+              className={`${inputStyle} mt-1 pr-10`}
               {...register("password", { required: "Password is required!" })}
             />
             <button

@@ -5,13 +5,13 @@ import { IconArrowLeft, IconPhoto, IconTrash, IconCategory, IconCalendar, IconCl
 
 import { useEvents } from "../../context/EventContext";
 
-import { buttonStyle, segmentStyle, steps, emptyEventValues, eventFormValues, filled, selectedTickets as getSelectedTickets, ticketCount as getTicketCount, validTickets, eventPayload, dateInPast, dateTaken, doorsOpenAt, nowLocal } from "../../utils/events";
+import { buttonStyle, segmentStyle, steps, emptyEventValues, eventFormValues, filled, selectedTickets as getSelectedTickets, ticketCount as getTicketCount, validTickets, dateInPast, dateTaken, doorsOpenAt, nowLocal } from "../../utils/events";
 import { statuses } from "../../utils/filters";
+import { categories, cities } from "../../data/details";
 
 import Reveal from "../../components/ui/Reveal";
 import PictureSlider from "../../components/events/PictureSlider";
 import EventField from "../../components/events/EventField";
-import useDebouncing from "../../utils/useDebouncing";
 import useLoadingText from "../../components/ui/useLoadingText";
 import ConfirmModal from "../../components/ui/ConfirmModal";
 
@@ -19,7 +19,7 @@ export default function EventEditor() {
   const { slug: id } = useParams();
   const navigate = useNavigate();
 
-  const { categories, getEvent, createEvent, updateEvent, getVenueDates } = useEvents();
+  const { getEvent, createEvent, updateEvent, getVenueDates } = useEvents();
   const { loading, runner, texter } = useLoadingText();
   const event = getEvent(id);
   const eventId = event?.eventId;
@@ -32,18 +32,28 @@ export default function EventEditor() {
 
   const [step, setStep] = useState(0);
   const [image, setImage] = useState("");
-  const [pictures, setPictures] = useState([]);
+  const [editedPictures, setEditedPictures] = useState(null);
   const [slide, setSlide] = useState(0);
   const [message, setMessage] = useState(null);
   const [confirming, setConfirming] = useState(false);
   const [takenDates, setTakenDates] = useState([]);
+  const [lastId, setLastId] = useState(id);
+  const pictures = editedPictures ?? event?.previewImages ?? [];
   const photo = image || event?.thumbnailUrl;
-  const venue = useDebouncing((values.location ?? "").trim());
+
+  if (id !== lastId) {
+    setLastId(id);
+    setStep(0);
+    setImage("");
+    setMessage(null);
+    setEditedPictures(null);
+    setSlide(0);
+  }
 
   const tickets = getSelectedTickets(values.ticketTypes);
   const totalTickets = getTicketCount(tickets);
   const past = !id && dateInPast(values);
-  const taken = dateTaken(values.dateTime, venue ? takenDates : []);
+  const taken = dateTaken(values.dateTime, values.location ? takenDates : []);
   const ready = [
     filled(values.title),
     filled(values.location) && filled(values.dateTime) && filled(values.showTime) && !past && !taken,
@@ -62,40 +72,27 @@ export default function EventEditor() {
   }, [unsaved]);
 
   useEffect(() => {
-    setStep(0);
-    setImage("");
-    setMessage(null);
-    setPictures([]);
-    setSlide(0);
-
     if (!id) reset(emptyEventValues());
-  }, [id, reset]);
-
-  useEffect(() => {
-    if (id && event) {
-      reset(eventFormValues(event));
-      setPictures(event.previewImages ?? []);
-      setSlide(0);
-    }
+    else if (event) reset(eventFormValues(event));
   }, [id, event, reset]);
 
   useEffect(() => {
-    if (venue) getVenueDates(venue, eventId).then(setTakenDates).catch(() => setTakenDates([]));
-  }, [venue, eventId]);
+    if (values.location) getVenueDates(values.location, eventId).then(setTakenDates).catch(() => setTakenDates([]));
+  }, [values.location, getVenueDates, eventId]);
 
   const handleError = (text) => setMessage({ type: "error", message: text });
   const handlePictures = (added) => {
-    setPictures([...pictures, ...added.map((imageUrl) => ({ imageUrl }))]);
+    setEditedPictures([...pictures, ...added.map((imageUrl) => ({ imageUrl }))]);
     setSlide(pictures.length);
   };
   const handleRemovePicture = () => {
-    setPictures(pictures.filter((_, i) => i !== slide));
+    setEditedPictures(pictures.filter((_, i) => i !== slide));
     setSlide(Math.max(0, slide - 1));
   };
 
   const onSubmission = (data) => runner(async () => {
     try {
-      await (id ? updateEvent(eventId, eventPayload(data, photo, pictures)) : createEvent(eventPayload(data, photo, pictures)));
+      await (id ? updateEvent(eventId, data, photo, pictures) : createEvent(data, photo, pictures));
       setMessage({ type: "success", message: id ? "Event updated!" : "Event added!" });
     } catch (error) {
       setMessage({ type: "error", message: typeof error.response?.data === "string" ? error.response.data : "Failed to save event!" });
@@ -179,7 +176,7 @@ export default function EventEditor() {
                       label="Category:"
                       icon={IconCategory}
                       all="No category"
-                      options={categories.map((category) => ({ value: String(category.id), label: category.name }))}
+                      options={categories}
                       value={values.category}
                       onSelect={(value) => setValue("category", value, { shouldDirty: true })}
                     />
@@ -207,10 +204,13 @@ export default function EventEditor() {
                       onError={handleError}
                     />
                     <EventField
+                      type="select"
                       label="Location:"
                       icon={IconMapPin}
-                      placeholder="Enter the event location"
-                      {...register("location")}
+                      all="Select a location"
+                      options={cities}
+                      value={values.location}
+                      onSelect={(value) => setValue("location", value, { shouldDirty: true })}
                     />
                     <EventField
                       type="date"
@@ -300,7 +300,7 @@ export default function EventEditor() {
                         type="select"
                         label="Status:"
                         icon={IconArchive}
-                        options={statuses}
+                        options={event?.status === "ARCHIVED" ? statuses.filter(({ value }) => value === "ARCHIVED") : statuses}
                         value={values.status}
                         onSelect={(value) => setValue("status", value, { shouldDirty: true })}
                       />
@@ -342,14 +342,15 @@ export default function EventEditor() {
         />
       )}
       {message && <ConfirmModal type={message.type} message={message.message} onClose={handleClose} />}
-      {blocker.state === "blocked" && 
-        <ConfirmModal 
-          message="Discard changes?" 
-          description="Your unsaved changes will be lost." 
-          confirmText="DISCARD" 
-          onConfirm={blocker.proceed} 
-          onClose={blocker.reset} 
-        />}
+      {blocker.state === "blocked" && (
+        <ConfirmModal
+          message="Discard changes?"
+          description="Your unsaved changes will be lost."
+          confirmText="DISCARD"
+          onConfirm={blocker.proceed}
+          onClose={blocker.reset}
+        />
+      )}
     </div>
   )
 }

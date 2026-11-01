@@ -5,20 +5,15 @@ import EventCard from "../components/events/EventCard";
 import Reveal from "../components/ui/Reveal";
 import FilterRow from "../components/ui/FilterRow";
 
+import { messageStyle } from "../utils/events";
 import { adminEventFilters, eventFilters, months, statuses } from "../utils/filters";
+import { categories } from "../data/details";
 
 export default function Events() {
   const { user } = useAuth();
-  const { events, categories, filters, handleFilter, eventsLoading, eventsError, refreshEvents } = useEvents();
+  const { events, filters, handleFilter, favoritesOnly, eventsLoading, eventsError } = useEvents();
   const fields = user.role === "ADMIN" ? adminEventFilters : eventFilters;
-  const options = { category: categories.map(({ name }) => ({ value: name, label: name })), date: months, status: statuses };
-
-  const filteredEvents = events.filter((event) =>
-    (!filters.name || event.title.toLowerCase().includes(filters.name.trim().toLowerCase())) &&
-    (!filters.category || event.category?.name === filters.category) &&
-    (!filters.date || event.dateTime?.startsWith(filters.date)) &&
-    (user.role !== "ADMIN" || !filters.status || event.status === filters.status)
-  );
+  const options = { category: categories, date: months, status: statuses };
 
   return (
     <div className="flex flex-1 flex-col">
@@ -35,14 +30,13 @@ export default function Events() {
           <FilterRow fields={fields.filter(({ type }) => type !== "search")} filters={filters} options={options} onChange={handleFilter} />
         </Reveal>
       </div>
-      {eventsError && <Retry message={eventsError} onRetry={refreshEvents} />}
       {eventsLoading && !events.length ? (
         <p className={messageStyle}>Loading events...</p>
       ) : eventsError ? (
         <p className={messageStyle}>{eventsError}</p>
-      ) : filteredEvents.length > 0 ? (
+      ) : events.length > 0 ? (
         <div className="grid gap-8 mt-8 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-          {filteredEvents.map((event) => (
+          {events.map((event) => (
             <Reveal key={event.eventId} className="h-full">
               <EventCard event={event} role={user.role} />
             </Reveal>
@@ -50,9 +44,13 @@ export default function Events() {
         </div>
       ) : (
         <p className="my-auto py-8 text-center text-gray-400">
-          {events.length === 0
-            ? (user.role === "ADMIN" ? "You should start adding events to kick things off!" : "It seems there are no events available...")
-            : "No events match your filters..."}
+          {favoritesOnly
+            ? "You haven't favorited any events yet..."
+            : filters.name.trim() || filters.category || filters.date || (user.role === "ADMIN" && filters.status !== "ACTIVE")
+              ? "No events match your filters..."
+              : user.role === "ADMIN"
+                ? "You should start adding events to kick things off!"
+                : "It seems there are no events available..."}
         </p>
       )}
     </div>

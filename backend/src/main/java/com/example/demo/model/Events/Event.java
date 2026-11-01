@@ -56,9 +56,7 @@ public class Event {
     @Column(name = "show_time")
     private LocalDateTime showTime;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    private Category category;
+    private String category;
 
     @Column(name = "image_url", columnDefinition = "TEXT") // This will now serve as the thumbnail/main photo
     private String imageUrl;

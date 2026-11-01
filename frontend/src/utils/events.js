@@ -3,11 +3,18 @@ import PaymentPayPal from "../assets/images/Payment-PayPal.png";
 
 export const toSlug = (title) => title.toLowerCase().trim().replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-|-$/g, "");
 
+const inputBase = "w-full bg-white/15 rounded-md p-3 focus:outline-2";
+export const inputStyle = `${inputBase} focus:outline-cyan-500`;
+export const registerInputStyle = `${inputBase} focus:outline-yellow-500`;
+
 export const imageTypes = ["image/png", "image/jpeg", "image/webp"];
 export const steps = ["Introduction", "Venue", "Tickets", "Display"];
 export const ticketNames = ["STANDARD", "VIP"];
+export const ticketTypes = ticketNames.map((name) => ({ value: name, label: name }));
 export const defaultTicketPrice = 200;
 export const defaultTicketQuantity = 1;
+
+export const profileSegments = ["Introduction", "Additional Details", "Security"];
 
 export const segmentStyle = "-mb-1 border-b-4 pb-3 transition duration-300";
 export const buttonStyle = "flex-1 font-bold rounded-md py-3 text-center transition duration-200 enabled:cursor-pointer enabled:hover:brightness-50 disabled:opacity-50";
@@ -61,7 +68,7 @@ export const emptyEventValues = () => ({
 export const eventFormValues = (event) => ({
   title: event.title,
   description: event.description ?? "",
-  category: String(event.category?.id ?? ""),
+  category: event.category ?? "",
   dateTime: event.dateTime.slice(0, 10),
   location: event.location,
   showTime: (event.showTime ?? event.dateTime).slice(11, 16),
@@ -108,11 +115,23 @@ export const findTicket = (ticketTypes = [], name) => ticketTypes.find((ticket) 
 export const toDate = (value, dateStyle = "full") => new Date(value).toLocaleDateString("en-US", { dateStyle });
 
 export const paymentMethods = [
-  { label: "GCASH", image: PaymentGCash, field: "Mobile No.:", placeholder: "Must be 11 digits", pattern: /^[0-9]{11}$/ },
+  { label: "GCASH", image: PaymentGCash, field: "Mobile No.:", placeholder: "Must be 11 digits", pattern: /^[0-9]{11}$/, maxLength: 11 },
   { label: "PAYPAL", image: PaymentPayPal, field: "Email:", placeholder: "Enter your PayPal email", pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ }
 ];
 
 export const toTime = (value) => value ? new Date(value).toLocaleTimeString("en-US", { timeStyle: "short" }) : "TBA";
+
+const membershipUnits = [["year", 365], ["month", 30], ["week", 7]];
+
+export const toMembership = (joinedAt) => {
+  const days = (Date.now() - new Date(joinedAt)) / 86400000;
+  const [unit, length] = membershipUnits.find(([, size]) => days >= size) ?? [];
+
+  if (!unit) return "less than 1 week";
+
+  const count = Math.floor(days / length);
+  return `${count} ${unit}${count > 1 ? "s" : ""}`;
+};
 
 export const eventTickets = (ticketTypes, selection, cartItems) => ticketNames.flatMap((name) => {
   const ticket = findTicket(ticketTypes, name);
@@ -137,12 +156,12 @@ export const eventPayload = (data, photo, pictures) => {
     location: data.location.trim(),
     imageUrl: photo,
     price: tickets.length ? Math.min(...tickets.map(({ price }) => Number(price))) : 0,
-    category: data.category ? { id: Number(data.category) } : null,
+    category: data.category || null,
     previewImages: pictures.map(({ id, imageUrl }) => id ? { id } : { imageUrl }),
     dateTime: `${data.dateTime}T00:00`,
     showTime: `${data.dateTime}T${data.showTime}`,
     doorsOpen: doorsOpenAt(data.dateTime, data.showTime) || null,
-    ticketTypes: tickets.map(({ enabled, ticketId, ...ticket }) => ({ ...ticket, id: ticketId })),
+    ticketTypes: tickets.map(({ ticketId, ...ticket }) => ({ ...ticket, id: ticketId })),
     totalTickets: ticketCount(tickets)
   };
 };

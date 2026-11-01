@@ -18,7 +18,7 @@ export default function DroppingDown({ value, options = [], all, icon, className
         {open ? <IconChevronUp size={24} /> : <IconChevronDown size={24} />}
       </button>
       {open && (
-        <div className="absolute left-0 top-full z-20 bg-zinc-900 mt-3 min-w-full overflow-hidden rounded-md border border-zinc-700 shadow-lg shadow-black transition duration-200 starting:opacity-0 starting:-translate-y-2">
+        <div className="absolute left-0 top-full z-20 bg-zinc-900 mt-3 min-w-full max-h-60 overflow-y-auto rounded-md border border-zinc-700 shadow-lg shadow-black transition duration-200 starting:opacity-0 starting:-translate-y-2">
           {items.map((item) => (
             <button
               key={item.value}

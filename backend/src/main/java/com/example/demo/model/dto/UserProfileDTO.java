@@ -3,6 +3,8 @@ package com.example.demo.model.dto;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDate;
+
 @Data
 @Builder
 public class UserProfileDTO {
@@ -12,7 +14,10 @@ public class UserProfileDTO {
     private String phoneNumber;
     private String role;
     private String profileImageUrl;
+    private String bannerImageUrl;
     private String gender;
     private String city;
     private String about;
+    private LocalDate birthday;
+    private boolean privateProfile;
 }

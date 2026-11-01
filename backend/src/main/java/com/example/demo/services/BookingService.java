@@ -92,7 +92,7 @@ public class BookingService {
                 .eventImageUrl(booking.getEvent().getImageUrl())
                 .eventDateTime(booking.getEvent().getDateTime())
                 .eventLocation(booking.getEvent().getLocation())
-                .eventCategory(booking.getEvent().getCategory() != null ? booking.getEvent().getCategory().getName() : null)
+                .eventCategory(booking.getEvent().getCategory())
                 .ticketName(booking.getTicketType() != null ? booking.getTicketType().getName() : null)
                 .userName(booking.getUser().getName())
                 .userEmail(booking.getUser().getEmail())

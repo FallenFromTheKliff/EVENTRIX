@@ -5,6 +5,6 @@ import lombok.Data;
 @Data
 public class ReviewRequestDTO {
     private int stars;
-    private Long traitId;
+    private String trait;
     private String notes;
 }

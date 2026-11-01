@@ -26,7 +26,8 @@ export default function EventView() {
   const { cartItems, addToCart, checkout } = useCart();
   const { loading, runner, texter } = useLoadingText();
 
-  const segments = state?.payment ? ["Payment"] : ["Details", "Seats"];
+  const event = getEvent(slug) ?? state?.event;
+  const segments = state?.payment ? ["Payment"] : event?.status === "ACTIVE" ? ["Details", "Seats"] : ["Details"];
   const [slide, setSlide] = useState(0);
   const [segment, setSegment] = useState(segments[0]);
   const [selection, setSelection] = useState(emptySelection);
@@ -34,7 +35,6 @@ export default function EventView() {
   const [account, setAccount] = useState("");
   const [message, setMessage] = useState(null);
 
-  const event = getEvent(slug);
   if (!event) return null;
 
   const payingItems = state?.cartItemIds ? cartItems.filter(({ id }) => state.cartItemIds.includes(id)) : cartItems;
@@ -113,7 +113,7 @@ export default function EventView() {
               {segment === "Details" && (
                 <>
                   <h3 className="text-3xl font-bold">{event.title}</h3>
-                  {event.category && <p className={tagStyle}><IconTag size={18} />{event.category.name}</p>}
+                  {event.category && <p className={tagStyle}><IconTag size={18} />{event.category}</p>}
                   <p className={pillStyle}>
                     <IconCalendarEvent size={20} className={iconStyle} />
                     {toDate(event.dateTime)}
@@ -132,7 +132,9 @@ export default function EventView() {
                       Show Time: {toTime(event.showTime)}
                     </p>
                   </div>
-                  {ticketPills(({ availableQuantity }) => availableQuantity > 0 ? `${availableQuantity} left` : "Sold out")}
+                  {event.status === "ACTIVE" ? ticketPills(({ availableQuantity }) => availableQuantity > 0 ? `${availableQuantity} left` : "Sold out") : (
+                    <p className="rounded-md bg-red-500/20 p-3 text-center font-bold text-red-500">{event.status}</p>
+                  )}
                   <EventField type="textarea" name="description" label="Description:" icon={IconFileText} value={event.description ?? ""} readOnly />
                 </>
               )}
@@ -186,6 +188,7 @@ export default function EventView() {
                     name="account"
                     label={method.field}
                     placeholder={method.placeholder}
+                    maxLength={method.maxLength}
                     value={account}
                     onChange={(e) => setAccount(e.target.value)}
                   />
@@ -196,7 +199,7 @@ export default function EventView() {
               )}
             </div>
             <div className="flex gap-6 pt-4">
-              {segment === "Details" && (
+              {segment === "Details" && event.status === "ACTIVE" && (
                 <button type="button" onClick={() => setSegment("Seats")} className={`${buttonStyle} bg-cyan-500`}>
                   NEXT
                 </button>

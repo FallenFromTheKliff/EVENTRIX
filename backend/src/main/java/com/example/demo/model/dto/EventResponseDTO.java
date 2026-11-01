@@ -2,7 +2,6 @@ package com.example.demo.model.dto;
 
 import lombok.Builder;
 import lombok.Data;
-import com.example.demo.model.Events.Category;
 import com.example.demo.model.Events.TicketType;
 import com.example.demo.model.EventImage;
 import com.example.demo.model.EventStatus;
@@ -21,7 +20,7 @@ public class EventResponseDTO {
     private String location;
     private BigDecimal price;
     private String thumbnailUrl; // Main photo
-    private Category category;
+    private String category;
     private List<EventImage> previewImages;
     private List<TicketType> ticketTypes;
     private long likeCount;

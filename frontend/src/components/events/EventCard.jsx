@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router";
 
 import { IconCalendarEvent, IconClock, IconHeartFilled, IconMapPin } from "@tabler/icons-react";
-import { priceRange, toSlug, toTime } from "../../utils/events";
+import { priceRange, toSlug, toTime, toDate } from "../../utils/events";
 
 import { useEvents } from "../../context/EventContext";
 import { useCart } from "../../context/CartContext";
@@ -73,7 +73,7 @@ export default function EventCard({ event, role }) {
           <h3 className="text-2xl font-bold">{event.title}</h3>
           <p className="flex items-center gap-2 text-sm text-gray-300">
             <IconCalendarEvent size={18} className="shrink-0 text-cyan-400" />
-            {new Date(event.dateTime).toLocaleDateString("en-US", { dateStyle: "full" })}
+            {toDate(event.dateTime)}
           </p>
           <p className="flex items-center gap-2 text-sm text-gray-300">
             <IconClock size={18} className="shrink-0 text-cyan-400" />

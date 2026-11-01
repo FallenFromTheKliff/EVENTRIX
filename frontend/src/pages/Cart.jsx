@@ -2,8 +2,8 @@ import { useState } from "react";
 import { Link } from "react-router";
 
 import { useCart } from "../context/CartContext";
-import { useEvents } from "../context/EventContext";
-import { toSlug, messageStyle, bookingButton } from "../utils/events";
+import { categories } from "../data/details";
+import { toSlug, messageStyle, bookingButton, ticketTypes } from "../utils/events";
 import { cartFilters, emptyCartFilters, months } from "../utils/filters";
 
 import BookingCard from "../components/transactions/BookingCard";
@@ -15,8 +15,7 @@ import ConfirmModal from "../components/ui/ConfirmModal";
 const stepButton = "flex-1 rounded-md bg-zinc-700 py-2 text-sm font-bold transition duration-200 enabled:cursor-pointer enabled:hover:brightness-50 disabled:opacity-50";
 
 export default function Cart() {
-  const { cartBookings, cartLoading, cartError, refreshCart, removeFromCart, updateCartItem } = useCart();
-  const { categories } = useEvents();
+  const { cartBookings, cartLoading, cartError, removeFromCart, updateCartItem } = useCart();
   const [filters, setFilters] = useState(emptyCartFilters);
   const [removingItemId, setRemovingItemId] = useState(null);
   const [updatingItemId, setUpdatingItemId] = useState(null);
@@ -24,8 +23,8 @@ export default function Cart() {
 
   const handleFilter = (event) => setFilters({ ...filters, [event.target.name]: event.target.value });
   const options = {
-    category: categories.map(({ name }) => ({ value: name, label: name })),
-    ticketType: [...new Set(cartBookings.map((booking) => booking.ticketName).filter(Boolean))].map((name) => ({ value: name, label: name })),
+    category: categories,
+    ticketType: ticketTypes,
     date: months
   };
 
@@ -53,7 +52,6 @@ export default function Cart() {
 
     try {
       await removeFromCart(itemId);
-    } catch {
     } finally {
       setRemovingItemId(null);
     }
@@ -79,7 +77,6 @@ export default function Cart() {
           <Reveal variant="reappear" className="w-full">
             <BookingHeader />
           </Reveal>
-          {cartError && <Retry message={cartError} onRetry={refreshCart} />}
           {cartLoading && !cartBookings.length ? (
             <p className={messageStyle}>Loading cart...</p>
           ) : cartError ? (

@@ -2,6 +2,7 @@ package com.example.demo.services;
 
 import com.example.demo.model.BookingStatus;
 import com.example.demo.model.User;
+import com.example.demo.model.Details;
 import com.example.demo.model.dto.RegisterRequestDTO;
 import com.example.demo.model.dto.UserProfileDTO;
 import com.example.demo.model.dto.UserStatsDTO;
@@ -19,6 +20,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -59,13 +63,48 @@ public class UserService implements UserDetailsService {
 
     public UserProfileDTO updateUserDetails(String email, UserUpdateDTO updatedUser) {
         User user = userRepository.getByEmail(email);
+        String phone = updatedUser.getPhoneNumber();
+        LocalDate birthday = null;
+        if (updatedUser.getName() != null && updatedUser.getName().isBlank()) {
+            throw new IllegalArgumentException("Name is required.");
+        }
+        if (phone != null && !phone.matches("\\d{11}") && !(phone.isEmpty() && "ADMIN".equals(user.getRole()))) {
+            throw new IllegalArgumentException("Phone number must be 11 digits.");
+        }
+        if (updatedUser.getNewPassword() != null && !updatedUser.getNewPassword().isEmpty()) {
+            if (updatedUser.getNewPassword().length() < 8) {
+                throw new IllegalArgumentException("Password must be at least 8 characters.");
+            }
+            if (updatedUser.getCurrentPassword() == null || !passwordEncoder.matches(updatedUser.getCurrentPassword(), user.getPassword())) {
+                throw new IllegalArgumentException("Current password is incorrect.");
+            }
+        }
+        if (updatedUser.getGender() != null && !updatedUser.getGender().isEmpty() && !Details.GENDERS.contains(updatedUser.getGender())) {
+            throw new IllegalArgumentException("Choose a gender from the list.");
+        }
+        if (updatedUser.getCity() != null && !updatedUser.getCity().isEmpty() && !Details.CITIES.contains(updatedUser.getCity())) {
+            throw new IllegalArgumentException("Choose a city from the list.");
+        }
+        if (updatedUser.getBirthday() != null && !updatedUser.getBirthday().isEmpty()) {
+            try {
+                birthday = LocalDate.parse(updatedUser.getBirthday());
+            } catch (DateTimeParseException ex) {
+                throw new IllegalArgumentException("Enter a valid birthday.");
+            }
+            if (birthday.isAfter(LocalDate.now())) {
+                throw new IllegalArgumentException("Birthday cannot be in the future.");
+            }
+        }
         if (updatedUser.getName() != null) user.setName(updatedUser.getName());
         if (updatedUser.getPhoneNumber() != null) user.setPhoneNumber(updatedUser.getPhoneNumber());
-        if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) user.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+        if (updatedUser.getNewPassword() != null && !updatedUser.getNewPassword().isEmpty()) user.setPassword(passwordEncoder.encode(updatedUser.getNewPassword()));
         if (updatedUser.getProfileImageUrl() != null) user.setProfileImageUrl(updatedUser.getProfileImageUrl());
+        if (updatedUser.getBannerImageUrl() != null) user.setBannerImageUrl(updatedUser.getBannerImageUrl());
         if (updatedUser.getGender() != null) user.setGender(updatedUser.getGender());
         if (updatedUser.getCity() != null) user.setCity(updatedUser.getCity());
         if (updatedUser.getAbout() != null) user.setAbout(updatedUser.getAbout());
+        if (updatedUser.getBirthday() != null) user.setBirthday(birthday);
+        if (updatedUser.getPrivateProfile() != null) user.setPrivateProfile(updatedUser.getPrivateProfile());
         return toProfileDTO(userRepository.save(user));
     }
 
@@ -87,9 +126,12 @@ public class UserService implements UserDetailsService {
                 .phoneNumber(user.getPhoneNumber())
                 .role(user.getRole())
                 .profileImageUrl(user.getProfileImageUrl())
+                .bannerImageUrl(user.getBannerImageUrl())
                 .gender(user.getGender())
                 .city(user.getCity())
                 .about(user.getAbout())
+                .birthday(user.getBirthday())
+                .privateProfile(user.isPrivateProfile())
                 .build();
     }
 

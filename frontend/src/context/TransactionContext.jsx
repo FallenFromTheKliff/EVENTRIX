@@ -9,9 +9,9 @@ export function TransactionProvider({ children }) {
   const { user } = useAuth();
   const [bookings, setBookings] = useState([]);
   const [transactions, setTransactions] = useState([]);
-  const [bookingsLoading, setBookingsLoading] = useState(true);
+  const [bookingsLoading, setBookingsLoading] = useState(user?.role === "USER");
   const [bookingsError, setBookingsError] = useState(null);
-  const [transactionsLoading, setTransactionsLoading] = useState(true);
+  const [transactionsLoading, setTransactionsLoading] = useState(user?.role === "ADMIN");
   const [transactionsError, setTransactionsError] = useState(null);
 
   const refreshBookings = async () => {
@@ -31,9 +31,6 @@ export function TransactionProvider({ children }) {
     let active = true;
 
     if (user?.role === "USER") {
-      setBookingsLoading(true);
-      setBookingsError(null);
-
       axiosClient.get("/user/bookings")
         .then((response) => {
           if (active) setBookings(response.data);
@@ -44,16 +41,9 @@ export function TransactionProvider({ children }) {
         .finally(() => {
           if (active) setBookingsLoading(false);
         });
-    } else {
-      setBookings([]);
-      setBookingsLoading(false);
-      setBookingsError(null);
     }
 
     if (user?.role === "ADMIN") {
-      setTransactionsLoading(true);
-      setTransactionsError(null);
-
       axiosClient.get("/admin/transactions")
         .then((response) => {
           if (active) setTransactions(response.data);
@@ -64,10 +54,6 @@ export function TransactionProvider({ children }) {
         .finally(() => {
           if (active) setTransactionsLoading(false);
         });
-    } else {
-      setTransactions([]);
-      setTransactionsLoading(false);
-      setTransactionsError(null);
     }
 
     return () => {
@@ -97,7 +83,6 @@ export function TransactionProvider({ children }) {
       transactions,
       transactionsLoading,
       transactionsError,
-      refreshTransactions,
       updateTransactionStatus,
       cancelBooking
     }}>

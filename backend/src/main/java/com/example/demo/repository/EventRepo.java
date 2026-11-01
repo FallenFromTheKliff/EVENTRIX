@@ -15,8 +15,8 @@ public interface EventRepo extends JpaRepository<Event, Long> {
 
     // REFACTORED: Efficient, database-level filtering instead of loading all events into memory.
     // This query handles filtering by category, title (name), and date range.
-    @Query("SELECT e FROM Event e LEFT JOIN e.category c WHERE " +
-        "(CAST(:categoryName AS string) IS NULL OR c.name = :categoryName) AND " +
+    @Query("SELECT e FROM Event e WHERE " +
+        "(CAST(:categoryName AS string) IS NULL OR e.category = :categoryName) AND " +
         "(CAST(:title AS string) IS NULL OR LOWER(e.title) LIKE LOWER(CONCAT('%', CAST(:title AS string), '%'))) AND " +
         "(CAST(:startDate AS LocalDateTime) IS NULL OR e.dateTime >= :startDate) AND " +
         "(CAST(:endDate AS LocalDateTime) IS NULL OR e.dateTime <= :endDate) AND " +
@@ -30,7 +30,7 @@ public interface EventRepo extends JpaRepository<Event, Long> {
     );
 
     // NEW: Query to get events liked by a specific user.
-    @Query("SELECT e FROM Event e JOIN e.likes l WHERE l.user.id = :userId AND e.status = 'ACTIVE'")
+    @Query("SELECT e FROM Event e JOIN e.likes l WHERE l.user.id = :userId")
     List<Event> findLikedEventsByUserId(@Param("userId") Long userId);
 
     @Query("SELECT e.dateTime FROM Event e WHERE LOWER(e.location) = LOWER(:location) AND e.status = com.example.demo.model.EventStatus.ACTIVE AND e.eventId <> :excludeId")

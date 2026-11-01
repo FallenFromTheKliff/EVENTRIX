@@ -38,7 +38,7 @@ public class CartItemResponseDTO {
             event.getImageUrl(),
             event.getDateTime(),
             event.getLocation(),
-            event.getCategory() != null ? event.getCategory().getName() : null,
+            event.getCategory(),
             item.getBookingReference()
         );
     }

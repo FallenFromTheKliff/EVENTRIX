@@ -70,10 +70,6 @@ public class CartService {
             cart.getItems().add(item);
         } else {
             item.setQuantity(item.getQuantity() + dto.getQuantity());
-
-            if (item.getBookingReference() == null || item.getBookingReference().isBlank()) {
-                item.setBookingReference(BookingReferenceGenerator.generate());
-            }
         }
 
         return CartItemResponseDTO.from(cartItemRepository.save(item));
@@ -82,18 +78,7 @@ public class CartService {
     @Transactional
     public List<CartItemResponseDTO> getCartItems(String userEmail) {
         User user = userRepository.getByEmail(userEmail);
-
-        List<CartItem> items = getOrCreateCart(user).getItems();
-
-        for (CartItem item : items) {
-            if (item.getBookingReference() == null || item.getBookingReference().isBlank()) {
-                item.setBookingReference(BookingReferenceGenerator.generate());
-            }
-        }
-
-        return cartItemRepository.saveAll(items).stream()
-                .map(CartItemResponseDTO::from)
-                .toList();
+        return getOrCreateCart(user).getItems().stream().map(CartItemResponseDTO::from).toList();
     }
 
     @Transactional
@@ -125,10 +110,6 @@ public class CartService {
 
         item.setQuantity(dto.getQuantity());
 
-        if (item.getBookingReference() == null || item.getBookingReference().isBlank()) {
-            item.setBookingReference(BookingReferenceGenerator.generate());
-        }
-
         return CartItemResponseDTO.from(cartItemRepository.save(item));
     }
 
@@ -148,7 +129,7 @@ public class CartService {
         cartRepository.save(cart);
     }
 
-        @Transactional
+    @Transactional
     public ReceiptResponseDTO checkoutCart(String userEmail, PaymentRequestDTO paymentRequest) {
         User user = userRepository.getByEmail(userEmail);
         Cart cart = getOrCreateCart(user);
@@ -173,10 +154,6 @@ public class CartService {
             ticketTypeRepository.save(ticketType);
             BigDecimal subtotal = ticketType.getPrice().multiply(BigDecimal.valueOf(item.getQuantity()));
             totalAmount = totalAmount.add(subtotal);
-            if (item.getBookingReference() == null || item.getBookingReference().isBlank()) {
-                item.setBookingReference(BookingReferenceGenerator.generate());
-                cartItemRepository.save(item);
-            }
             Booking booking = new Booking();
             booking.setUser(user);
             booking.setEvent(event);

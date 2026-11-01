@@ -13,15 +13,12 @@ export default function DetailsModal({ booking, onClose }) {
 
   useEffect(() => {
     let active = true;
-    setEvent(null);
 
     getEventById(booking.eventId)
       .then((data) => {
         if (active) setEvent(data);
       })
-      .catch(() => {
-        if (active) setEvent(null);
-      });
+      .catch(() => {});
 
     return () => {
       active = false;
@@ -35,7 +32,7 @@ export default function DetailsModal({ booking, onClose }) {
         {event ? (
           <>
             <h3 className="text-3xl font-bold">{event.title}</h3>
-            {event.category && <p className={tagStyle}><IconTag size={18} />{event.category.name}</p>}
+            {event.category && <p className={tagStyle}><IconTag size={18} />{event.category}</p>}
             <p className={pillStyle}>
               <IconCalendarEvent size={20} className={iconStyle} />
               {toDate(event.dateTime)}

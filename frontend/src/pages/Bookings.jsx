@@ -1,9 +1,9 @@
 import { useState } from "react";
 
 import { useTransactions } from "../context/TransactionContext";
-import { useEvents } from "../context/EventContext";
 
-import { messageStyle, bookingButton } from "../utils/events";
+import { categories } from "../data/details";
+import { messageStyle, bookingButton, ticketTypes } from "../utils/events";
 import { emptyFilters, bookingFilters, bookingStatusOptions, months } from "../utils/filters";
 
 import BookingCard from "../components/transactions/BookingCard";
@@ -14,8 +14,7 @@ import useLoadingText from "../components/ui/useLoadingText";
 import ConfirmModal from "../components/ui/ConfirmModal";
 
 export default function Bookings() {
-  const { bookings, bookingsLoading, bookingsError, refreshBookings, cancelBooking } = useTransactions();
-  const { categories } = useEvents();
+  const { bookings, bookingsLoading, bookingsError, cancelBooking } = useTransactions();
   const { loading, runner, texter } = useLoadingText();
   const [filters, setFilters] = useState(emptyFilters);
   const [cancelling, setCancelling] = useState(null);
@@ -24,8 +23,8 @@ export default function Bookings() {
   const handleFilter = (event) => setFilters({ ...filters, [event.target.name]: event.target.value });
 
   const options = {
-    category: categories.map(({ name }) => ({ value: name, label: name })),
-    ticketType: [...new Set(bookings.map((booking) => booking.ticketName).filter(Boolean))].map((name) => ({ value: name, label: name })),
+    category: categories,
+    ticketType: ticketTypes,
     date: months,
     status: bookingStatusOptions
   };
@@ -68,7 +67,6 @@ export default function Bookings() {
           <Reveal variant="reappear" className="w-full">
             <BookingHeader />
           </Reveal>
-          {bookingsError && <Retry message={bookingsError} onRetry={refreshBookings} />}
           {bookingsLoading && !bookings.length ? (
             <p className={messageStyle}>Loading bookings...</p>
           ) : bookingsError ? (

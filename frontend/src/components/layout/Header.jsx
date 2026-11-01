@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router";
-import { IconChevronDown, IconChevronUp, IconHeartFilled, IconLogout, IconMenu2, IconShoppingCartFilled } from "@tabler/icons-react";
+import { IconBellFilled, IconChevronDown, IconChevronUp, IconHeartFilled, IconLogout, IconMenu2, IconShoppingCartFilled } from "@tabler/icons-react";
 
 import { useAuth } from "../../context/AuthContext";
 import { useEvents } from "../../context/EventContext";
@@ -23,7 +23,7 @@ export default function Header({ role = "public" }) {
   const { cartItems } = useCart();
   const { loading, runner, texter } = useLoadingText();
   const { pathname } = useLocation();
-  
+
   const [sideStep, setSideStep] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
   const [menuOpen, setMenuOpen] = useState(false);
@@ -107,9 +107,12 @@ export default function Header({ role = "public" }) {
                     </Link>
                   </>
                 )}
+                <button type="button" className="cursor-pointer transition duration-200 hover:brightness-50">
+                  <IconBellFilled size={32} />
+                </button>
                 {menuOpen && <button onClick={() => setMenuOpen(false)} className="fixed inset-0 z-10 cursor-default" />}
                 <div className="relative z-20">
-                  <button onClick={() => setMenuOpen(!menuOpen)} className="flex items-center gap-2 cursor-pointer">
+                  <button onClick={() => setMenuOpen(!menuOpen)} className="flex items-center gap-2 cursor-pointer transition duration-200 hover:brightness-50">
                     <img src={profile?.profileImageUrl || Placeholder} alt="Gojo" className="size-14 rounded-full object-cover" />
                     {menuOpen ? <IconChevronUp size={24} /> : <IconChevronDown size={24} />}
                   </button>

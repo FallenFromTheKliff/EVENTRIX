@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, Fragment } from "react";
 import axiosClient from "../api/axiosClient";
 
 const AuthContext = createContext();
@@ -71,6 +71,11 @@ export function AuthProvider({ children }) {
     return authenticatedUser;
   };
 
+  const updateProfile = async (data) => {
+    setProfile((await axiosClient.put("/user/profile", data)).data);
+  };
+  const getStats = async () => (await axiosClient.get("/user/stats")).data;
+
   const login = (credentials) => authenticator("/auth/login", credentials);
   const register = async (data) => {
     await axiosClient.post("/auth/register", data);
@@ -87,8 +92,8 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, profile, login, register, logout }}>
-      {children}
+    <AuthContext.Provider value={{ user, profile, getStats, updateProfile, login, register, logout }}>
+      <Fragment key={user?.email ?? ""}>{children}</Fragment>
     </AuthContext.Provider>
   )
 }
