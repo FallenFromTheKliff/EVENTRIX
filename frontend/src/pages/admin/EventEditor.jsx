@@ -5,7 +5,7 @@ import { IconArrowLeft, IconPhoto, IconTrash, IconCategory, IconCalendar, IconCl
 
 import { useEvents } from "../../context/EventContext";
 
-import { buttonStyle, segmentStyle, steps, emptyEventValues, eventFormValues, filled, selectedTickets as getSelectedTickets, ticketCount as getTicketCount, validTickets, dateInPast, dateTaken, doorsOpenAt, nowLocal } from "../../utils/events";
+import { buttonStyle, segmentStyle, steps, emptyEventValues, eventFormValues, filled, selectedTickets as getSelectedTickets, ticketCount as getTicketCount, validTickets, dateInPast, dateTaken, doorsOpenAt, nowLocal, removeStyle } from "../../utils/events";
 import { statuses } from "../../utils/filters";
 import { categories, cities } from "../../data/details";
 
@@ -128,16 +128,7 @@ export default function EventEditor() {
       <Reveal variant="lazy" ready={!id || Boolean(event)} className="flex flex-col lg:flex-row bg-zinc-900 overflow-hidden rounded-xl mt-8">
         <div className="relative flex flex-col items-center justify-center bg-gray-100 text-gray-400 min-h-180 overflow-hidden lg:w-1/2">
           {pictures.length ? (
-            <>
-              <PictureSlider images={pictures.map(({ imageUrl }) => imageUrl)} index={slide} alt="Event" onChange={setSlide} />
-              <button
-                type="button"
-                onClick={handleRemovePicture}
-                className="absolute top-3 right-3 bg-black/50 text-white rounded-full p-2 cursor-pointer transition duration-200 hover:brightness-50"
-              >
-                <IconTrash size={24} />
-              </button>
-            </>
+            <PictureSlider images={pictures.map(({ imageUrl }) => imageUrl)} index={slide} alt="Event" onChange={setSlide} />
           ) : (
             <div className="flex flex-col items-center">
               <IconPhoto size={112} />
@@ -202,7 +193,18 @@ export default function EventEditor() {
                       height={800}
                       onPick={handlePictures}
                       onError={handleError}
-                    />
+                    >
+                      {pictures.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={handleRemovePicture}
+                          className={`${removeStyle} mt-2 ml-32`}
+                        >
+                          <IconTrash size={18} />
+                          REMOVE PHOTO
+                        </button>
+                      )}
+                    </EventField>
                     <EventField
                       type="select"
                       label="Location:"

@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { useBlocker } from "react-router";
 import { useForm, useWatch } from "react-hook-form";
-import { IconArrowLeft, IconCake, IconFileText, IconLock, IconMail, IconMapPin, IconPhone, IconUser } from "@tabler/icons-react";
+import { IconArrowLeft, IconCake, IconCalendarPlus, IconFileText, IconLock, IconMail, IconMapPin, IconPhone, IconTrash, IconUser } from "@tabler/icons-react";
 
 import { useAuth } from "../../context/AuthContext";
 
-import { buttonStyle, segmentStyle, profileSegments, nowLocal } from "../../utils/events";
+import { buttonStyle, segmentStyle, profileSegments, nowLocal, inputStyle, removeStyle, toDate } from "../../utils/events";
 import { genders, cities } from "../../data/details";
 
 import Reveal from "../ui/Reveal";
@@ -18,11 +18,13 @@ import Placeholder from "../../assets/images/EVENTRIX-Placeholder.jpeg";
 const colors = { USER: "bg-zinc-800", ADMIN: "bg-zinc-900" };
 const lines = { USER: "border-zinc-900", ADMIN: "border-zinc-800" };
 const genderStyle = "flex flex-1 items-center justify-center rounded-md py-3 transition duration-200 enabled:cursor-pointer enabled:hover:brightness-50";
+const lockedStyle = `${inputStyle} pl-10 opacity-70 cursor-not-allowed`;
 
 const toFormValues = (profile) => ({
   name: profile?.name ?? "",
   phoneNumber: profile?.phoneNumber ?? "",
   profileImageUrl: profile?.profileImageUrl ?? "",
+  bannerImageUrl: profile?.bannerImageUrl ?? "",
   gender: profile?.gender ?? "",
   city: profile?.city ?? "",
   birthday: profile?.birthday ?? "",
@@ -131,16 +133,6 @@ export default function ProfileEditor({ onExit }) {
               <div className="flex-1">
                 <div className={segment === "Introduction" ? "space-y-4" : "hidden"}>
                   <EventField
-                    type="photo"
-                    label="Profile Picture:"
-                    text="UPLOAD PHOTO"
-                    hint="Recommended: 400 × 400 px, other sizes are cropped to fit."
-                    width={400}
-                    height={400}
-                    onPick={([picture]) => setValue("profileImageUrl", picture, { shouldDirty: true })}
-                    onError={handleError}
-                  />
-                  <EventField
                     label="Full Name:"
                     icon={IconUser}
                     placeholder="Enter your full name"
@@ -153,6 +145,7 @@ export default function ProfileEditor({ onExit }) {
                     label="Email:"
                     icon={IconMail}
                     hint="Your email cannot be changed."
+                    className={lockedStyle}
                     value={profile.email}
                     readOnly
                   />
@@ -168,6 +161,61 @@ export default function ProfileEditor({ onExit }) {
                       onChange: (e) => { e.target.value = e.target.value.replace(/\D/g, ""); }
                     })}
                   />
+                  <EventField
+                    name="createdAt"
+                    label="Account Created:"
+                    icon={IconCalendarPlus}
+                    className={lockedStyle}
+                    value={toDate(profile.createdAt, "long")}
+                    readOnly
+                  />
+                </div>
+                <div className={segment === "Aesthetics" ? "space-y-4" : "hidden"}>
+                  <EventField
+                    type="photo"
+                    label="Profile Picture:"
+                    text="UPLOAD PHOTO"
+                    hint="Recommended: 400 × 400 px, other sizes are cropped to fit."
+                    width={400}
+                    height={400}
+                    onPick={([picture]) => setValue("profileImageUrl", picture, { shouldDirty: true })}
+                    onError={handleError}
+                  >
+                    {values.profileImageUrl && (
+                      <button
+                        type="button"
+                        onClick={() => setValue("profileImageUrl", "", { shouldDirty: true })}
+                        className={`${removeStyle} mt-2 ml-32`}
+                      >
+                        <IconTrash size={18} />
+                        REMOVE PHOTO
+                      </button>
+                    )}
+                  </EventField>
+                  <EventField
+                    type="photo"
+                    label="Banner Picture:"
+                    text="UPLOAD BANNER"
+                    hint="Recommended: 1200 × 300 px (4:1), other sizes are cropped to fit."
+                    width={1200}
+                    height={300}
+                    onPick={([picture]) => setValue("bannerImageUrl", picture, { shouldDirty: true })}
+                    onError={handleError}
+                  >
+                    {values.bannerImageUrl && (
+                      <div className="mt-2 ml-32 space-y-2">
+                        <img src={values.bannerImageUrl} alt="Banner Picture" className="aspect-4/1 w-full rounded-md object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => setValue("bannerImageUrl", "", { shouldDirty: true })}
+                          className={removeStyle}
+                        >
+                          <IconTrash size={18} />
+                          REMOVE BANNER
+                        </button>
+                      </div>
+                    )}
+                  </EventField>
                 </div>
                 {user.role === "USER" && (
                   <div className={segment === "Additional Details" ? "space-y-4" : "hidden"}>
@@ -267,22 +315,13 @@ export default function ProfileEditor({ onExit }) {
         </Reveal>
       </Reveal>
       {message && <ConfirmModal type={message.type} message={message.message} onClose={handleClose} />}
-      {discarding && (
+      {(discarding || blocker.state === "blocked") && (
         <ConfirmModal
           message="Discard changes?"
           description="Your unsaved changes will be lost."
           confirmText="DISCARD"
-          onConfirm={handleDiscard}
-          onClose={() => setDiscarding(false)}
-        />
-      )}
-      {blocker.state === "blocked" && (
-        <ConfirmModal
-          message="Discard changes?"
-          description="Your unsaved changes will be lost."
-          confirmText="DISCARD"
-          onConfirm={blocker.proceed}
-          onClose={blocker.reset}
+          onConfirm={discarding ? handleDiscard : blocker.proceed}
+          onClose={discarding ? () => setDiscarding(false) : blocker.reset}
         />
       )}
     </>

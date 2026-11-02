@@ -1,22 +1,20 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { IconClock, IconLock, IconMail, IconMapPin, IconPencil, IconPhone, IconStarFilled, IconTag, IconTicket } from "@tabler/icons-react";
 
 import { useAuth } from "../context/AuthContext";
 import { useEvents } from "../context/EventContext";
 
-import { messageStyle, tagStyle, toMembership, imageTypes, resizeImage } from "../utils/events";
-import useDebouncing from "../utils/useDebouncing";
+import { messageStyle, tagStyle, toMembership } from "../utils/events";
 
 import Reveal from "../components/ui/Reveal";
 import StatCard from "../components/ui/StatCard";
-import ConfirmModal from "../components/ui/ConfirmModal";
 import PictureSlider from "../components/events/PictureSlider";
 import ProfileEditor from "../components/auth/ProfileEditor";
 
 import Placeholder from "../assets/images/EVENTRIX-Placeholder.jpeg";
 
 export default function Profile() {
-  const { user, profile, getStats, updateProfile } = useAuth();
+  const { user, profile, getStats } = useAuth();
   const { getFavorites } = useEvents();
 
   const [mode, setMode] = useState(user.role === "ADMIN" ? "details" : "display");
@@ -24,12 +22,6 @@ export default function Profile() {
   const [favorites, setFavorites] = useState([]);
   const [slide, setSlide] = useState(0);
   const [error, setError] = useState("");
-
-  const [changing, setChanging] = useState(false);
-  const [banner, setBanner] = useState("");
-  const [failed, setFailed] = useState("");
-  const bannerInput = useRef(null);
-  const debouncedBanner = useDebouncing(banner, 2000);
 
   const event = favorites[slide];
 
@@ -54,30 +46,6 @@ export default function Profile() {
     };
   }, [user.role, getStats, getFavorites]);
 
-  useEffect(() => {
-    if (!debouncedBanner) return;
-
-    updateProfile({ bannerImageUrl: debouncedBanner }).catch(() => {
-      setBanner("");
-      setFailed("Failed to update banner!");
-    });
-  }, [debouncedBanner, updateProfile]);
-
-  const handleBanner = async (e) => {
-    const [file] = e.target.files;
-    e.target.value = "";
-    if (!file) return;
-    if (!imageTypes.includes(file.type)) {
-      setFailed("Only PNG, JPG, and WEBP images are allowed!");
-      return;
-    }
-    try {
-      setBanner(await resizeImage(file, 1200, 300));
-    } catch {
-      setFailed("Unable to read that image!");
-    }
-  };
-
   return (
     <div className="flex flex-1 flex-col">
       {profile && <title>{`${profile.name} - EVENTRIX`}</title>}
@@ -88,16 +56,8 @@ export default function Profile() {
       ) : mode === "display" ? (
         <div className="space-y-8">
           <div className="bg-zinc-800 overflow-hidden rounded-xl">
-            <Reveal variant="reappear" className="relative h-48 bg-linear-to-r from-cyan-500 to-blue-950">
+            <Reveal variant="reappear" className="h-48 bg-linear-to-r from-cyan-500 to-blue-950">
               {profile.bannerImageUrl && <img src={profile.bannerImageUrl} alt="Banner" className="size-full object-cover" />}
-              <button
-                type="button"
-                onClick={() => setChanging(true)}
-                className="absolute top-3 right-3 bg-black/50 text-white rounded-full p-2 cursor-pointer transition duration-200 hover:brightness-50"
-              >
-                <IconPencil size={24} />
-              </button>
-              <input ref={bannerInput} type="file" accept={imageTypes.join()} onChange={handleBanner} className="hidden" />
             </Reveal>
             <div className="grid grid-cols-[auto_1fr] items-center gap-x-6 gap-y-4 px-8 pb-5">
               <Reveal variant="reappear" className="relative -mt-18">
@@ -207,19 +167,6 @@ export default function Profile() {
       ) : (
         <ProfileEditor onExit={() => setMode("display")} />
       )}
-      {changing && (
-        <ConfirmModal
-          message="Change banner?"
-          description="Recommended: 1200 × 300 px (4:1), other sizes are cropped to fit."
-          confirmText="YES"
-          onConfirm={() => {
-            setChanging(false);
-            bannerInput.current.click();
-          }}
-          onClose={() => setChanging(false)}
-        />
-      )}
-      {failed && <ConfirmModal type="error" message={failed} onClose={() => setFailed("")} />}
     </div>
   )
 }

@@ -132,6 +132,7 @@ public class UserService implements UserDetailsService {
                 .about(user.getAbout())
                 .birthday(user.getBirthday())
                 .privateProfile(user.isPrivateProfile())
+                .createdAt(user.getCreatedAt())
                 .build();
     }
 

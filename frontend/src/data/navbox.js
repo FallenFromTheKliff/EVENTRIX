@@ -1,4 +1,4 @@
-import { IconCalendarEvent, IconCalendarPlus, IconHelpCircle, IconHome, IconLayoutDashboard, IconReceipt, IconSettings, IconTicket, IconUser, IconMessageStar, IconMessage } from "@tabler/icons-react";
+import { IconCalendarEvent, IconCalendarPlus, IconHelpCircle, IconHome, IconLayoutDashboard, IconReceipt, IconSettings, IconTicket, IconUser, IconMessageStar } from "@tabler/icons-react";
 
 export const sectionsss = [
   { id: "home", label: "Home" },
@@ -30,7 +30,7 @@ export const rolesss = {
       category: "Main",
       links: [
         { to: "/dashboard", label: "Dashboard", icon: IconLayoutDashboard },
-        { to: "/reception", label: "Reception", icon: IconMessage },
+        { to: "/reception", label: "Reception", icon: IconMessageStar },
         { to: "/transactions", label: "Transactions", icon: IconReceipt }
       ]
     },

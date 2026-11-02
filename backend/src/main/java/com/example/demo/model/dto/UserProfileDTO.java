@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -20,4 +21,5 @@ public class UserProfileDTO {
     private String about;
     private LocalDate birthday;
     private boolean privateProfile;
+    private LocalDateTime createdAt;
 }
