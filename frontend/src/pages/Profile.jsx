@@ -1,17 +1,21 @@
 import { useState, useEffect } from "react";
-import { IconClock, IconLock, IconMail, IconMapPin, IconPencil, IconPhone, IconStarFilled, IconTag, IconTicket } from "@tabler/icons-react";
+import { IconArchive, IconBroadcast, IconCalendarEvent, IconClock, IconFileText, IconLock, IconMail, IconMapPin, IconPencil, IconPhone, IconStarFilled, IconTag, IconTicket } from "@tabler/icons-react";
 
 import { useAuth } from "../context/AuthContext";
 import { useEvents } from "../context/EventContext";
 
-import { messageStyle, tagStyle, toMembership } from "../utils/events";
+import { messageStyle, tagStyle, pillStyle, iconStyle, toMembership, toDate } from "../utils/events";
+import { statusBadges } from "../data/statcheck";
 
 import Reveal from "../components/ui/Reveal";
 import StatCard from "../components/ui/StatCard";
 import PictureSlider from "../components/events/PictureSlider";
+import EventField from "../components/events/EventField";
 import ProfileEditor from "../components/auth/ProfileEditor";
 
 import Placeholder from "../assets/images/EVENTRIX-Placeholder.jpeg";
+
+const badgeStyle = "flex w-fit items-center gap-2 rounded-full px-3 py-1 text-sm";
 
 export default function Profile() {
   const { user, profile, getStats } = useAuth();
@@ -139,12 +143,12 @@ export default function Profile() {
                 <Reveal variant="type">Favorite Events</Reveal>
               </h2>
             </div>
-            <Reveal variant="lazy" className="mt-8 flex flex-col lg:flex-row bg-zinc-800 min-h-96 overflow-hidden rounded-xl">
+            <Reveal variant="lazy" className="mt-8 flex flex-col lg:flex-row bg-zinc-800 min-h-180 overflow-hidden rounded-xl">
               {profile.privateProfile ? (
                 <p className="m-auto p-8 text-center text-gray-400">This person has decided to hide their favorite events from public view.</p>
               ) : event ? (
                 <>
-                  <div className="relative min-h-72 overflow-hidden lg:w-1/2">
+                  <div className="relative min-h-112 overflow-hidden lg:w-1/2">
                     <PictureSlider
                       images={favorites.map(({ thumbnailUrl }) => thumbnailUrl || Placeholder)}
                       index={slide}
@@ -152,10 +156,24 @@ export default function Profile() {
                       onChange={setSlide}
                     />
                   </div>
-                  <Reveal variant="right" className="flex flex-1 flex-col gap-4 p-8">
+                  <Reveal variant="right" className="relative flex flex-1 flex-col gap-4 p-8">
                     <h3 className="text-3xl font-bold">{event.title}</h3>
-                    {event.category && <p className={tagStyle}><IconTag size={18} />{event.category}</p>}
-                    <p className="line-clamp-6 text-gray-300">{event.description}</p>
+                    <div className="flex flex-wrap gap-3">
+                      {event.category && <p className={tagStyle}><IconTag size={18} />{event.category}</p>}
+                      <p className={`${badgeStyle} ${statusBadges[event.status].color}`}>
+                        {event.status === "ACTIVE" ? <IconBroadcast size={18} /> : <IconArchive size={18} />}
+                        {statusBadges[event.status].label}
+                      </p>
+                    </div>
+                    <p className={pillStyle}>
+                      <IconCalendarEvent size={20} className={iconStyle} />
+                      {toDate(event.dateTime)}
+                    </p>
+                    <p className={pillStyle}>
+                      <IconMapPin size={20} className={iconStyle} />
+                      {event.location}
+                    </p>
+                    <EventField type="textarea" name="description" label="Description:" icon={IconFileText} value={event.description ?? ""} readOnly />
                   </Reveal>
                 </>
               ) : (

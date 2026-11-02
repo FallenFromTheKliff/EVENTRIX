@@ -166,7 +166,6 @@ export default function EventEditor() {
                       type="select"
                       label="Category:"
                       icon={IconCategory}
-                      all="No category"
                       options={categories}
                       value={values.category}
                       onSelect={(value) => setValue("category", value, { shouldDirty: true })}

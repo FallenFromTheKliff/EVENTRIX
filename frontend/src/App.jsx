@@ -1,4 +1,5 @@
-import { createBrowserRouter, createRoutesFromElements, Route } from "react-router";
+import { useEffect } from "react";
+import { createBrowserRouter, createRoutesFromElements, Outlet, Route, useLocation } from "react-router";
 import { RouterProvider } from "react-router/dom";
 
 import AppLayout from "./components/layout/AppLayout";
@@ -20,8 +21,18 @@ import Bookings from "./pages/Bookings";
 import Transactions from "./pages/admin/Transactions";
 import Cart from "./pages/Cart";
 
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return <Outlet />;
+}
+
 const router = createBrowserRouter(createRoutesFromElements(
-  <>
+  <Route element={<ScrollToTop />}>
     <Route path="/" element={<Landing />} />
     <Route path="/auth" element={<Auth />} />
     <Route element={<ProtectedRoute />}>
@@ -46,7 +57,7 @@ const router = createBrowserRouter(createRoutesFromElements(
         </Route>
       </Route>
     </Route>
-  </>
+  </Route>
 ));
 
 function App() {

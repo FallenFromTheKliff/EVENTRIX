@@ -14,7 +14,7 @@ export const eventFilters = [
 
 export const adminEventFilters = [
   ...eventFilters,
-  { name: "status", type: "select", all: "All Statuses", icon: IconArchive }
+  { name: "status", type: "select", icon: IconArchive }
 ];
 
 export const statuses = eventStatuses;

@@ -1,5 +1,6 @@
 import PaymentGCash from "../assets/images/Payment-GCash.png";
 import PaymentPayPal from "../assets/images/Payment-PayPal.png";
+import { categories } from "../data/details";
 
 export const toSlug = (title) => title.toLowerCase().trim().replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-|-$/g, "");
 
@@ -22,7 +23,7 @@ export const pillStyle = "relative rounded-md bg-white/5 p-3 pl-11 text-gray-300
 export const iconStyle = "absolute left-3 top-1/2 -translate-y-1/2 text-cyan-400";
 export const tagStyle = "flex w-fit items-center gap-2 rounded-full bg-cyan-500/20 px-3 py-1 text-sm text-cyan-400";
 export const messageStyle = "my-auto py-8 text-center text-lg text-white";
-export const removeStyle = "flex items-center gap-2 bg-red-500 text-sm font-bold rounded-md px-3 py-2 transition duration-200 enabled:cursor-pointer enabled:hover:brightness-50";
+export const removeStyle = "flex items-center gap-2 bg-red-500 text-sm font-bold rounded-md px-3 py-2 transition duration-200 enabled:cursor-pointer enabled:hover:brightness-50 disabled:opacity-50";
 export const bookingButton = "flex w-full items-center justify-center rounded-md py-2 text-center text-sm font-bold transition duration-200 enabled:cursor-pointer enabled:hover:brightness-50 disabled:opacity-50";
 export const bookingColumns = "grid-cols-[minmax(0,2fr)_minmax(5rem,1fr)_minmax(7rem,1fr)_minmax(8rem,1.5fr)_7rem]";
 export const adminColumns = "grid-cols-[minmax(0,1.7fr)_4rem_6rem_minmax(0,1.3fr)_minmax(0,1fr)_6rem]";
@@ -58,7 +59,7 @@ export const emptyTicket = (name, ticket = {}) => ({
 export const emptyEventValues = () => ({
   title: "",
   description: "",
-  category: "",
+  category: categories[0].value,
   dateTime: "",
   location: "",
   showTime: "",
@@ -69,7 +70,7 @@ export const emptyEventValues = () => ({
 export const eventFormValues = (event) => ({
   title: event.title,
   description: event.description ?? "",
-  category: event.category ?? "",
+  category: event.category ?? categories[0].value,
   dateTime: event.dateTime.slice(0, 10),
   location: event.location,
   showTime: (event.showTime ?? event.dateTime).slice(11, 16),

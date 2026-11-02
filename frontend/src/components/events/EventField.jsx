@@ -9,9 +9,9 @@ import DroppingDown from "../ui/DroppingDown";
 const ticketButtonStyle = "relative w-44 flex items-center gap-2 rounded-md px-3 py-3 text-base font-bold cursor-pointer transition duration-200 enabled:hover:brightness-50";
 const ticketButtonColors = { STANDARD: "bg-cyan-500 text-white", VIP: "bg-blue-950 text-yellow-400" };
 
-export default function EventField({ type = "text", label, icon: Icon, hint, error, children, options, all, onSelect, text, limit = 1, count = 0, width, height, onPick, onError, enabled, onToggle, ...props }) {
+export default function EventField({ type = "text", label, icon: Icon, hint, error, children, options, all, onSelect, text, limit = 1, count = 0, width, height, onPick, onError, loading, enabled, onToggle, ...props }) {
   const [show, setShow] = useState(false);
-  
+
   if (type === "toggle") return (
     <button
       type="button"
@@ -60,14 +60,14 @@ export default function EventField({ type = "text", label, icon: Icon, hint, err
       <div>
         <div className="flex items-center gap-4">
           <p className="w-28 text-sm">{label}</p>
-          <label className={`flex flex-1 items-center justify-center gap-2 bg-gray-300 text-black font-bold rounded-md py-3 transition duration-200 ${count >= limit ? "opacity-50" : "cursor-pointer hover:brightness-50"}`}>
-            <IconPhoto size={20} />
+          <label className={`flex flex-1 items-center justify-center gap-2 bg-gray-300 text-black font-bold rounded-md py-3 transition duration-200 ${count >= limit || loading ? "opacity-50" : "cursor-pointer hover:brightness-50"}`}>
+            {!loading && <IconPhoto size={20} />}
             {text}
             <input
               type="file"
               multiple={limit > 1}
               accept={imageTypes.join()}
-              disabled={count >= limit}
+              disabled={count >= limit || loading}
               onChange={handleFiles}
               className="hidden"
             />

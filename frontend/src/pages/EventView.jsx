@@ -75,7 +75,7 @@ export default function EventView() {
 
   const handleClose = () => {
     setMessage(null);
-    if (message.type === "success") navigate(state?.payment ? "/bookings" : "/events");
+    if (message?.type === "success") navigate(state?.payment ? "/bookings" : "/events");
   };
 
   return (

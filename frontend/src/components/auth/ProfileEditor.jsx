@@ -38,6 +38,8 @@ const toFormValues = (profile) => ({
 export default function ProfileEditor({ onExit }) {
   const { user, profile, updateProfile } = useAuth();
   const { loading, runner, texter } = useLoadingText();
+  const photoUpload = useLoadingText(2000);
+  const bannerUpload = useLoadingText(2000);
   const { register, handleSubmit, control, reset, setValue, formState: { isDirty, errors } } = useForm({
     defaultValues: toFormValues(profile)
   });
@@ -174,17 +176,19 @@ export default function ProfileEditor({ onExit }) {
                   <EventField
                     type="photo"
                     label="Profile Picture:"
-                    text="UPLOAD PHOTO"
+                    text={photoUpload.texter("UPLOAD PHOTO", "UPLOADING...")}
+                    loading={photoUpload.loading}
                     hint="Recommended: 400 × 400 px, other sizes are cropped to fit."
                     width={400}
                     height={400}
-                    onPick={([picture]) => setValue("profileImageUrl", picture, { shouldDirty: true })}
+                    onPick={([picture]) => photoUpload.runner(async () => setValue("profileImageUrl", picture, { shouldDirty: true }))}
                     onError={handleError}
                   >
                     {values.profileImageUrl && (
                       <button
                         type="button"
                         onClick={() => setValue("profileImageUrl", "", { shouldDirty: true })}
+                        disabled={photoUpload.loading}
                         className={`${removeStyle} mt-2 ml-32`}
                       >
                         <IconTrash size={18} />
@@ -195,26 +199,30 @@ export default function ProfileEditor({ onExit }) {
                   <EventField
                     type="photo"
                     label="Banner Picture:"
-                    text="UPLOAD BANNER"
+                    text={bannerUpload.texter("UPLOAD BANNER", "UPLOADING...")}
+                    loading={bannerUpload.loading}
                     hint="Recommended: 1200 × 300 px (4:1), other sizes are cropped to fit."
                     width={1200}
                     height={300}
-                    onPick={([picture]) => setValue("bannerImageUrl", picture, { shouldDirty: true })}
+                    onPick={([picture]) => bannerUpload.runner(async () => setValue("bannerImageUrl", picture, { shouldDirty: true }))}
                     onError={handleError}
                   >
-                    {values.bannerImageUrl && (
-                      <div className="mt-2 ml-32 space-y-2">
-                        <img src={values.bannerImageUrl} alt="Banner Picture" className="aspect-4/1 w-full rounded-md object-cover" />
+                    <div className="mt-2 ml-32 space-y-2">
+                      <div className="bg-linear-to-r from-cyan-500 to-blue-950 h-24 overflow-hidden rounded-md">
+                        {values.bannerImageUrl && <img src={values.bannerImageUrl} alt="Banner Picture" className="size-full object-contain" />}
+                      </div>
+                      {values.bannerImageUrl && (
                         <button
                           type="button"
                           onClick={() => setValue("bannerImageUrl", "", { shouldDirty: true })}
+                          disabled={bannerUpload.loading}
                           className={removeStyle}
                         >
                           <IconTrash size={18} />
                           REMOVE BANNER
                         </button>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </EventField>
                 </div>
                 {user.role === "USER" && (

@@ -39,7 +39,7 @@ export default function Reveal({ children, className = "", variant = "up", ready
     return () => clearInterval(timer);
   }, [variant, shown, children]);
 
-  if (variant === "type") return <span ref={ref} className={text ? "" : "invisible"}>{text || children}</span>;
+  if (variant === "type") return <span ref={ref} className={`transition-opacity duration-300 ${text === children ? "" : "opacity-70"} ${text ? "" : "invisible"}`}>{text || children}</span>;
 
   if (variant === "lazy") return (
     <div ref={ref} className={`relative ${className}`}>

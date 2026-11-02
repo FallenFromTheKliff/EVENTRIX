@@ -10,16 +10,11 @@ import BookingCard from "../components/transactions/BookingCard";
 import BookingHeader from "../components/transactions/BookingHeader";
 import FilterRow from "../components/ui/FilterRow";
 import Reveal from "../components/ui/Reveal";
-import ConfirmModal from "../components/ui/ConfirmModal";
-
-const stepButton = "flex-1 rounded-md bg-zinc-700 py-2 text-sm font-bold transition duration-200 enabled:cursor-pointer enabled:hover:brightness-50 disabled:opacity-50";
 
 export default function Cart() {
-  const { cartBookings, cartLoading, cartError, removeFromCart, updateCartItem } = useCart();
+  const { cartBookings, cartLoading, cartError, removeFromCart } = useCart();
   const [filters, setFilters] = useState(emptyCartFilters);
   const [removingItemId, setRemovingItemId] = useState(null);
-  const [updatingItemId, setUpdatingItemId] = useState(null);
-  const [failed, setFailed] = useState("");
 
   const handleFilter = (event) => setFilters({ ...filters, [event.target.name]: event.target.value });
   const options = {
@@ -34,18 +29,6 @@ export default function Cart() {
     (!filters.ticketType || booking.ticketName === filters.ticketType) &&
     (!filters.date || booking.eventDateTime?.startsWith(filters.date))
   );
-
-  const handleQuantity = async (itemId, quantity) => {
-    setUpdatingItemId(itemId);
-
-    try {
-      await updateCartItem(itemId, quantity);
-    } catch {
-      setFailed("Not enough tickets available!");
-    } finally {
-      setUpdatingItemId(null);
-    }
-  };
 
   const handleRemove = async (itemId) => {
     setRemovingItemId(itemId);
@@ -85,25 +68,6 @@ export default function Cart() {
             filteredBookings.map((booking) => (
               <Reveal key={booking.cartItemId} className="w-full">
                 <BookingCard booking={booking}>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => handleQuantity(booking.cartItemId, booking.quantity - 1)}
-                      disabled={booking.quantity <= 1 || updatingItemId === booking.cartItemId}
-                      className={stepButton}
-                    >
-                      -
-                    </button>
-                    <p className="w-12 text-center font-bold">{booking.quantity}</p>
-                    <button
-                      type="button"
-                      onClick={() => handleQuantity(booking.cartItemId, booking.quantity + 1)}
-                      disabled={updatingItemId === booking.cartItemId}
-                      className={stepButton}
-                    >
-                      +
-                    </button>
-                  </div>
                   <Link
                     to={`/events/${toSlug(booking.eventTitle)}`}
                     state={{ payment: true, cartItemIds: [booking.cartItemId] }}
@@ -129,7 +93,6 @@ export default function Cart() {
           )}
         </div>
       </section>
-      {failed && <ConfirmModal type="error" message={failed} onClose={() => setFailed("")} />}
     </div>
   );
 }

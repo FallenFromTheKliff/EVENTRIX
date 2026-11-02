@@ -11,3 +11,8 @@ export const eventStatuses = [
   { value: "ACTIVE", label: "ACTIVE" },
   { value: "ARCHIVED", label: "ARCHIVED" }
 ];
+
+export const statusBadges = {
+  ACTIVE: { label: "LIVE", color: "bg-green-500/20 text-green-500" },
+  ARCHIVED: { label: "CLOSED", color: "bg-red-500/20 text-red-500" }
+};

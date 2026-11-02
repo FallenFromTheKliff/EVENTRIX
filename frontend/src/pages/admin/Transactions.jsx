@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { useTransactions } from "../../context/TransactionContext";
 
+import { categories } from "../../data/details";
 import { messageStyle, bookingButton, ticketTypes } from "../../utils/events";
 import { cartFilters as transactionFilters, emptyFilters, months } from "../../utils/filters";
 
@@ -22,7 +23,7 @@ export default function Transactions() {
   const handleFilter = (event) => setFilters({ ...filters, [event.target.name]: event.target.value });
 
   const options = {
-    category: [...new Set(transactions.map((item) => item.eventCategory).filter(Boolean))].map((name) => ({ value: name, label: name })),
+    category: categories,
     ticketType: ticketTypes,
     date: months
   };
