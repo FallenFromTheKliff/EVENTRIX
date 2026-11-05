@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useTransactions } from "../context/TransactionContext";
 
 import { categories } from "../data/details";
-import { messageStyle, bookingButton, ticketTypes } from "../utils/events";
+import { messageStyle, bookingButton, ticketTypes, isUpcoming } from "../utils/events";
 import { emptyFilters, bookingFilters, bookingStatusOptions, months } from "../utils/filters";
 
 import BookingCard from "../components/transactions/BookingCard";
@@ -75,7 +75,7 @@ export default function Bookings() {
             filteredBookings.map((booking) => (
               <Reveal key={booking.bookingId} className="w-full">
                 <BookingCard booking={booking}>
-                  {booking.status === "PENDING" && (
+                  {booking.status === "PAID" && isUpcoming(booking.eventDateTime) && (
                     <button type="button" onClick={() => setCancelling(booking.bookingId)} className={`${bookingButton} bg-red-500`}>
                       CANCEL BOOKING
                     </button>

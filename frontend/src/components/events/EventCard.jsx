@@ -90,7 +90,7 @@ export default function EventCard({ event, role }) {
             {role === "ADMIN" ? (
               <>
                 <Link to={`/edit-event/${toSlug(event.title)}`} className={`${buttonStyle} bg-yellow-500 text-center`}>EDIT</Link>
-                <button onClick={() => setConfirming(true)} className={`${buttonStyle} bg-red-500`}>DELETE</button>
+                <button onClick={() => setConfirming(true)} className={`${buttonStyle} bg-red-500`}>ARCHIVE</button>
               </>
             ) : (
               <>

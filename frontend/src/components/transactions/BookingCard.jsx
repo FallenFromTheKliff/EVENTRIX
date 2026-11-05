@@ -1,31 +1,31 @@
 import { useState } from "react";
+import { Link, useLocation } from "react-router";
 
-import { adminColumns, bookingButton, bookingColumns, toDate } from "../../utils/events";
+import { adminColumns, bookingButton, bookingColumns, toDate, toSlug } from "../../utils/events";
 import { bookingStatuses } from "../../data/statcheck";
 
-import DetailsModal from "./DetailsModal";
 import Placeholder from "../../assets/images/EVENTRIX-Placeholder.jpeg";
 
 export default function BookingCard({ booking, children, admin = false }) {
   const [open, setOpen] = useState(false);
-  const [details, setDetails] = useState(false);
   const { label, color } = bookingStatuses[booking.status] ?? bookingStatuses.PENDING;
+  const { pathname } = useLocation();
 
   return (
     <>
-      <div className="overflow-hidden rounded-xl bg-zinc-800">
+      <div className={`overflow-hidden rounded-xl ${admin ? "bg-zinc-700" : "bg-zinc-800"}`}>
         <div className={`grid items-center gap-3 px-5 py-4 ${admin ? `${adminColumns} text-sm` : `${bookingColumns} gap-4 px-6`}`}>
+          {admin && (
+            <p className="truncate text-center" title={booking.userEmail || booking.userName}>
+              {booking.userName || booking.userEmail || "—"}
+            </p>
+          )}
           <h3 className={`truncate ${admin ? "text-base" : "text-lg"} font-bold`}>{booking.eventTitle}</h3>
           <p className="text-center font-bold">{booking.quantity}</p>
           <p className={`text-center ${admin ? "text-xs" : "text-sm"} ${color}`}>{label}</p>
           <p className="truncate text-center font-bold" title={booking.bookingReference}>
             {booking.bookingReference || "—"}
           </p>
-          {admin && (
-            <p className="truncate text-center" title={booking.userEmail || booking.userName}>
-              {booking.userName || booking.userEmail || "—"}
-            </p>
-          )}
           <button
             type="button"
             onClick={() => setOpen((current) => !current)}
@@ -37,7 +37,7 @@ export default function BookingCard({ booking, children, admin = false }) {
         </div>
         <div className={`grid transition-all duration-300 ${open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
           <div className="overflow-hidden">
-            <div className="border-t border-zinc-700">
+            <div className={`border-t ${admin ? "border-zinc-600" : "border-zinc-700"}`}>
               <div className="flex flex-col gap-6 px-6 pt-5 pb-6 lg:flex-row lg:items-stretch">
                 <img
                   src={booking.eventImageUrl || Placeholder}
@@ -68,15 +68,13 @@ export default function BookingCard({ booking, children, admin = false }) {
                   </div>
                   <div className="flex w-full flex-col justify-center gap-2 md:w-60 md:shrink-0">
                     {children}
-                    {!booking.cartItemId && (
-                      <button
-                        type="button"
-                        onClick={() => setDetails(true)}
-                        className={`${bookingButton} bg-green-500`}
-                      >
-                        VIEW DETAILS
-                      </button>
-                    )}
+                    <Link
+                      to={`${admin ? "/edit-event" : "/events"}/${toSlug(booking.eventTitle)}`}
+                      state={{ from: pathname, eventId: booking.eventId }}
+                      className={`${bookingButton} bg-green-500 hover:brightness-50`}
+                    >
+                      VIEW DETAILS
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -84,7 +82,6 @@ export default function BookingCard({ booking, children, admin = false }) {
           </div>
         </div>
       </div>
-      {details && <DetailsModal booking={booking} onClose={() => setDetails(false)} />}
     </>
   );
 }

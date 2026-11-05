@@ -112,7 +112,7 @@ public class UserService implements UserDetailsService {
         User user = userRepository.getByEmail(email);
         Double average = reviewRepository.findAverageStarsByUserId(user.getUserId());
         return UserStatsDTO.builder()
-                .totalBookings(bookingRepository.countByUserAndStatusNotIn(user, List.of(BookingStatus.CANCELLED, BookingStatus.DECLINED)))
+                .totalBookings(bookingRepository.countByUserAndStatusNotIn(user, List.of(BookingStatus.CANCELLED)))
                 .averageStars(average == null ? 0.0 : average)
                 .joinedAt(user.getCreatedAt())
                 .build();

@@ -75,22 +75,12 @@ export default function Transactions() {
               {filteredTransactions.map((item) => (
                 <Reveal key={item.bookingId} className="w-full">
                   <BookingCard booking={item} admin>
-                    {item.status === "PENDING" && (
-                      <>
-                        <button type="button" onClick={handleAsk(item.bookingId, "PAID", "Mark as successful?")} className={`${bookingButton} bg-green-500`}>
-                          MARK SUCCESSFUL
-                        </button>
-                        <button type="button" onClick={handleAsk(item.bookingId, "CANCELLED", "Cancel booking?")} className={`${bookingButton} bg-red-500`}>
-                          CANCEL
-                        </button>
-                      </>
-                    )}
                     {item.status === "PROCESSING" && (
                       <>
                         <button type="button" onClick={handleAsk(item.bookingId, "CANCELLED", "Confirm cancellation?")} className={`${bookingButton} bg-red-500`}>
                           CONFIRM CANCELLATION
                         </button>
-                        <button type="button" onClick={handleAsk(item.bookingId, "PENDING", "Reject cancellation?")} className={`${bookingButton} bg-cyan-500`}>
+                        <button type="button" onClick={handleAsk(item.bookingId, "PAID", "Reject cancellation?")} className={`${bookingButton} bg-cyan-500`}>
                           REJECT CANCELLATION
                         </button>
                       </>

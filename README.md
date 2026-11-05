@@ -99,7 +99,7 @@ Create a PostgreSQL database named `eventrixdb`.
 
 ### 3. Configure the backend
 
-Create `backend/src/main/resources/application.properties` (it is gitignored, so it never gets committed):
+Create `backend/src/main/resources/application.properties` then fill in your own database credentials.
 
 ```properties
 spring.application.name=backend

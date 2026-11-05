@@ -5,6 +5,5 @@ public enum BookingStatus {
     PROCESSING,
     PAID,    // Payment confirmed
     COMPLETED, // Event passed and user marked as attended/completed
-    CANCELLED, // Cancelled by user or admin
-    DECLINED   // Declined by admin
+    CANCELLED
 }

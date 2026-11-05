@@ -70,7 +70,7 @@ export default function Cart() {
                 <BookingCard booking={booking}>
                   <Link
                     to={`/events/${toSlug(booking.eventTitle)}`}
-                    state={{ payment: true, cartItemIds: [booking.cartItemId] }}
+                    state={{ payment: true, cartItemIds: [booking.cartItemId], from: "/cart", eventId: booking.eventId }}
                     className={`${bookingButton} bg-green-500 hover:brightness-50`}
                   >
                     PROCEED TO PAYMENT

@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import { useBlocker, useNavigate, useParams } from "react-router";
+import { Link, useBlocker, useLocation, useNavigate, useParams } from "react-router";
 import { useForm, useFieldArray, useWatch } from "react-hook-form";
 import { IconArrowLeft, IconPhoto, IconTrash, IconCategory, IconCalendar, IconClock, IconMapPin, IconFileText, IconTicket, IconCurrencyPeso, IconArchive } from "@tabler/icons-react";
 
 import { useEvents } from "../../context/EventContext";
 
-import { buttonStyle, segmentStyle, steps, emptyEventValues, eventFormValues, filled, selectedTickets as getSelectedTickets, ticketCount as getTicketCount, validTickets, dateInPast, dateTaken, doorsOpenAt, nowLocal, removeStyle } from "../../utils/events";
+import { buttonStyle, segmentStyle, steps, backLabels, emptyEventValues, eventFormValues, filled, selectedTickets as getSelectedTickets, ticketCount as getTicketCount, validTickets, dateInPast, dateTaken, doorsOpenAt, nowLocal, removeStyle } from "../../utils/events";
 import { statuses } from "../../utils/filters";
 import { categories, cities } from "../../data/details";
 
@@ -18,10 +18,30 @@ import ConfirmModal from "../../components/ui/ConfirmModal";
 export default function EventEditor() {
   const { slug: id } = useParams();
   const navigate = useNavigate();
-
-  const { getEvent, createEvent, updateEvent, getVenueDates } = useEvents();
+  const { state } = useLocation();
+  const { getEvent, getEventById, createEvent, updateEvent, getVenueDates } = useEvents();
   const { loading, runner, texter } = useLoadingText();
-  const event = getEvent(id);
+
+  const [fetched, setFetched] = useState(null);
+
+  useEffect(() => {
+    if (!state?.eventId) return;
+
+    let active = true;
+
+    getEventById(state.eventId)
+      .then((data) => {
+        if (active) setFetched(data);
+      })
+      .catch(() => {});
+
+    return () => {
+      active = false;
+    };
+  }, [state?.eventId, getEventById]);
+
+  const event = getEvent(id) ?? fetched;
+  const archived = event?.status === "ARCHIVED";
   const eventId = event?.eventId;
 
   const { register, handleSubmit, control, reset, setValue, formState: { isDirty } } = useForm({
@@ -112,14 +132,14 @@ export default function EventEditor() {
         <h2 className="flex items-center gap-3 -mb-1 border-b-4 border-cyan-500 pb-3 text-3xl font-bold">
           {id ? (
             <>
-              <button
-                onClick={() => navigate("/events")}
-                disabled={loading}
-                className="flex items-center gap-3 transition duration-200 enabled:cursor-pointer enabled:hover:brightness-50"
+              <Link
+                to={state?.from ?? "/events"}
+                onClick={(e) => loading && e.preventDefault()}
+                className="flex items-center gap-3 transition duration-200 hover:brightness-50"
               >
                 <IconArrowLeft size={32} />
-                <Reveal variant="type">Manage Events</Reveal>
-              </button>
+                <Reveal variant="type">{backLabels[state?.from] ?? "Manage Events"}</Reveal>
+              </Link>
               {event && <span>/ <Reveal variant="type">{event.title}</Reveal></span>}
             </>
           ) : <Reveal variant="type">Add Event</Reveal>}
@@ -152,7 +172,7 @@ export default function EventEditor() {
             ))}
           </div>
           <form noValidate onSubmit={(e) => e.preventDefault()} className="mt-6 flex flex-1 flex-col">
-            <fieldset disabled={loading} className="flex flex-1 min-w-0 flex-col">
+            <fieldset disabled={archived} className="flex-1 min-w-0 space-y-4">
               <div className="flex-1 space-y-4">
                 {step === 0 && (
                   <>
@@ -319,14 +339,16 @@ export default function EventEditor() {
                     BACK
                   </button>
                 )}
-                <button
-                  type="button"
-                  onClick={step < 3 ? () => setStep(step + 1) : () => setConfirming(true)}
-                  disabled={step < 3 ? !ready[step] : !ready.every(Boolean)}
-                  className={`${buttonStyle} ${step < 3 ? "bg-cyan-500" : "bg-green-500"}`}
-                >
-                  {step < 3 ? "NEXT" : id ? "SAVE CHANGES" : "ADD EVENT"}
-                </button>
+                {(step < 3 || !archived) && (
+                  <button
+                    type="button"
+                    onClick={step < 3 ? () => setStep(step + 1) : () => setConfirming(true)}
+                    disabled={!archived && (step < 3 ? !ready[step] : !ready.every(Boolean))}
+                    className={`${buttonStyle} ${step < 3 ? "bg-cyan-500" : "bg-green-500"}`}
+                  >
+                    {step < 3 ? "NEXT" : id ? "SAVE CHANGES" : "ADD EVENT"}
+                  </button>
+                )}
               </div>
             </fieldset>
           </form>

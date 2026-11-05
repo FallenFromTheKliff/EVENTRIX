@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import { IconArchive, IconBroadcast, IconCalendarEvent, IconClock, IconFileText, IconLock, IconMail, IconMapPin, IconPencil, IconPhone, IconStarFilled, IconTag, IconTicket } from "@tabler/icons-react";
+import { IconArchive, IconBroadcast, IconCalendarEvent, IconCalendarPlus, IconFileText, IconLock, IconMail, IconMapPin, IconPencil, IconPhone, IconStarFilled, IconTag, IconTicket } from "@tabler/icons-react";
 
 import { useAuth } from "../context/AuthContext";
 import { useEvents } from "../context/EventContext";
 
-import { messageStyle, tagStyle, pillStyle, iconStyle, toMembership, toDate } from "../utils/events";
+import { messageStyle, tagStyle, pillStyle, iconStyle, lockedStyle, toDate } from "../utils/events";
 import { statusBadges } from "../data/statcheck";
 
 import Reveal from "../components/ui/Reveal";
@@ -60,7 +60,7 @@ export default function Profile() {
       ) : mode === "display" ? (
         <div className="space-y-8">
           <div className="bg-zinc-800 overflow-hidden rounded-xl">
-            <Reveal variant="reappear" className="h-48 bg-linear-to-r from-cyan-500 to-blue-950">
+            <Reveal variant="reappear" className="aspect-4/1 bg-linear-to-r from-cyan-500 to-blue-950">
               {profile.bannerImageUrl && <img src={profile.bannerImageUrl} alt="Banner" className="size-full object-cover" />}
             </Reveal>
             <div className="grid grid-cols-[auto_1fr] items-center gap-x-6 gap-y-4 px-8 pb-5">
@@ -114,7 +114,7 @@ export default function Profile() {
                     <StatCard icon={IconTicket} label="Total Bookings Made" value={stats.totalBookings} />
                   </Reveal>
                   <Reveal variant="reappear" className="h-full">
-                    <StatCard icon={IconClock} label="Time Spent on EVENTRIX" value={toMembership(stats.joinedAt)} />
+                    <StatCard icon={IconCalendarPlus} label="Member Since" value={toDate(stats.joinedAt, "long")} />
                   </Reveal>
                   <Reveal variant="reappear" className="h-full">
                     <StatCard icon={IconStarFilled} label="Average Stars from Reviews" value={stats.averageStars.toFixed(1)} />
@@ -165,6 +165,8 @@ export default function Profile() {
                         {statusBadges[event.status].label}
                       </p>
                     </div>
+                    <EventField type="textarea" name="description" label="Description:" icon={IconFileText} className={lockedStyle} value={event.description ?? ""} readOnly />
+                    <p className="-mb-3 text-sm">Additional Details:</p>
                     <p className={pillStyle}>
                       <IconCalendarEvent size={20} className={iconStyle} />
                       {toDate(event.dateTime)}
@@ -173,7 +175,6 @@ export default function Profile() {
                       <IconMapPin size={20} className={iconStyle} />
                       {event.location}
                     </p>
-                    <EventField type="textarea" name="description" label="Description:" icon={IconFileText} value={event.description ?? ""} readOnly />
                   </Reveal>
                 </>
               ) : (

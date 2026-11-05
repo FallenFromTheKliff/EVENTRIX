@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -41,8 +42,8 @@ public class BookingService {
     @Transactional
     public void cancelBooking(Long bookingId, String userEmail) {
         Booking booking = findOwnedBooking(bookingId, userEmail);
-        if (booking.getStatus() != BookingStatus.PENDING) {
-            throw new IllegalStateException("Only pending bookings can be cancelled");
+        if (!booking.getEvent().getDateTime().isAfter(LocalDateTime.now())) {
+            throw new IllegalStateException("Bookings can only be cancelled before the event date");
         }
         booking.setStatus(BookingStatus.PROCESSING);
         booking.setAdminNotes("Cancellation requested by user");
@@ -53,11 +54,13 @@ public class BookingService {
     public BookingResponseDTO updateBookingStatus(Long bookingId, BookingStatus status, String adminNotes) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
-        boolean holdsTickets = booking.getStatus() == BookingStatus.PENDING
-                || booking.getStatus() == BookingStatus.PROCESSING
-                || booking.getStatus() == BookingStatus.PAID;
-        boolean isCancelledOrDeclined = status == BookingStatus.CANCELLED || status == BookingStatus.DECLINED;
-        if (holdsTickets && isCancelledOrDeclined && booking.getTicketType() != null) {
+        if (booking.getStatus() != BookingStatus.PROCESSING) {
+            throw new IllegalStateException("Only bookings awaiting cancellation can be updated.");
+        }
+        if (status != BookingStatus.CANCELLED && status != BookingStatus.PAID) {
+            throw new IllegalArgumentException("A cancellation request can only be confirmed or rejected.");
+        }
+        if (status == BookingStatus.CANCELLED && booking.getTicketType() != null) {
             TicketType ticketType = booking.getTicketType();
             ticketType.setAvailableQuantity(ticketType.getAvailableQuantity() + booking.getQuantity());
         }

@@ -161,7 +161,7 @@ public class CartService {
             booking.setQuantity(item.getQuantity());
             booking.setTotalAmount(subtotal);
             booking.setBookingReference(item.getBookingReference());
-            booking.setStatus(BookingStatus.PENDING);
+            booking.setStatus(BookingStatus.PAID);
             booking.setTicketType(ticketType);
             bookingRepository.save(booking);
             receipt.getItems().add(ReceiptItem.builder()

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { Link, useLocation, useNavigate, useParams } from "react-router";
 import { IconArrowLeft, IconCalendarEvent, IconClock, IconCurrencyPeso, IconFileText, IconMapPin, IconTag, IconTicket } from "@tabler/icons-react";
@@ -6,7 +6,7 @@ import { IconArrowLeft, IconCalendarEvent, IconClock, IconCurrencyPeso, IconFile
 import { useEvents } from "../context/EventContext";
 import { useCart } from "../context/CartContext";
 
-import { emptySelection, paymentMethods, eventTickets, selectedTickets, totalPrice, validSeats, segmentStyle, buttonStyle, pillStyle, iconStyle, tagStyle, toDate, toTime } from "../utils/events";
+import { emptySelection, backLabels, paymentMethods, eventTickets, selectedTickets, totalPrice, validSeats, segmentStyle, buttonStyle, pillStyle, iconStyle, tagStyle, lockedStyle, toDate, toTime } from "../utils/events";
 
 import Reveal from "../components/ui/Reveal";
 import PictureSlider from "../components/events/PictureSlider";
@@ -22,11 +22,30 @@ export default function EventView() {
   const { slug } = useParams();
   const { state } = useLocation();
   const navigate = useNavigate();
-  const { getEvent } = useEvents();
+  const { getEvent, getEventById } = useEvents();
   const { cartItems, addToCart, checkout } = useCart();
   const { loading, runner, texter } = useLoadingText();
 
-  const event = getEvent(slug) ?? state?.event;
+  const [fetched, setFetched] = useState(null);
+
+  useEffect(() => {
+    if (!state?.eventId) return;
+
+    let active = true;
+
+    getEventById(state.eventId)
+      .then((data) => {
+        if (active) setFetched(data);
+      })
+      .catch(() => {});
+
+    return () => {
+      active = false;
+    };
+  }, [state?.eventId, getEventById]);
+
+  const event = getEvent(slug) ?? state?.event ?? fetched;
+
   const segments = state?.payment ? ["Payment"] : event?.status === "ACTIVE" ? ["Details", "Seats"] : ["Details"];
   const [slide, setSlide] = useState(0);
   const [segment, setSegment] = useState(segments[0]);
@@ -83,9 +102,9 @@ export default function EventView() {
       <title>{event.title}</title>
       <div className="flex border-b-4 border-zinc-900">
         <h2 className="flex items-center gap-3 -mb-1 border-b-4 border-cyan-500 pb-3 text-3xl font-bold">
-          <Link to="/events" className="flex items-center gap-3 transition duration-200 hover:brightness-50">
+          <Link to={state?.from ?? "/events"} className="flex items-center gap-3 transition duration-200 hover:brightness-50">
             <IconArrowLeft size={32} />
-            <Reveal variant="type">Ongoing Events</Reveal>
+            <Reveal variant="type">{backLabels[state?.from] ?? "Ongoing Events"}</Reveal>
           </Link>
           <span>/ <Reveal variant="type">{event.title}</Reveal></span>
         </h2>
@@ -135,7 +154,7 @@ export default function EventView() {
                   {event.status === "ACTIVE" ? ticketPills(({ availableQuantity }) => availableQuantity > 0 ? `${availableQuantity} left` : "Sold out") : (
                     <p className="rounded-md bg-red-500/20 p-3 text-center font-bold text-red-500">{event.status}</p>
                   )}
-                  <EventField type="textarea" name="description" label="Description:" icon={IconFileText} value={event.description ?? ""} readOnly />
+                  <EventField type="textarea" name="description" label="Description:" icon={IconFileText} className={lockedStyle} value={event.description ?? ""} readOnly />
                 </>
               )}
               {segment === "Seats" && (

@@ -31,7 +31,7 @@ export const bookingFilters = [
   { name: "status", type: "select", all: "All Statuses", icon: IconArchive }
 ];
 
-export const bookingStatusOptions = ["PENDING", "PAID", "PROCESSING", "CANCELLED", "COMPLETED"].map((value) => ({ value, label: bookingStatuses[value].label }));
+export const bookingStatusOptions = ["PAID", "PROCESSING", "CANCELLED", "COMPLETED"].map((value) => ({ value, label: bookingStatuses[value].label }));
 
 const now = new Date();
 

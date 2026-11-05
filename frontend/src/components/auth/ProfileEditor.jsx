@@ -5,7 +5,7 @@ import { IconArrowLeft, IconCake, IconCalendarPlus, IconFileText, IconLock, Icon
 
 import { useAuth } from "../../context/AuthContext";
 
-import { buttonStyle, segmentStyle, profileSegments, nowLocal, inputStyle, removeStyle, toDate } from "../../utils/events";
+import { buttonStyle, segmentStyle, profileSegments, nowLocal, lockedStyle, removeStyle, toDate } from "../../utils/events";
 import { genders, cities } from "../../data/details";
 
 import Reveal from "../ui/Reveal";
@@ -18,7 +18,6 @@ import Placeholder from "../../assets/images/EVENTRIX-Placeholder.jpeg";
 const colors = { USER: "bg-zinc-800", ADMIN: "bg-zinc-900" };
 const lines = { USER: "border-zinc-900", ADMIN: "border-zinc-800" };
 const genderStyle = "flex flex-1 items-center justify-center rounded-md py-3 transition duration-200 enabled:cursor-pointer enabled:hover:brightness-50";
-const lockedStyle = `${inputStyle} pl-10 opacity-70 cursor-not-allowed`;
 
 const toFormValues = (profile) => ({
   name: profile?.name ?? "",
@@ -47,6 +46,7 @@ export default function ProfileEditor({ onExit }) {
 
   const [segment, setSegment] = useState(profileSegments[0]);
   const [message, setMessage] = useState(null);
+  const [confirming, setConfirming] = useState(false);
   const [discarding, setDiscarding] = useState(false);
 
   const unsaved = isDirty && message?.type !== "success";
@@ -88,6 +88,8 @@ export default function ProfileEditor({ onExit }) {
       setMessage({ type: "success", message: "Profile updated!" });
     } catch (error) {
       setMessage({ type: "error", message: typeof error.response?.data === "string" ? error.response.data : "Failed to save changes!" });
+    } finally {
+      setConfirming(false);
     }
   });
 
@@ -130,7 +132,7 @@ export default function ProfileEditor({ onExit }) {
               </button>
             ))}
           </div>
-          <form onSubmit={handleSubmit(onSubmission, handleInvalid)} noValidate className="mt-6 flex flex-1 flex-col">
+          <form onSubmit={handleSubmit(() => setConfirming(true), handleInvalid)} noValidate className="mt-6 flex flex-1 flex-col">
             <fieldset disabled={loading} className="flex flex-1 min-w-0 flex-col">
               <div className="flex-1">
                 <div className={segment === "Introduction" ? "space-y-4" : "hidden"}>
@@ -323,6 +325,16 @@ export default function ProfileEditor({ onExit }) {
         </Reveal>
       </Reveal>
       {message && <ConfirmModal type={message.type} message={message.message} onClose={handleClose} />}
+      {confirming && (
+        <ConfirmModal
+          message="Save changes?"
+          description="This will update your profile with your changes."
+          confirmText={texter("SAVE", "SAVING")}
+          loading={loading}
+          onConfirm={handleSubmit(onSubmission)}
+          onClose={() => setConfirming(false)}
+        />
+      )}
       {(discarding || blocker.state === "blocked") && (
         <ConfirmModal
           message="Discard changes?"

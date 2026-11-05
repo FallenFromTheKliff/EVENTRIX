@@ -7,6 +7,7 @@ export const toSlug = (title) => title.toLowerCase().trim().replace(/[^\p{L}\p{N
 const inputBase = "w-full bg-white/15 rounded-md p-3 focus:outline-2";
 export const inputStyle = `${inputBase} focus:outline-cyan-500`;
 export const registerInputStyle = `${inputBase} focus:outline-yellow-500`;
+export const lockedStyle = `${inputStyle} pl-10 opacity-70 cursor-not-allowed`;
 
 export const imageTypes = ["image/png", "image/jpeg", "image/webp"];
 export const steps = ["Introduction", "Venue", "Tickets", "Display"];
@@ -16,6 +17,7 @@ export const defaultTicketPrice = 200;
 export const defaultTicketQuantity = 1;
 
 export const profileSegments = ["Introduction", "Aesthetics", "Additional Details", "Security"];
+export const backLabels = { "/bookings": "My Bookings", "/cart": "My Cart", "/transactions": "Transaction History" };
 
 export const segmentStyle = "-mb-1 border-b-4 pb-3 transition duration-300";
 export const buttonStyle = "flex-1 font-bold rounded-md py-3 text-center transition duration-200 enabled:cursor-pointer enabled:hover:brightness-50 disabled:opacity-50";
@@ -26,7 +28,7 @@ export const messageStyle = "my-auto py-8 text-center text-lg text-white";
 export const removeStyle = "flex items-center gap-2 bg-red-500 text-sm font-bold rounded-md px-3 py-2 transition duration-200 enabled:cursor-pointer enabled:hover:brightness-50 disabled:opacity-50";
 export const bookingButton = "flex w-full items-center justify-center rounded-md py-2 text-center text-sm font-bold transition duration-200 enabled:cursor-pointer enabled:hover:brightness-50 disabled:opacity-50";
 export const bookingColumns = "grid-cols-[minmax(0,2fr)_minmax(5rem,1fr)_minmax(7rem,1fr)_minmax(8rem,1.5fr)_7rem]";
-export const adminColumns = "grid-cols-[minmax(0,1.7fr)_4rem_6rem_minmax(0,1.3fr)_minmax(0,1fr)_6rem]";
+export const adminColumns = "grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)_4rem_6rem_minmax(0,1.3fr)_6rem]";
 
 export const resizeImage = (file, width, height) => new Promise((resolve, reject) => {
   const url = URL.createObjectURL(file);
@@ -85,6 +87,8 @@ const toLocal = (date) => new Date(date.getTime() - date.getTimezoneOffset() * 6
 
 export const nowLocal = () => toLocal(new Date());
 
+export const isUpcoming = (value) => new Date(value) > new Date();
+
 export const dateInPast = ({ dateTime, showTime }) => Boolean(dateTime) && new Date(`${dateTime}T${showTime || "23:59"}`) < new Date();
 
 export const doorsOpenAt = (dateTime, showTime) => dateTime && showTime ? toLocal(new Date(new Date(`${dateTime}T${showTime}`).getTime() - 7200000)) : "";
@@ -122,18 +126,6 @@ export const paymentMethods = [
 ];
 
 export const toTime = (value) => value ? new Date(value).toLocaleTimeString("en-US", { timeStyle: "short" }) : "TBA";
-
-const membershipUnits = [["year", 365], ["month", 30], ["week", 7]];
-
-export const toMembership = (joinedAt) => {
-  const days = (Date.now() - new Date(joinedAt)) / 86400000;
-  const [unit, length] = membershipUnits.find(([, size]) => days >= size) ?? [];
-
-  if (!unit) return "less than 1 week";
-
-  const count = Math.floor(days / length);
-  return `${count} ${unit}${count > 1 ? "s" : ""}`;
-};
 
 export const eventTickets = (ticketTypes, selection, cartItems) => ticketNames.flatMap((name) => {
   const ticket = findTicket(ticketTypes, name);
