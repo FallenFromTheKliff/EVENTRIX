@@ -1,28 +1,32 @@
 import { useState } from "react";
 
-import { IconPhoto, IconCrown, IconTicket, IconCheck, IconPlus, IconEye, IconEyeOff } from "@tabler/icons-react";
+import { IconPhoto, IconCheck, IconPlus, IconEye, IconEyeOff } from "@tabler/icons-react";
+import { imageTypes, resizeImage, inputStyle, pillStyle, iconStyle } from "../../utils/events";
 
-import { imageTypes, resizeImage, inputStyle, iconStyle } from "../../utils/events";
+import { ticketBadges } from "../../data/statcheck";
 
 import DroppingDown from "../ui/DroppingDown";
 
-const ticketButtonStyle = "relative w-44 flex items-center gap-2 rounded-md px-3 py-3 text-base font-bold cursor-pointer transition duration-200 enabled:hover:brightness-50";
-const ticketButtonColors = { STANDARD: "bg-cyan-500 text-white", VIP: "bg-blue-950 text-yellow-400" };
+const ticketButtonStyle = "relative w-44 flex items-center gap-2 rounded-md px-3 py-3 text-base font-bold transition duration-200 enabled:cursor-pointer enabled:hover:brightness-50 disabled:cursor-not-allowed";
 
 export default function EventField({ type = "text", label, icon: Icon, hint, error, children, options, all, onSelect, text, limit = 1, count = 0, width, height, onPick, onError, loading, enabled, onToggle, ...props }) {
   const [show, setShow] = useState(false);
+  const fieldStyle = props.readOnly ? pillStyle : inputStyle;
 
-  if (type === "toggle") return (
-    <button
-      type="button"
-      onClick={onToggle}
-      className={`${ticketButtonStyle} ${enabled ? ticketButtonColors[label] : "bg-zinc-700 text-gray-400"}`}
-    >
-      {label === "VIP" ? <IconCrown size={22} /> : <IconTicket size={22} />}
-      {label}
-      {enabled ? <IconCheck size={20} className="absolute right-3" /> : <IconPlus size={20} className="absolute right-3" />}
-    </button>
-  );
+  if (type === "toggle") {
+    const { color, icon: TicketIcon } = ticketBadges[label] ?? ticketBadges.STANDARD;
+    return (
+      <button
+        type="button"
+        onClick={onToggle}
+        className={`${ticketButtonStyle} ${enabled ? color : "bg-zinc-700 text-gray-400"}`}
+      >
+        <TicketIcon size={22} />
+        {label}
+        {enabled ? <IconCheck size={20} className="absolute right-3" /> : <IconPlus size={20} className="absolute right-3" />}
+      </button>
+    );
+  }
 
   if (type === "select") return (
     <div className="flex items-center gap-4">
@@ -60,7 +64,7 @@ export default function EventField({ type = "text", label, icon: Icon, hint, err
       <div>
         <div className="flex items-center gap-4">
           <p className="w-28 text-sm">{label}</p>
-          <label className={`flex flex-1 items-center justify-center gap-2 bg-gray-300 text-black font-bold rounded-md py-3 transition duration-200 ${count >= limit || loading ? "opacity-50" : "cursor-pointer hover:brightness-50"}`}>
+          <label className="flex flex-1 items-center justify-center gap-2 bg-gray-300 text-black font-bold rounded-md py-3 transition duration-200 has-enabled:cursor-pointer has-enabled:hover:brightness-50 has-disabled:cursor-not-allowed">
             {!loading && <IconPhoto size={20} />}
             {text}
             <input
@@ -84,18 +88,33 @@ export default function EventField({ type = "text", label, icon: Icon, hint, err
       <label htmlFor={props.name} className="text-sm">{label}</label>
       <div className="relative mt-1">
         <Icon size={18} className="absolute left-3 top-3 text-cyan-400" />
-        <textarea id={props.name} rows={5} className={`${inputStyle} w-full pl-10`} {...props} />
+        <textarea id={props.name} rows={5} className={`${fieldStyle} w-full pl-10 disabled:cursor-not-allowed`} {...props} />
       </div>
     </div>
   );
 
+  if (type === "ticket") {
+    const { color, icon: TicketIcon } = ticketBadges[label] ?? ticketBadges.STANDARD;
+    return (
+      <div className="flex items-center gap-4">
+        <p className={`flex w-28 shrink-0 items-center justify-center gap-1.5 rounded-md ${color} py-1 text-sm font-bold`}>
+          <TicketIcon size={16} />
+          {label}
+        </p>
+        <div className="relative flex-1">
+          <input id={props.name} className={pillStyle} readOnly {...props} />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
       <div className="flex items-center gap-4">
-        <label htmlFor={props.name} className="w-28 text-sm">{label}</label>
+        {label && <label htmlFor={props.name} className="w-28 text-sm">{label}</label>}
         <div className="relative flex-1">
           {Icon && <Icon size={18} className={iconStyle} />}
-          <input id={props.name} type={type === "password" && show ? "text" : type} className={`${inputStyle} w-full disabled:cursor-not-allowed ${Icon ? "pl-10" : ""} ${type === "password" ? "pr-10" : ""}`} {...props} />
+          <input id={props.name} type={type === "password" && show ? "text" : type} className={`${fieldStyle} w-full disabled:cursor-not-allowed ${Icon ? "pl-10" : ""} ${type === "password" ? "pr-10" : ""}`} {...props} />
           {type === "password" && (
             <button type="button" onClick={() => setShow(!show)} className="absolute inset-y-0 right-3 flex items-center text-gray-300 cursor-pointer transition-colors duration-200 hover:text-white">
               {show ? <IconEyeOff size={20} /> : <IconEye size={20} />}

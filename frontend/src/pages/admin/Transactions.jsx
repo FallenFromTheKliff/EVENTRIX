@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { useTransactions } from "../../context/TransactionContext";
 
@@ -14,20 +14,22 @@ import useLoadingText from "../../components/ui/useLoadingText";
 import ConfirmModal from "../../components/ui/ConfirmModal";
 
 export default function Transactions() {
-  const { transactions, transactionsLoading, transactionsError, updateTransactionStatus } = useTransactions();
+  const { transactions, transactionsLoading, transactionsError, refreshTransactions, updateTransactionStatus } = useTransactions();
   const { loading, runner, texter } = useLoadingText();
   const [filters, setFilters] = useState(emptyFilters);
   const [action, setAction] = useState(null);
   const [failed, setFailed] = useState("");
 
-  const handleFilter = (event) => setFilters({ ...filters, [event.target.name]: event.target.value });
+  useEffect(() => {
+    refreshTransactions();
+  }, [refreshTransactions]);
 
+  const handleFilter = (event) => setFilters({ ...filters, [event.target.name]: event.target.value });
   const options = {
     category: categories,
     ticketType: ticketTypes,
     date: months
   };
-
   const filteredTransactions = transactions.filter((item) =>
     (item.eventTitle || "").toLowerCase().includes(filters.name.trim().toLowerCase()) &&
     (!filters.category || item.eventCategory === filters.category) &&
@@ -39,8 +41,8 @@ export default function Transactions() {
   const handleAction = () => runner(async () => {
     try {
       await updateTransactionStatus(action.bookingId, action.status);
-    } catch {
-      setFailed("Failed to update the booking!");
+    } catch (error) {
+      setFailed(typeof error.response?.data === "string" ? error.response.data : "Failed to update the booking!");
     } finally {
       setAction(null);
     }

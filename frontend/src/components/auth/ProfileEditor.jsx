@@ -5,7 +5,7 @@ import { IconArrowLeft, IconCake, IconCalendarPlus, IconFileText, IconLock, Icon
 
 import { useAuth } from "../../context/AuthContext";
 
-import { buttonStyle, segmentStyle, profileSegments, nowLocal, lockedStyle, removeStyle, toDate } from "../../utils/events";
+import { buttonStyle, segmentStyle, profileSegments, nowLocal, removeStyle, pillStyle, toDate } from "../../utils/events";
 import { genders, cities } from "../../data/details";
 
 import Reveal from "../ui/Reveal";
@@ -149,7 +149,7 @@ export default function ProfileEditor({ onExit }) {
                     label="Email:"
                     icon={IconMail}
                     hint="Your email cannot be changed."
-                    className={lockedStyle}
+                    className={pillStyle}
                     value={profile.email}
                     readOnly
                   />
@@ -169,7 +169,7 @@ export default function ProfileEditor({ onExit }) {
                     name="createdAt"
                     label="Account Created:"
                     icon={IconCalendarPlus}
-                    className={lockedStyle}
+                    className={pillStyle}
                     value={toDate(profile.createdAt, "long")}
                     readOnly
                   />
@@ -203,9 +203,9 @@ export default function ProfileEditor({ onExit }) {
                     label="Banner Picture:"
                     text={bannerUpload.texter("UPLOAD BANNER", "UPLOADING...")}
                     loading={bannerUpload.loading}
-                    hint="Recommended: 1200 × 300 px (4:1), other sizes are cropped to fit."
+                    hint="Recommended: 1200 × 200 px (6:1), other sizes are cropped to fit."
                     width={1200}
-                    height={300}
+                    height={200}
                     onPick={([picture]) => bannerUpload.runner(async () => setValue("bannerImageUrl", picture, { shouldDirty: true }))}
                     onError={handleError}
                   >

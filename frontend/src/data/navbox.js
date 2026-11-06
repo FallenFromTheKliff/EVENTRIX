@@ -13,15 +13,15 @@ export const rolesss = {
       category: "Main",
       links: [
         { to: "/home", label: "Home", icon: IconHome },
-        { to: "/reviews", label: "My Reviews", icon: IconMessageStar },
+        { to: "/events", label: "Events", icon: IconCalendarEvent },
         { to: "/support", label: "Support", icon: IconHelpCircle }
       ]
     },
     {
       category: "Events",
       links: [
-        { to: "/events", label: "View Events", icon: IconCalendarEvent },
-        { to: "/bookings", label: "My Bookings", icon: IconTicket }
+        { to: "/bookings", label: "My Bookings", icon: IconTicket },
+        { to: "/reviews", label: "My Reviews", icon: IconMessageStar }
       ]
     }
   ],

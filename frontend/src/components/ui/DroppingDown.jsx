@@ -11,7 +11,7 @@ export default function DroppingDown({ value, options = [], all, icon, className
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className={`flex items-center gap-3 enabled:cursor-pointer disabled:opacity-50 ${className}`}
+        className={`flex items-center gap-3 enabled:cursor-pointer disabled:cursor-not-allowed ${className}`}
       >
         {icon}
         <span className="flex-1 truncate text-left">{items.find((item) => item.value === value)?.label}</span>

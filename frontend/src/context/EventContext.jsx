@@ -79,10 +79,6 @@ export function EventProvider({ children }) {
 
   const createEvent = (data, photo, pictures) => mutator(axiosClient.post("/admin/events/create", eventPayload(data, photo, pictures)));
   const updateEvent = (id, data, photo, pictures) => mutator(axiosClient.put(`/admin/events/${id}`, eventPayload(data, photo, pictures)));
-  const deleteEvent = async (id) => {
-    await axiosClient.put(`/admin/events/${id}/archive`);
-    await mutator(axiosClient.delete(`/admin/events/${id}`));
-  };
   const archiveEvent = (id) => mutator(axiosClient.put(`/admin/events/${id}/archive`));
 
   return (
@@ -96,7 +92,7 @@ export function EventProvider({ children }) {
       eventsError,
       refreshEvents,
       ...(user?.role === "ADMIN"
-        ? { createEvent, updateEvent, deleteEvent, archiveEvent, getVenueDates }
+        ? { createEvent, updateEvent, archiveEvent, getVenueDates }
         : { favoritesOnly, toggleFavoritesOnly, toggleFavorite, addComment, getFavorites })
     }}>
       {children}

@@ -27,7 +27,7 @@ export default function Sidebar({ role = "public", mobile = false, isOpen, onClo
       ))}
     </div>
   ));
-  
+
   if (!mobile) return (
     <nav className={`hidden lg:block ${colors[role]} w-65 shrink-0`}>
       <div className="sticky top-20">{items}</div>

@@ -2,25 +2,26 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router";
 
 import { adminColumns, bookingButton, bookingColumns, toDate, toSlug } from "../../utils/events";
-import { bookingStatuses } from "../../data/statcheck";
+import { bookingStatuses, ticketBadges } from "../../data/statcheck";
 
 import Placeholder from "../../assets/images/EVENTRIX-Placeholder.jpeg";
 
 export default function BookingCard({ booking, children, admin = false }) {
   const [open, setOpen] = useState(false);
   const { label, color } = bookingStatuses[booking.status] ?? bookingStatuses.PENDING;
+  const { color: ticketColor, icon: TicketIcon } = ticketBadges[booking.ticketName] ?? ticketBadges.STANDARD;
   const { pathname } = useLocation();
 
   return (
     <>
-      <div className={`overflow-hidden rounded-xl ${admin ? "bg-zinc-700" : "bg-zinc-800"}`}>
+      <div className={`overflow-hidden rounded-xl ${admin ? "bg-zinc-900" : "bg-zinc-800"}`}>
         <div className={`grid items-center gap-3 px-5 py-4 ${admin ? `${adminColumns} text-sm` : `${bookingColumns} gap-4 px-6`}`}>
           {admin && (
-            <p className="truncate text-center" title={booking.userEmail || booking.userName}>
+            <p className="truncate" title={booking.userEmail || booking.userName}>
               {booking.userName || booking.userEmail || "—"}
             </p>
           )}
-          <h3 className={`truncate ${admin ? "text-base" : "text-lg"} font-bold`}>{booking.eventTitle}</h3>
+          <h3 className={`truncate ${admin ? "text-base text-center" : "text-lg"} font-bold`}>{booking.eventTitle}</h3>
           <p className="text-center font-bold">{booking.quantity}</p>
           <p className={`text-center ${admin ? "text-xs" : "text-sm"} ${color}`}>{label}</p>
           <p className="truncate text-center font-bold" title={booking.bookingReference}>
@@ -51,11 +52,16 @@ export default function BookingCard({ booking, children, admin = false }) {
                     <p>Event Venue:</p>
                     <p>{booking.eventLocation || "—"}</p>
                     <p>Booking Date:</p>
-                    <p>{booking.bookingDate ? toDate(booking.bookingDate, "long") : "—"}</p>
+                    <p className={booking.bookingDate ? "" : `${bookingStatuses.PENDING.color} italic`}>
+                      {booking.bookingDate ? toDate(booking.bookingDate, "long") : "Set after payment"}
+                    </p>
                     {booking.ticketName && (
                       <>
                         <p>Ticket Type:</p>
-                        <p>{booking.ticketName}</p>
+                        <p className={`flex w-fit items-center gap-2 rounded-md px-3 py-0.5 ${ticketColor} font-bold`}>
+                          <TicketIcon size={18} />
+                          {booking.ticketName}
+                        </p>
                       </>
                     )}
                     <p>Ticket Price:</p>
@@ -68,13 +74,15 @@ export default function BookingCard({ booking, children, admin = false }) {
                   </div>
                   <div className="flex w-full flex-col justify-center gap-2 md:w-60 md:shrink-0">
                     {children}
-                    <Link
-                      to={`${admin ? "/edit-event" : "/events"}/${toSlug(booking.eventTitle)}`}
-                      state={{ from: pathname, eventId: booking.eventId }}
-                      className={`${bookingButton} bg-green-500 hover:brightness-50`}
-                    >
-                      VIEW DETAILS
-                    </Link>
+                    {!booking.cartItemId && (
+                      <Link
+                        to={`${admin ? "/edit-event" : "/events"}/${toSlug(booking.eventTitle)}`}
+                        state={{ from: pathname, eventId: booking.eventId }}
+                        className={`${bookingButton} bg-green-500 hover:brightness-50`}
+                      >
+                        VIEW DETAILS
+                      </Link>
+                    )}
                   </div>
                 </div>
               </div>

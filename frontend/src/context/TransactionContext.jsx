@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useCallback } from "react";
 
 import axiosClient from "../api/axiosClient";
 import { useAuth } from "./AuthContext";
@@ -14,18 +14,27 @@ export function TransactionProvider({ children }) {
   const [transactionsLoading, setTransactionsLoading] = useState(user?.role === "ADMIN");
   const [transactionsError, setTransactionsError] = useState(null);
 
-  const refreshBookings = async () => {
-    setBookingsLoading(true);
-    setBookingsError(null);
-
+  const refreshBookings = useCallback(async () => {
     try {
       setBookings((await axiosClient.get("/user/bookings")).data);
+      setBookingsError(null);
     } catch {
       setBookingsError("Sorry, we couldn't retrieve your bookings! Try refreshing the page.");
     } finally {
       setBookingsLoading(false);
     }
-  };
+  }, []);
+
+  const refreshTransactions = useCallback(async () => {
+    try {
+      setTransactions((await axiosClient.get("/admin/transactions")).data);
+      setTransactionsError(null);
+    } catch {
+      setTransactionsError("Oops, we couldn't load the transactions... Try refreshing the page!");
+    } finally {
+      setTransactionsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -40,19 +49,6 @@ export function TransactionProvider({ children }) {
         })
         .finally(() => {
           if (active) setBookingsLoading(false);
-        });
-    }
-
-    if (user?.role === "ADMIN") {
-      axiosClient.get("/admin/transactions")
-        .then((response) => {
-          if (active) setTransactions(response.data);
-        })
-        .catch(() => {
-          if (active) setTransactionsError("Oops, we couldn't load the transactions... Try refreshing the page!");
-        })
-        .finally(() => {
-          if (active) setTransactionsLoading(false);
         });
     }
 
@@ -83,6 +79,7 @@ export function TransactionProvider({ children }) {
       transactions,
       transactionsLoading,
       transactionsError,
+      refreshTransactions,
       updateTransactionStatus,
       cancelBooking
     }}>

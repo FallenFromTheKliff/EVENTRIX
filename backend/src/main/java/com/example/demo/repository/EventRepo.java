@@ -20,7 +20,7 @@ public interface EventRepo extends JpaRepository<Event, Long> {
         "(CAST(:title AS string) IS NULL OR LOWER(e.title) LIKE LOWER(CONCAT('%', CAST(:title AS string), '%'))) AND " +
         "(CAST(:startDate AS LocalDateTime) IS NULL OR e.dateTime >= :startDate) AND " +
         "(CAST(:endDate AS LocalDateTime) IS NULL OR e.dateTime <= :endDate) AND " +
-        "(:status IS NULL OR e.status = :status)")
+        "(:status IS NULL OR e.status = :status) ORDER BY e.dateTime ASC, e.eventId ASC")
     List<Event> findEventsWithFilters(
             @Param("categoryName") String categoryName,
             @Param("title") String title,

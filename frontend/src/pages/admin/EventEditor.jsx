@@ -40,8 +40,8 @@ export default function EventEditor() {
     };
   }, [state?.eventId, getEventById]);
 
-  const event = getEvent(id) ?? fetched;
-  const archived = event?.status === "ARCHIVED";
+  const event = fetched ?? getEvent(id);
+  const locked = event?.status === "ARCHIVED" || Boolean(state?.from);
   const eventId = event?.eventId;
 
   const { register, handleSubmit, control, reset, setValue, formState: { isDirty } } = useForm({
@@ -172,8 +172,8 @@ export default function EventEditor() {
             ))}
           </div>
           <form noValidate onSubmit={(e) => e.preventDefault()} className="mt-6 flex flex-1 flex-col">
-            <fieldset disabled={archived} className="flex-1 min-w-0 space-y-4">
-              <div className="flex-1 space-y-4">
+            <fieldset disabled={locked} className="flex-1 min-w-0">
+              <div className="space-y-4">
                 {step === 0 && (
                   <>
                     <EventField
@@ -266,7 +266,7 @@ export default function EventEditor() {
                               enabled={enabled}
                               onToggle={() => setValue(`ticketTypes.${index}.enabled`, !enabled, { shouldDirty: true })}
                             />
-                            <div className={`space-y-3 transition-opacity duration-200 ${enabled ? "" : "opacity-50"}`}>
+                            <div className="space-y-3">
                               <EventField
                                 type="number"
                                 label="Price:"
@@ -329,28 +329,34 @@ export default function EventEditor() {
                   </>
                 )}
               </div>
-              <div className="flex gap-6 pt-4">
-                {step > 0 && (
-                  <button
-                    type="button"
-                    onClick={() => setStep(step - 1)}
-                    className={`${buttonStyle} bg-gray-300 text-black`}
-                  >
-                    BACK
-                  </button>
-                )}
-                {(step < 3 || !archived) && (
-                  <button
-                    type="button"
-                    onClick={step < 3 ? () => setStep(step + 1) : () => setConfirming(true)}
-                    disabled={!archived && (step < 3 ? !ready[step] : !ready.every(Boolean))}
-                    className={`${buttonStyle} ${step < 3 ? "bg-cyan-500" : "bg-green-500"}`}
-                  >
-                    {step < 3 ? "NEXT" : id ? "SAVE CHANGES" : "ADD EVENT"}
-                  </button>
-                )}
-              </div>
             </fieldset>
+            <div className="flex gap-6 pt-4">
+              {step > 0 && (
+                <button type="button" onClick={() => setStep(step - 1)} className={`${buttonStyle} bg-gray-300 text-black`}>
+                  BACK
+                </button>
+              )}
+              {step < 3 && (
+                <button
+                  type="button"
+                  onClick={() => setStep(step + 1)}
+                  disabled={!locked && !ready[step]}
+                  className={`${buttonStyle} bg-cyan-500`}
+                >
+                  NEXT
+                </button>
+              )}
+              {!locked && (id || step === 3) && (
+                <button
+                  type="button"
+                  onClick={() => setConfirming(true)}
+                  disabled={!ready.every(Boolean)}
+                  className={`${buttonStyle} bg-green-500`}
+                >
+                  {id ? "SAVE CHANGES" : "ADD EVENT"}
+                </button>
+              )}
+            </div>
           </form>
         </Reveal>
       </Reveal>

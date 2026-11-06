@@ -43,6 +43,7 @@ EVENTRIX/
 │       │   ├── java/com/example/demo/java/com/example/demo/
 │       │   │   ├── config/                     # Spring Security setup
 │       │   │   ├── controller/
+│       │   │   ├── exception/
 │       │   │   ├── jwt/                        # token creation/validation
 │       │   │   ├── model/
 │       │   │   │   ├── dto/

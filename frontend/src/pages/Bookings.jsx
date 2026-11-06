@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { useTransactions } from "../context/TransactionContext";
 
@@ -14,21 +14,23 @@ import useLoadingText from "../components/ui/useLoadingText";
 import ConfirmModal from "../components/ui/ConfirmModal";
 
 export default function Bookings() {
-  const { bookings, bookingsLoading, bookingsError, cancelBooking } = useTransactions();
+  const { bookings, bookingsLoading, bookingsError, refreshBookings, cancelBooking } = useTransactions();
   const { loading, runner, texter } = useLoadingText();
   const [filters, setFilters] = useState(emptyFilters);
   const [cancelling, setCancelling] = useState(null);
   const [failed, setFailed] = useState("");
 
-  const handleFilter = (event) => setFilters({ ...filters, [event.target.name]: event.target.value });
+  useEffect(() => {
+    refreshBookings();
+  }, [refreshBookings]);
 
+  const handleFilter = (event) => setFilters({ ...filters, [event.target.name]: event.target.value });
   const options = {
     category: categories,
     ticketType: ticketTypes,
     date: months,
     status: bookingStatusOptions
   };
-
   const filteredBookings = bookings.filter((booking) =>
     (booking.eventTitle || "").toLowerCase().includes(filters.name.trim().toLowerCase()) &&
     (!filters.category || booking.eventCategory === filters.category) &&
@@ -40,8 +42,8 @@ export default function Bookings() {
   const handleCancel = () => runner(async () => {
     try {
       await cancelBooking(cancelling);
-    } catch {
-      setFailed("Failed to cancel booking!");
+    } catch (error) {
+      setFailed(typeof error.response?.data === "string" ? error.response.data : "Failed to cancel booking!");
     } finally {
       setCancelling(null);
     }

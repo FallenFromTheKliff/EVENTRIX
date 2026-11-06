@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect } from "react";
 
 import axiosClient from "../api/axiosClient";
 import { useAuth } from "./AuthContext";
+import { useEvents } from "./EventContext";
 import { useTransactions } from "./TransactionContext";
 
 const CartContext = createContext();
@@ -24,6 +25,7 @@ const toBooking = ({ id, bookingReference, quantity, ticketType, eventId, eventT
 
 export function CartProvider({ children }) {
   const { user } = useAuth();
+  const { refreshEvents } = useEvents();
   const { refreshBookings } = useTransactions();
   const [cartItems, setCartItems] = useState([]);
   const [cartLoading, setCartLoading] = useState(user?.role === "USER");
@@ -84,7 +86,7 @@ export function CartProvider({ children }) {
 
   const checkout = async (payment) => {
     await axiosClient.post("/user/cart/checkout", payment);
-    await Promise.allSettled([refreshCart(), refreshBookings()]);
+    await Promise.allSettled([refreshCart(), refreshBookings(), refreshEvents()]);
   };
 
   return (

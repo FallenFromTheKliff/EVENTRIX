@@ -4,7 +4,7 @@ import { IconArchive, IconBroadcast, IconCalendarEvent, IconCalendarPlus, IconFi
 import { useAuth } from "../context/AuthContext";
 import { useEvents } from "../context/EventContext";
 
-import { messageStyle, tagStyle, pillStyle, iconStyle, lockedStyle, toDate } from "../utils/events";
+import { messageStyle, tagStyle, toDate } from "../utils/events";
 import { statusBadges } from "../data/statcheck";
 
 import Reveal from "../components/ui/Reveal";
@@ -60,7 +60,7 @@ export default function Profile() {
       ) : mode === "display" ? (
         <div className="space-y-8">
           <div className="bg-zinc-800 overflow-hidden rounded-xl">
-            <Reveal variant="reappear" className="aspect-4/1 bg-linear-to-r from-cyan-500 to-blue-950">
+            <Reveal variant="reappear" className="aspect-6/1 bg-linear-to-r from-cyan-500 to-blue-950">
               {profile.bannerImageUrl && <img src={profile.bannerImageUrl} alt="Banner" className="size-full object-cover" />}
             </Reveal>
             <div className="grid grid-cols-[auto_1fr] items-center gap-x-6 gap-y-4 px-8 pb-5">
@@ -143,12 +143,12 @@ export default function Profile() {
                 <Reveal variant="type">Favorite Events</Reveal>
               </h2>
             </div>
-            <Reveal variant="lazy" className="mt-8 flex flex-col lg:flex-row bg-zinc-800 min-h-180 overflow-hidden rounded-xl">
+            <Reveal variant="lazy" className={`mt-8 flex flex-col lg:flex-row bg-zinc-800 overflow-hidden rounded-xl ${event && !profile.privateProfile ? "" : "min-h-180"}`}>
               {profile.privateProfile ? (
                 <p className="m-auto p-8 text-center text-gray-400">This person has decided to hide their favorite events from public view.</p>
               ) : event ? (
                 <>
-                  <div className="relative min-h-112 overflow-hidden lg:w-1/2">
+                  <div className="relative aspect-5/4 overflow-hidden lg:w-1/2">
                     <PictureSlider
                       images={favorites.map(({ thumbnailUrl }) => thumbnailUrl || Placeholder)}
                       index={slide}
@@ -165,16 +165,10 @@ export default function Profile() {
                         {statusBadges[event.status].label}
                       </p>
                     </div>
-                    <EventField type="textarea" name="description" label="Description:" icon={IconFileText} className={lockedStyle} value={event.description ?? ""} readOnly />
+                    <EventField type="textarea" name="description" label="Description:" icon={IconFileText} value={event.description ?? ""} readOnly />
                     <p className="-mb-3 text-sm">Additional Details:</p>
-                    <p className={pillStyle}>
-                      <IconCalendarEvent size={20} className={iconStyle} />
-                      {toDate(event.dateTime)}
-                    </p>
-                    <p className={pillStyle}>
-                      <IconMapPin size={20} className={iconStyle} />
-                      {event.location}
-                    </p>
+                    <EventField name="eventDate" icon={IconCalendarEvent} value={toDate(event.dateTime)} readOnly />
+                    <EventField name="eventLocation" icon={IconMapPin} value={event.location} readOnly />
                   </Reveal>
                 </>
               ) : (

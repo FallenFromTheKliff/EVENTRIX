@@ -45,6 +45,15 @@ export default function Header({ role = "public" }) {
     return () => observer.disconnect();
   }, [role]);
 
+  useEffect(() => {
+    const query = window.matchMedia("(min-width: 64rem)");
+    const handleDesktop = (e) => {
+      if (e.matches) setSideStep(false);
+    };
+    query.addEventListener("change", handleDesktop);
+    return () => query.removeEventListener("change", handleDesktop);
+  }, []);
+
   const handleSection = (id) => {
     setActiveSection(id);
     window.history.replaceState(null, "", `#${id}`);
@@ -101,9 +110,13 @@ export default function Header({ role = "public" }) {
                         <IconHeartFilled size={32} />
                       </button>
                     )}
-                    <Link to="/cart" className="relative transition duration-200 hover:brightness-50">
+                    <Link to="/cart" className={`relative transition duration-200 hover:brightness-50 ${pathname === "/cart" ? "text-cyan-500" : ""}`}>
                       <IconShoppingCartFilled size={32} />
-                      {cartItems.length > 0 && <span className="absolute top-0 right-0 bg-cyan-500 size-3 rounded-full" />}
+                      {cartItems.length > 0 && (
+                        <span className={`absolute -top-2 -right-3 flex items-center justify-center ${pathname === "/cart" ? "bg-red-500" : "bg-cyan-500"} text-xs font-bold text-white h-5 min-w-5 rounded-full px-1 ring-2 ring-zinc-800`}>
+                          {cartItems.length}
+                        </span>
+                      )}
                     </Link>
                   </>
                 )}
@@ -119,7 +132,7 @@ export default function Header({ role = "public" }) {
                   {menuOpen && (
                     <div className="absolute right-0 top-full bg-zinc-900 mt-3 w-48 overflow-hidden rounded-md border border-zinc-700 shadow-lg shadow-black transition duration-200 starting:opacity-0 starting:-translate-y-2">
                       {menusss.map(({ to, label, icon: Icon }) => (
-                        <Link key={to} to={to} onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 transition-colors duration-200 hover:bg-cyan-600">
+                        <Link key={to} to={to} onClick={() => setMenuOpen(false)} className={`flex items-center gap-3 px-4 py-3 transition-colors duration-200 hover:bg-cyan-600 ${pathname === to ? "bg-cyan-500" : ""}`}>
                           <Icon size={20} />
                           {label}
                         </Link>

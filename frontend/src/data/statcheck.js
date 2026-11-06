@@ -1,3 +1,5 @@
+import { IconCrown, IconTicket } from "@tabler/icons-react";
+
 export const bookingStatuses = {
   PENDING: { label: "Pending Payment", color: "text-yellow-500" },
   PAID: { label: "Successful", color: "text-green-500" },
@@ -14,4 +16,9 @@ export const eventStatuses = [
 export const statusBadges = {
   ACTIVE: { label: "LIVE", color: "bg-green-500/20 text-green-500" },
   ARCHIVED: { label: "CLOSED", color: "bg-red-500/20 text-red-500" }
+};
+
+export const ticketBadges = {
+  STANDARD: { color: "bg-cyan-500 text-white", icon: IconTicket },
+  VIP: { color: "bg-blue-950 text-yellow-400", icon: IconCrown }
 };

@@ -1,18 +1,18 @@
 import { useState, useEffect } from "react";
 
 import { Link, useLocation, useNavigate, useParams } from "react-router";
-import { IconArrowLeft, IconCalendarEvent, IconClock, IconCurrencyPeso, IconFileText, IconMapPin, IconTag, IconTicket } from "@tabler/icons-react";
+import { IconArrowLeft, IconCalendarEvent, IconClock, IconCurrencyPeso, IconFileText, IconMapPin, IconTag } from "@tabler/icons-react";
 
 import { useEvents } from "../context/EventContext";
 import { useCart } from "../context/CartContext";
 
-import { emptySelection, backLabels, paymentMethods, eventTickets, selectedTickets, totalPrice, validSeats, segmentStyle, buttonStyle, pillStyle, iconStyle, tagStyle, lockedStyle, toDate, toTime } from "../utils/events";
+import { emptySelection, backLabels, paymentMethods, eventTickets, selectedTickets, totalPrice, validSeats, segmentStyle, buttonStyle, tagStyle, toDate, toTime } from "../utils/events";
 
 import Reveal from "../components/ui/Reveal";
-import PictureSlider from "../components/events/PictureSlider";
-import EventField from "../components/events/EventField";
 import useLoadingText from "../components/ui/useLoadingText";
 import ConfirmModal from "../components/ui/ConfirmModal";
+import PictureSlider from "../components/events/PictureSlider";
+import EventField from "../components/events/EventField";
 
 import Placeholder from "../assets/images/EVENTRIX-Placeholder.jpeg";
 
@@ -44,15 +44,17 @@ export default function EventView() {
     };
   }, [state?.eventId, getEventById]);
 
-  const event = getEvent(slug) ?? state?.event ?? fetched;
+  const event = fetched ?? getEvent(slug) ?? state?.event;
 
-  const segments = state?.payment ? ["Payment"] : event?.status === "ACTIVE" ? ["Details", "Seats"] : ["Details"];
+  const segments = state?.payment ? ["Payment"] : event?.status === "ACTIVE" && !state?.from ? ["Details", "Seats"] : ["Details"];
   const [slide, setSlide] = useState(0);
   const [segment, setSegment] = useState(segments[0]);
   const [selection, setSelection] = useState(emptySelection);
   const [method, setMethod] = useState(paymentMethods[0]);
   const [account, setAccount] = useState("");
   const [message, setMessage] = useState(null);
+  const [confirming, setConfirming] = useState(false);
+  const [paying, setPaying] = useState(false);
 
   if (!event) return null;
 
@@ -63,16 +65,9 @@ export default function EventView() {
 
   const updateTicket = (name, change) => setSelection({ ...selection, [name]: { ...selection[name], ...change } });
 
-  const ticketPills = (getText) => (
-    <div className="flex gap-4">
-      {tickets.map((ticket) => (
-        <p key={ticket.name} className={`${pillStyle} flex-1`}>
-          <IconTicket size={20} className={iconStyle} />
-          {ticket.name}: {getText(ticket)}
-        </p>
-      ))}
-    </div>
-  );
+  const ticketFields = (getText) => tickets.map((ticket) => (
+    <EventField key={ticket.name} type="ticket" name={`${ticket.name}Info`} label={ticket.name} value={getText(ticket)} />
+  ));
 
   const handleAdd = () => runner(async () => {
     try {
@@ -80,6 +75,8 @@ export default function EventView() {
       setMessage({ type: "success", message: "Added to cart!" });
     } catch {
       setMessage({ type: "error", message: "Failed to add to cart!" });
+    } finally {
+      setConfirming(false);
     }
   });
 
@@ -87,8 +84,10 @@ export default function EventView() {
     try {
       await checkout({ paymentMethod: method.label, referenceNumber: account, cartItemIds: state.cartItemIds });
       setMessage({ type: "success", message: "Payment successful!" });
-    } catch {
-      setMessage({ type: "error", message: "Payment failed!" });
+    } catch (error) {
+      setMessage({ type: "error", message: typeof error.response?.data === "string" ? error.response.data : "Payment failed!" });
+    } finally {
+      setPaying(false);
     }
   });
 
@@ -104,7 +103,7 @@ export default function EventView() {
         <h2 className="flex items-center gap-3 -mb-1 border-b-4 border-cyan-500 pb-3 text-3xl font-bold">
           <Link to={state?.from ?? "/events"} className="flex items-center gap-3 transition duration-200 hover:brightness-50">
             <IconArrowLeft size={32} />
-            <Reveal variant="type">{backLabels[state?.from] ?? "Ongoing Events"}</Reveal>
+            <Reveal variant="type">{backLabels[state?.from] ?? "Events"}</Reveal>
           </Link>
           <span>/ <Reveal variant="type">{event.title}</Reveal></span>
         </h2>
@@ -130,32 +129,18 @@ export default function EventView() {
           <fieldset disabled={loading} className="mt-6 flex flex-1 min-w-0 flex-col">
             <div className="flex-1 space-y-4">
               {segment === "Details" && (
-                <>
+                <div className="flex flex-col gap-4">
                   <h3 className="text-3xl font-bold">{event.title}</h3>
                   {event.category && <p className={tagStyle}><IconTag size={18} />{event.category}</p>}
-                  <p className={pillStyle}>
-                    <IconCalendarEvent size={20} className={iconStyle} />
-                    {toDate(event.dateTime)}
-                  </p>
-                  <p className={pillStyle}>
-                    <IconMapPin size={20} className={iconStyle} />
-                    {event.location}
-                  </p>
-                  <div className="flex gap-4">
-                    <p className={`${pillStyle} flex-1`}>
-                      <IconClock size={20} className={iconStyle} />
-                      Doors Open: {toTime(event.doorsOpen)}
-                    </p>
-                    <p className={`${pillStyle} flex-1`}>
-                      <IconClock size={20} className={iconStyle} />
-                      Show Time: {toTime(event.showTime)}
-                    </p>
+                  <EventField type="textarea" name="description" label="Description:" icon={IconFileText} value={event.description ?? ""} readOnly />
+                  <p className="-mb-3 text-sm">Additional Details:</p>
+                  <EventField name="eventDate" icon={IconCalendarEvent} value={toDate(event.dateTime)} readOnly />
+                  <EventField name="eventLocation" icon={IconMapPin} value={event.location} readOnly />
+                  <div className="grid grid-cols-2 gap-4">
+                    <EventField name="doorsOpen" icon={IconClock} value={`Doors Open: ${toTime(event.doorsOpen)}`} readOnly />
+                    <EventField name="showTime" icon={IconClock} value={`Show Time: ${toTime(event.showTime)}`} readOnly />
                   </div>
-                  {event.status === "ACTIVE" ? ticketPills(({ availableQuantity }) => availableQuantity > 0 ? `${availableQuantity} left` : "Sold out") : (
-                    <p className="rounded-md bg-red-500/20 p-3 text-center font-bold text-red-500">{event.status}</p>
-                  )}
-                  <EventField type="textarea" name="description" label="Description:" icon={IconFileText} className={lockedStyle} value={event.description ?? ""} readOnly />
-                </>
+                </div>
               )}
               {segment === "Seats" && (
                 <>
@@ -212,13 +197,13 @@ export default function EventView() {
                     onChange={(e) => setAccount(e.target.value)}
                   />
                   <div className="border-t border-zinc-700" />
-                  {ticketPills(({ carted }) => carted)}
+                  {ticketFields(({ carted }) => carted)}
                   <EventField type="number" name="totalPrice" label="Total Price:" icon={IconCurrencyPeso} value={cartTotal} readOnly />
                 </>
               )}
             </div>
             <div className="flex gap-6 pt-4">
-              {segment === "Details" && event.status === "ACTIVE" && (
+              {segment === "Details" && segments.length > 1 && (
                 <button type="button" onClick={() => setSegment("Seats")} className={`${buttonStyle} bg-cyan-500`}>
                   NEXT
                 </button>
@@ -228,20 +213,40 @@ export default function EventView() {
                   <button type="button" onClick={() => setSegment("Details")} className={`${buttonStyle} bg-gray-300 text-black`}>
                     BACK
                   </button>
-                  <button type="button" onClick={handleAdd} disabled={!validSeats(chosen)} className={`${buttonStyle} bg-green-500`}>
-                    {texter("ADD TO CART", "ADDING")}
+                  <button type="button" onClick={() => setConfirming(true)} disabled={!validSeats(chosen)} className={`${buttonStyle} bg-green-500`}>
+                    ADD TO CART
                   </button>
                 </>
               )}
               {segment === "Payment" && (
-                <button type="button" onClick={handlePay} disabled={cartTotal === 0 || !method.pattern.test(account)} className={`${buttonStyle} bg-green-500`}>
-                  {texter("PAY", "PAYING")}
+                <button type="button" onClick={() => setPaying(true)} disabled={cartTotal === 0 || !method.pattern.test(account)} className={`${buttonStyle} bg-green-500`}>
+                  PAY
                 </button>
               )}
             </div>
           </fieldset>
         </Reveal>
       </Reveal>
+      {confirming && (
+        <ConfirmModal
+          message="Add to cart?"
+          description="The selected tickets will be added to your cart."
+          confirmText={texter("ADD", "ADDING")}
+          loading={loading}
+          onConfirm={handleAdd}
+          onClose={() => setConfirming(false)}
+        />
+      )}
+      {paying && (
+        <ConfirmModal
+          message="Proceed to payment?"
+          description="This will pay for the selected tickets and book them."
+          confirmText={texter("PAY", "PAYING")}
+          loading={loading}
+          onConfirm={handlePay}
+          onClose={() => setPaying(false)}
+        />
+      )}
       {message && <ConfirmModal type={message.type} message={message.message} onClose={handleClose} />}
     </div>
   );

@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router";
 
-import { IconCalendarEvent, IconClock, IconHeartFilled, IconMapPin } from "@tabler/icons-react";
-import { priceRange, toSlug, toTime, toDate } from "../../utils/events";
+import { IconCalendarEvent, IconClock, IconHeartFilled, IconLockFilled, IconMapPin } from "@tabler/icons-react";
+import { priceRange, toSlug, toTime, toDate, isSoldOut } from "../../utils/events";
 
 import { useEvents } from "../../context/EventContext";
 import { useCart } from "../../context/CartContext";
@@ -17,7 +17,7 @@ const buttonStyle = "flex-1 font-bold rounded-md py-2 cursor-pointer transition 
 const disabledStyle = "disabled:opacity-50 disabled:cursor-default disabled:hover:brightness-100 aria-disabled:opacity-50 aria-disabled:cursor-default aria-disabled:hover:brightness-100";
 
 export default function EventCard({ event, role }) {
-  const { toggleFavorite, deleteEvent } = useEvents();
+  const { toggleFavorite, archiveEvent } = useEvents();
   const { quickBuy: addQuickBuyToCart } = useCart();
   const { loading, runner, texter } = useLoadingText();
   const quickBuy = useLoadingText(500);
@@ -25,12 +25,12 @@ export default function EventCard({ event, role }) {
   const [failed, setFailed] = useState("");
   const [added, setAdded] = useState(false);
 
-  const handleDelete = () => runner(async () => {
+  const handleArchive = () => runner(async () => {
     try {
-      await deleteEvent(event.eventId);
+      await archiveEvent(event.eventId);
     } catch {
       setConfirming(false);
-      setFailed("Failed to delete event!");
+      setFailed("Failed to archive event!");
     }
   });
 
@@ -41,7 +41,7 @@ export default function EventCard({ event, role }) {
       try {
         const ticket = event.ticketTypes.find(({ name }) => name?.toUpperCase() === "STANDARD");
 
-        if (!ticket) {
+        if (!ticket || ticket.availableQuantity < 1) {
           setFailed("Standard tickets are unavailable!");
           return;
         }
@@ -60,6 +60,9 @@ export default function EventCard({ event, role }) {
       <div className={`flex flex-col h-full min-h-136 ${colors[role]} overflow-hidden rounded-xl shadow-2xl shadow-black/60`}>
         <div className="relative">
           <img src={event.thumbnailUrl || Placeholder} alt={event.title} className="h-72 w-full object-cover" />
+          {event.status === "ACTIVE" && isSoldOut(event.ticketTypes) && (
+            <p className="absolute top-3 left-3 bg-red-500 rounded-full px-4 py-1 text-sm font-bold">SOLD OUT</p>
+          )}
           {role === "USER" && (
             <button
               onClick={() => toggleFavorite(event.eventId)}
@@ -67,6 +70,11 @@ export default function EventCard({ event, role }) {
             >
               <IconHeartFilled size={28} />
             </button>
+          )}
+          {role === "ADMIN" && event.status === "ARCHIVED" && (
+            <div className="absolute top-3 right-3 bg-black/50 rounded-full p-2 text-red-500">
+              <IconLockFilled size={28} />
+            </div>
           )}
         </div>
         <div className="space-y-1 p-4">
@@ -88,14 +96,23 @@ export default function EventCard({ event, role }) {
           <p className="text-lg font-semibold text-cyan-400">{priceRange(event.ticketTypes)}</p>
           <div className="flex gap-3">
             {role === "ADMIN" ? (
-              <>
-                <Link to={`/edit-event/${toSlug(event.title)}`} className={`${buttonStyle} bg-yellow-500 text-center`}>EDIT</Link>
-                <button onClick={() => setConfirming(true)} className={`${buttonStyle} bg-red-500`}>ARCHIVE</button>
-              </>
-            ) : (
+                <>
+                  <Link
+                    to={`/edit-event/${toSlug(event.title)}`}
+                    state={{ eventId: event.eventId }}
+                    className={`${buttonStyle} ${event.status === "ARCHIVED" ? "bg-cyan-500" : "bg-yellow-500"} text-center`}
+                  >
+                    {event.status === "ARCHIVED" ? "VIEW" : "EDIT"}
+                  </Link>
+                  {event.status !== "ARCHIVED" && (
+                    <button onClick={() => setConfirming(true)} className={`${buttonStyle} bg-red-500`}>ARCHIVE</button>
+                  )}
+                </>
+              ) : (
               <>
                 <Link
                   to={`/events/${toSlug(event.title)}`}
+                  state={{ eventId: event.eventId }}
                   onClick={(e) => quickBuy.loading && e.preventDefault()}
                   aria-disabled={quickBuy.loading}
                   className={`${buttonStyle} ${disabledStyle} bg-cyan-500 text-center`}
@@ -104,7 +121,7 @@ export default function EventCard({ event, role }) {
                 </Link>
                 <button
                   onClick={handleQuickBuy}
-                  disabled={quickBuy.loading}
+                  disabled={quickBuy.loading || isSoldOut(event.ticketTypes)}
                   className={`${buttonStyle} ${disabledStyle} bg-yellow-500`}
                 >
                   {added ? "ADDED!" : quickBuy.texter("QUICK BUY", "ADDING")}
@@ -116,11 +133,11 @@ export default function EventCard({ event, role }) {
       </div>
       {confirming && (
         <ConfirmModal
-          message="Delete event?"
-          description="This will permanently remove the event and cannot be undone."
-          confirmText={texter("DELETE", "DELETING")}
+          message="Archive event?"
+          description="This will close the event to new bookings and it can no longer be edited."
+          confirmText={texter("ARCHIVE", "ARCHIVING")}
           loading={loading}
-          onConfirm={handleDelete}
+          onConfirm={handleArchive}
           onClose={() => setConfirming(false)}
         />
       )}

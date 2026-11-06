@@ -114,6 +114,9 @@ public class EventService {
         if (eventDetails.getStatus() != null && eventDetails.getStatus() != saved.getStatus()) {
             return eventDetails.getStatus() == EventStatus.ARCHIVED ? archiveEvent(id) : unarchiveEvent(id);
         }
+        if (event.getStatus() == EventStatus.ARCHIVED) {
+            throw new IllegalStateException("Archived events can't be edited");
+        }
         return saved;
     }
 

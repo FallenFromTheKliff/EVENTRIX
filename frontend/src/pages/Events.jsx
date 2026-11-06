@@ -20,7 +20,7 @@ export default function Events() {
       <title>Events - EVENTRIX</title>
       <div className="flex flex-wrap items-end gap-x-4">
         <h2 className="relative -mb-1 border-b-4 border-cyan-500 pb-3 text-3xl font-bold">
-          <Reveal variant="type">{user.role === "ADMIN" ? "Manage Events" : "Ongoing Events"}</Reveal>
+          <Reveal variant="type">{user.role === "ADMIN" ? "Manage Events" : "Events"}</Reveal>
         </h2>
         <Reveal variant="slide" className="ml-auto">
           <FilterRow fields={fields.filter(({ type }) => type === "search")} filters={filters} options={options} onChange={handleFilter} />

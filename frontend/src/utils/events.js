@@ -7,7 +7,6 @@ export const toSlug = (title) => title.toLowerCase().trim().replace(/[^\p{L}\p{N
 const inputBase = "w-full bg-white/15 rounded-md p-3 focus:outline-2";
 export const inputStyle = `${inputBase} focus:outline-cyan-500`;
 export const registerInputStyle = `${inputBase} focus:outline-yellow-500`;
-export const lockedStyle = `${inputStyle} pl-10 opacity-70 cursor-not-allowed`;
 
 export const imageTypes = ["image/png", "image/jpeg", "image/webp"];
 export const steps = ["Introduction", "Venue", "Tickets", "Display"];
@@ -21,14 +20,14 @@ export const backLabels = { "/bookings": "My Bookings", "/cart": "My Cart", "/tr
 
 export const segmentStyle = "-mb-1 border-b-4 pb-3 transition duration-300";
 export const buttonStyle = "flex-1 font-bold rounded-md py-3 text-center transition duration-200 enabled:cursor-pointer enabled:hover:brightness-50 disabled:opacity-50";
-export const pillStyle = "relative rounded-md bg-white/5 p-3 pl-11 text-gray-300";
+export const pillStyle = "w-full bg-white/5 rounded-md p-3 text-gray-300 cursor-default resize-none focus:outline-none";
 export const iconStyle = "absolute left-3 top-1/2 -translate-y-1/2 text-cyan-400";
 export const tagStyle = "flex w-fit items-center gap-2 rounded-full bg-cyan-500/20 px-3 py-1 text-sm text-cyan-400";
 export const messageStyle = "my-auto py-8 text-center text-lg text-white";
 export const removeStyle = "flex items-center gap-2 bg-red-500 text-sm font-bold rounded-md px-3 py-2 transition duration-200 enabled:cursor-pointer enabled:hover:brightness-50 disabled:opacity-50";
 export const bookingButton = "flex w-full items-center justify-center rounded-md py-2 text-center text-sm font-bold transition duration-200 enabled:cursor-pointer enabled:hover:brightness-50 disabled:opacity-50";
 export const bookingColumns = "grid-cols-[minmax(0,2fr)_minmax(5rem,1fr)_minmax(7rem,1fr)_minmax(8rem,1.5fr)_7rem]";
-export const adminColumns = "grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)_4rem_6rem_minmax(0,1.3fr)_6rem]";
+export const adminColumns = "grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)_minmax(0,0.8fr)_minmax(0,1fr)_minmax(0,1.2fr)_6rem] 2xl:grid-cols-[repeat(5,minmax(0,1fr))_6rem]";
 
 export const resizeImage = (file, width, height) => new Promise((resolve, reject) => {
   const url = URL.createObjectURL(file);
@@ -113,6 +112,8 @@ export const priceRange = (ticketTypes = []) =>
     .filter(Boolean)
     .map(({ price }) => `₱${price}`)
     .join(" - ");
+
+export const isSoldOut = (ticketTypes = []) => ticketTypes.length > 0 && ticketTypes.every(({ availableQuantity }) => availableQuantity < 1);
 
 export const emptySelection = Object.fromEntries(ticketNames.map((name) => [name, { enabled: false, quantity: "1" }]));
 
