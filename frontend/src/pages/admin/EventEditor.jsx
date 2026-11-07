@@ -131,7 +131,7 @@ export default function EventEditor() {
 
   return (
     <div>
-      <title>{id ? event?.title : "Add an Event"}</title>
+      <title>{id ? event?.title : "Add an Event"} | EVENTRIX</title>
       <div className="flex border-b-4 border-zinc-900">
         <h2 className="flex items-center gap-3 -mb-1 border-b-4 border-cyan-500 pb-3 text-3xl font-bold">
           {id ? (
@@ -177,160 +177,150 @@ export default function EventEditor() {
           </div>
           <form noValidate onSubmit={(e) => e.preventDefault()} className="mt-6 flex flex-1 flex-col">
             <fieldset disabled={locked} className="flex-1 min-w-0">
-              <div className="space-y-4">
-                {step === 0 && (
-                  <>
-                    <EventField
-                      label="Event Title:"
-                      icon={IconFileText}
-                      placeholder="Enter the event title"
-                      {...register("title")}
-                    />
-                    <EventField
-                      type="select"
-                      label="Category:"
-                      icon={IconCategory}
-                      options={categories}
-                      value={values.category}
-                      onSelect={(value) => setValue("category", value, { shouldDirty: true })}
-                    />
-                    <EventField
-                      type="textarea"
-                      label="Description:"
-                      icon={IconFileText}
-                      placeholder="Enter a short description of the event"
-                      {...register("description")}
-                    />
-                  </>
-                )}
-                {step === 1 && (
-                  <>
-                    <EventField
-                      type="photo"
-                      label="Event Pictures:"
-                      text={`ADD PHOTO (${pictures.length}/4)`}
-                      hint="Up to 4 pictures, each cropped to 800 × 800 px."
-                      limit={4}
-                      count={pictures.length}
-                      width={800}
-                      height={800}
-                      onPick={handlePictures}
-                      onError={handleError}
+              <div className={step === 0 ? "space-y-4" : "hidden"}>
+                <EventField
+                  label="Event Title:"
+                  icon={IconFileText}
+                  placeholder="Enter the event title"
+                  {...register("title")}
+                />
+                <EventField
+                  type="select"
+                  label="Category:"
+                  icon={IconCategory}
+                  options={categories}
+                  value={values.category}
+                  onSelect={(value) => setValue("category", value, { shouldDirty: true })}
+                />
+                <EventField
+                  type="textarea"
+                  label="Description:"
+                  icon={IconFileText}
+                  placeholder="Enter a short description of the event"
+                  {...register("description")}
+                />
+              </div>
+              <div className={step === 1 ? "space-y-4" : "hidden"}>
+                <EventField
+                  type="photo"
+                  label="Event Pictures:"
+                  text={`ADD PHOTO (${pictures.length}/4)`}
+                  hint="Up to 4 pictures, each cropped to 800 × 800 px."
+                  limit={4}
+                  count={pictures.length}
+                  width={800}
+                  height={800}
+                  onPick={handlePictures}
+                  onError={handleError}
+                >
+                  {pictures.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={handleRemovePicture}
+                      className={`${removeStyle} mt-2 ml-32`}
                     >
-                      {pictures.length > 0 && (
-                        <button
-                          type="button"
-                          onClick={handleRemovePicture}
-                          className={`${removeStyle} mt-2 ml-32`}
-                        >
-                          <IconTrash size={18} />
-                          REMOVE PHOTO
-                        </button>
-                      )}
-                    </EventField>
-                    <EventField
-                      type="select"
-                      label="Location:"
-                      icon={IconMapPin}
-                      all="Select a location"
-                      options={cities}
-                      value={values.location}
-                      onSelect={(value) => setValue("location", value, { shouldDirty: true })}
-                    />
-                    <EventField
-                      type="date"
-                      label="Date:"
-                      icon={IconCalendar}
-                      min={id ? undefined : today()}
-                      error={past ? "Date cannot be earlier than now!" : taken ? "Location is unavailable on or beside that date!" : ""}
-                      {...register("dateTime")}
-                    />
-                    <EventField type="time" label="Show Time:" icon={IconClock} {...register("showTime")} />
-                    <EventField
-                      type="time"
-                      name="doorsOpen"
-                      label="Doors Open:"
-                      icon={IconClock}
-                      hint="Doors open 2 hours before the show time."
-                      value={doorsOpenAt(values.dateTime, values.showTime).slice(11, 16)}
-                      readOnly
-                    />
-                  </>
-                )}
-                {step === 2 && (
-                  <>
-                    <div className="space-y-4">
-                      {fields.map((field, index) => {
-                        const enabled = values.ticketTypes[index].enabled;
-                        return (
-                          <div key={field.id} className="space-y-3">
-                            <EventField
-                              type="toggle"
-                              label={field.name}
-                              enabled={enabled}
-                              onToggle={() => setValue(`ticketTypes.${index}.enabled`, !enabled, { shouldDirty: true })}
-                            />
-                            <div className="space-y-3">
-                              <EventField
-                                type="number"
-                                label="Price:"
-                                icon={IconCurrencyPeso}
-                                placeholder={`Must be at least ${defaultTicketPrice}`}
-                                min={defaultTicketPrice}
-                                step="1"
-                                disabled={!enabled}
-                                {...register(`ticketTypes.${index}.price`)}
-                              />
-                              <EventField
-                                type="number"
-                                label="Ticket Quantity:"
-                                placeholder={`Must be at least ${defaultTicketQuantity}`}
-                                min={defaultTicketQuantity}
-                                step="1"
-                                disabled={!enabled}
-                                {...register(`ticketTypes.${index}.availableQuantity`)}
-                              />
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                    <div className="border-t border-zinc-700" />
-                    <EventField
-                      type="number"
-                      name="totalTickets"
-                      label="No. Tickets:"
-                      icon={IconTicket}
-                      value={totalTickets}
-                      readOnly
-                    />
-                  </>
-                )}
-                {step === 3 && (
-                  <>
-                    <EventField
-                      type="photo"
-                      label="Display Picture:"
-                      text="UPLOAD PHOTO"
-                      hint="Recommended: 720 × 576 px (5:4), other sizes are cropped to fit."
-                      width={720}
-                      height={576}
-                      onPick={([picture]) => setImage(picture)}
-                      onError={handleError}
-                    >
-                      {photo && <img src={photo} alt="Display Picture" className="aspect-5/4 h-40 mt-2 ml-32 object-cover rounded-md" />}
-                    </EventField>
-                    {id && (
-                      <EventField
-                        type="select"
-                        label="Status:"
-                        icon={IconArchive}
-                        options={event?.status === "ARCHIVED" ? statuses.filter(({ value }) => value === "ARCHIVED") : statuses}
-                        value={values.status}
-                        onSelect={(value) => setValue("status", value, { shouldDirty: true })}
-                      />
-                    )}
-                  </>
+                      <IconTrash size={18} />
+                      REMOVE PHOTO
+                    </button>
+                  )}
+                </EventField>
+                <EventField
+                  type="select"
+                  label="Location:"
+                  icon={IconMapPin}
+                  all="Select a location"
+                  options={cities}
+                  value={values.location}
+                  onSelect={(value) => setValue("location", value, { shouldDirty: true })}
+                />
+                <EventField
+                  type="date"
+                  label="Date:"
+                  icon={IconCalendar}
+                  min={id ? undefined : today()}
+                  error={past ? "Date cannot be earlier than now!" : taken ? "Location is unavailable on or beside that date!" : ""}
+                  {...register("dateTime")}
+                />
+                <EventField type="time" label="Show Time:" icon={IconClock} {...register("showTime")} />
+                <EventField
+                  type="time"
+                  name="doorsOpen"
+                  label="Doors Open:"
+                  icon={IconClock}
+                  hint="Doors open 2 hours before the show time."
+                  value={doorsOpenAt(values.dateTime, values.showTime).slice(11, 16)}
+                  readOnly
+                />
+              </div>
+              <div className={step === 2 ? "space-y-4" : "hidden"}>
+                <div className="space-y-4">
+                  {fields.map((field, index) => {
+                    const enabled = values.ticketTypes[index].enabled;
+                    return (
+                      <div key={field.id} className="space-y-3">
+                        <EventField
+                          type="toggle"
+                          label={field.name}
+                          enabled={enabled}
+                          onToggle={() => setValue(`ticketTypes.${index}.enabled`, !enabled, { shouldDirty: true })}
+                        />
+                        <div className="space-y-3">
+                          <EventField
+                            type="number"
+                            label="Price:"
+                            icon={IconCurrencyPeso}
+                            placeholder={`Must be at least ${defaultTicketPrice}`}
+                            min={defaultTicketPrice}
+                            step="1"
+                            disabled={!enabled}
+                            {...register(`ticketTypes.${index}.price`)}
+                          />
+                          <EventField
+                            type="number"
+                            label="Ticket Quantity:"
+                            placeholder={`Must be at least ${defaultTicketQuantity}`}
+                            min={defaultTicketQuantity}
+                            step="1"
+                            disabled={!enabled}
+                            {...register(`ticketTypes.${index}.availableQuantity`)}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="border-t border-zinc-700" />
+                <EventField
+                  type="number"
+                  name="totalTickets"
+                  label="No. Tickets:"
+                  icon={IconTicket}
+                  value={totalTickets}
+                  readOnly
+                />
+              </div>
+              <div className={step === 3 ? "space-y-4" : "hidden"}>
+                <EventField
+                  type="photo"
+                  label="Display Picture:"
+                  text="UPLOAD PHOTO"
+                  hint="Recommended: 720 × 576 px (5:4), other sizes are cropped to fit."
+                  width={720}
+                  height={576}
+                  onPick={([picture]) => setImage(picture)}
+                  onError={handleError}
+                >
+                  {photo && <img src={photo} alt="Display Picture" className="aspect-5/4 h-40 mt-2 ml-32 object-cover rounded-md" />}
+                </EventField>
+                {id && (
+                  <EventField
+                    type="select"
+                    label="Status:"
+                    icon={IconArchive}
+                    options={event?.status === "ARCHIVED" ? statuses.filter(({ value }) => value === "ARCHIVED") : statuses}
+                    value={values.status}
+                    onSelect={(value) => setValue("status", value, { shouldDirty: true })}
+                  />
                 )}
               </div>
             </fieldset>

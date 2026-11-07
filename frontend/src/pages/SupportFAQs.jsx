@@ -5,7 +5,7 @@ import { contacts, faqs } from "../data/support";
 export default function SupportFAQs() {
   return (
     <div className="space-y-12">
-      <title>Support - EVENTRIX</title>
+      <title>Support | EVENTRIX</title>
       <section>
         <div className="flex border-b-4 border-zinc-900">
           <h2 className="-mb-1 border-b-4 border-cyan-500 pb-3 text-3xl font-bold">

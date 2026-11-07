@@ -7,10 +7,11 @@ import { useEvents } from "../context/EventContext";
 import { messageStyle, tagStyle } from "../utils/styles";
 import { toDate } from "../utils/dates";
 import { statusBadges } from "../data/statcheck";
+import usePagination from "../utils/usePagination";
 
 import Reveal from "../components/ui/Reveal";
 import StatCard from "../components/ui/StatCard";
-import PictureSlider from "../components/events/PictureSlider";
+import Pagination from "../components/ui/Pagination";
 import EventField from "../components/events/EventField";
 import ProfileEditor from "../components/auth/ProfileEditor";
 
@@ -25,10 +26,9 @@ export default function Profile() {
   const [mode, setMode] = useState(user.role === "ADMIN" ? "details" : "display");
   const [stats, setStats] = useState(null);
   const [favorites, setFavorites] = useState([]);
-  const [slide, setSlide] = useState(0);
   const [error, setError] = useState("");
 
-  const event = favorites[slide];
+  const { page, pages, setPage, items: [event] } = usePagination(favorites, 1);
 
   useEffect(() => {
     if (user.role !== "USER") return;
@@ -53,7 +53,7 @@ export default function Profile() {
 
   return (
     <div className="flex flex-1 flex-col">
-      {profile && <title>{`${profile.name} - EVENTRIX`}</title>}
+      {profile && <title>{`${profile.name} | EVENTRIX`}</title>}
       {error ? (
         <p className={messageStyle}>{error}</p>
       ) : !profile || (user.role === "USER" && !stats) ? (
@@ -144,33 +144,35 @@ export default function Profile() {
                 <Reveal variant="type">Favorite Events</Reveal>
               </h2>
             </div>
-            <Reveal variant="lazy" className={`mt-8 flex flex-col lg:flex-row bg-zinc-800 overflow-hidden rounded-xl ${event && !profile.privateProfile ? "" : "min-h-180"}`}>
+            <Reveal variant="lazy" className={`mt-8 flex flex-col bg-zinc-800 overflow-hidden rounded-xl ${event && !profile.privateProfile ? "" : "min-h-180"}`}>
               {profile.privateProfile ? (
                 <p className="m-auto p-8 text-center text-gray-400">This person has decided to hide their favorite events from public view.</p>
               ) : event ? (
                 <>
-                  <div className="relative aspect-5/4 overflow-hidden lg:w-1/2">
-                    <PictureSlider
-                      images={favorites.map(({ thumbnailUrl }) => thumbnailUrl || Placeholder)}
-                      index={slide}
-                      alt={event.title}
-                      onChange={setSlide}
-                    />
-                  </div>
-                  <Reveal variant="right" className="relative flex flex-1 flex-col gap-4 p-8">
-                    <h3 className="text-3xl font-bold">{event.title}</h3>
-                    <div className="flex flex-wrap gap-3">
-                      {event.category && <p className={tagStyle}><IconTag size={18} />{event.category}</p>}
-                      <p className={`${badgeStyle} ${statusBadges[event.status].color}`}>
-                        {event.status === "ACTIVE" ? <IconBroadcast size={18} /> : <IconArchive size={18} />}
-                        {statusBadges[event.status].label}
-                      </p>
+                  <div className="flex w-full flex-col lg:flex-row">
+                    <Reveal key={event.eventId} variant="reappear" className="relative aspect-5/4 overflow-hidden lg:w-1/2">
+                      <img src={event.thumbnailUrl || Placeholder} alt={event.title} className="absolute inset-0 size-full object-cover" />
+                    </Reveal>
+                    <div className="relative flex flex-1 flex-col p-8">
+                      <Reveal key={event.eventId} variant="right" className="flex flex-col gap-4">
+                        <h3 className="text-3xl font-bold">
+                          <Reveal variant="type">{event.title}</Reveal>
+                        </h3>
+                        <div className="flex flex-wrap gap-3">
+                          {event.category && <p className={tagStyle}><IconTag size={18} />{event.category}</p>}
+                          <p className={`${badgeStyle} ${statusBadges[event.status].color}`}>
+                            {event.status === "ACTIVE" ? <IconBroadcast size={18} /> : <IconArchive size={18} />}
+                            {statusBadges[event.status].label}
+                          </p>
+                        </div>
+                        <EventField type="textarea" name="description" label="Description:" icon={IconFileText} value={event.description ?? ""} readOnly />
+                        <p className="-mb-3 text-sm">Additional Details:</p>
+                        <EventField name="eventDate" icon={IconCalendarEvent} value={toDate(event.dateTime)} readOnly />
+                        <EventField name="eventLocation" icon={IconMapPin} value={event.location} readOnly />
+                      </Reveal>
+                      <Pagination page={page} pages={pages} onChange={setPage} className="mt-auto pt-4" />
                     </div>
-                    <EventField type="textarea" name="description" label="Description:" icon={IconFileText} value={event.description ?? ""} readOnly />
-                    <p className="-mb-3 text-sm">Additional Details:</p>
-                    <EventField name="eventDate" icon={IconCalendarEvent} value={toDate(event.dateTime)} readOnly />
-                    <EventField name="eventLocation" icon={IconMapPin} value={event.location} readOnly />
-                  </Reveal>
+                  </div>
                 </>
               ) : (
                 <p className="m-auto p-8 text-center text-gray-400">This person has not favorited any events yet...</p>

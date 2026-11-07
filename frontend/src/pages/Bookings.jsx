@@ -7,12 +7,16 @@ import { messageStyle, bookingButton } from "../utils/styles";
 import { isUpcoming } from "../utils/dates";
 import { emptyFilters, bookingFilters, bookingStatusOptions, months } from "../utils/filters";
 
+import useDebouncing from "../utils/useDebouncing";
+import usePagination from "../utils/usePagination";
+
 import BookingCard from "../components/transactions/BookingCard";
 import BookingHeader from "../components/transactions/BookingHeader";
 import FilterRow from "../components/ui/FilterRow";
 import Reveal from "../components/ui/Reveal";
 import useLoadingText from "../components/ui/useLoadingText";
 import ConfirmModal from "../components/ui/ConfirmModal";
+import Pagination from "../components/ui/Pagination";
 
 export default function Bookings() {
   const { bookings, bookingsLoading, bookingsError, refreshBookings, cancelBooking } = useTransactions();
@@ -25,20 +29,27 @@ export default function Bookings() {
     refreshBookings();
   }, [refreshBookings]);
 
-  const handleFilter = (event) => setFilters({ ...filters, [event.target.name]: event.target.value });
   const options = {
     category: categories,
     ticketType: ticketTypes,
     date: months,
     status: bookingStatusOptions
   };
+
+  const debouncedFilters = useDebouncing(filters, 200);
   const filteredBookings = bookings.filter((booking) =>
-    (booking.eventTitle || "").toLowerCase().includes(filters.name.trim().toLowerCase()) &&
-    (!filters.category || booking.eventCategory === filters.category) &&
-    (!filters.ticketType || booking.ticketName === filters.ticketType) &&
-    (!filters.date || booking.eventDateTime?.startsWith(filters.date)) &&
-    (!filters.status || booking.status === filters.status)
+    (booking.eventTitle || "").toLowerCase().includes(debouncedFilters.name.trim().toLowerCase()) &&
+    (!debouncedFilters.category || booking.eventCategory === debouncedFilters.category) &&
+    (!debouncedFilters.ticketType || booking.ticketName === debouncedFilters.ticketType) &&
+    (!debouncedFilters.date || booking.eventDateTime?.startsWith(debouncedFilters.date)) &&
+    (!debouncedFilters.status || booking.status === debouncedFilters.status)
   );
+
+  const { page, pages, setPage, items } = usePagination(filteredBookings);
+  const handleFilter = (event) => {
+    setFilters({ ...filters, [event.target.name]: event.target.value });
+    setPage(1);
+  };
 
   const handleCancel = () => runner(async () => {
     try {
@@ -52,7 +63,7 @@ export default function Bookings() {
 
   return (
     <div className="flex flex-1 flex-col">
-      <title>Bookings - EVENTRIX</title>
+      <title>Bookings | EVENTRIX</title>
       <section className="flex flex-1 flex-col">
         <div className="flex flex-wrap items-end gap-x-4">
           <h2 className="relative -mb-1 border-b-4 border-cyan-500 pb-3 text-3xl font-bold">
@@ -75,7 +86,7 @@ export default function Bookings() {
           ) : bookingsError ? (
             <p className={messageStyle}>{bookingsError}</p>
           ) : filteredBookings.length ? (
-            filteredBookings.map((booking) => (
+            items.map((booking) => (
               <Reveal key={booking.bookingId} className="w-full">
                 <BookingCard booking={booking}>
                   {booking.status === "PAID" && isUpcoming(booking.eventDateTime) && (
@@ -91,6 +102,7 @@ export default function Bookings() {
               {bookings.length ? "No bookings match your filters..." : "You haven't booked any events yet..."}
             </p>
           )}
+          <Pagination page={page} pages={pages} onChange={setPage} className="pt-8" />
         </div>
       </section>
       {cancelling !== null && (

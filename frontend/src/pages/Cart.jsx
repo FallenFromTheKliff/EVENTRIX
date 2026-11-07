@@ -8,29 +8,39 @@ import { toSlug } from "../utils/events";
 import { messageStyle, bookingButton } from "../utils/styles";
 import { cartFilters, emptyCartFilters, months } from "../utils/filters";
 
+import useDebouncing from "../utils/useDebouncing";
+import usePagination from "../utils/usePagination";
+
 import BookingCard from "../components/transactions/BookingCard";
 import BookingHeader from "../components/transactions/BookingHeader";
 import FilterRow from "../components/ui/FilterRow";
 import Reveal from "../components/ui/Reveal";
+import Pagination from "../components/ui/Pagination";
 
 export default function Cart() {
   const { cartBookings, cartLoading, cartError, removeFromCart } = useCart();
   const [filters, setFilters] = useState(emptyCartFilters);
   const [removingItemId, setRemovingItemId] = useState(null);
 
-  const handleFilter = (event) => setFilters({ ...filters, [event.target.name]: event.target.value });
   const options = {
     category: categories,
     ticketType: ticketTypes,
     date: months
   };
 
+  const debouncedFilters = useDebouncing(filters, 200);
   const filteredBookings = cartBookings.filter((booking) =>
-    booking.eventTitle.toLowerCase().includes(filters.name.trim().toLowerCase()) &&
-    (!filters.category || booking.eventCategory === filters.category) &&
-    (!filters.ticketType || booking.ticketName === filters.ticketType) &&
-    (!filters.date || booking.eventDateTime?.startsWith(filters.date))
+    booking.eventTitle.toLowerCase().includes(debouncedFilters.name.trim().toLowerCase()) &&
+    (!debouncedFilters.category || booking.eventCategory === debouncedFilters.category) &&
+    (!debouncedFilters.ticketType || booking.ticketName === debouncedFilters.ticketType) &&
+    (!debouncedFilters.date || booking.eventDateTime?.startsWith(debouncedFilters.date))
   );
+
+  const { page, pages, setPage, items } = usePagination(filteredBookings);
+  const handleFilter = (event) => {
+    setFilters({ ...filters, [event.target.name]: event.target.value });
+    setPage(1);
+  };
 
   const handleRemove = async (itemId) => {
     setRemovingItemId(itemId);
@@ -44,7 +54,7 @@ export default function Cart() {
 
   return (
     <div className="flex flex-1 flex-col">
-      <title>Cart - EVENTRIX</title>
+      <title>Cart | EVENTRIX</title>
       <section className="flex flex-1 flex-col">
         <div className="flex flex-wrap items-end gap-x-4">
           <h2 className="relative -mb-1 border-b-4 border-cyan-500 pb-3 text-3xl font-bold">
@@ -67,7 +77,7 @@ export default function Cart() {
           ) : cartError ? (
             <p className={messageStyle}>{cartError}</p>
           ) : filteredBookings.length > 0 ? (
-            filteredBookings.map((booking) => (
+            items.map((booking) => (
               <Reveal key={booking.cartItemId} className="w-full">
                 <BookingCard booking={booking}>
                   <Link
@@ -93,6 +103,7 @@ export default function Cart() {
               {cartBookings.length ? "No cart items match these filters." : "Your cart is empty."}
             </p>
           )}
+          <Pagination page={page} pages={pages} onChange={setPage} className="pt-8" />
         </div>
       </section>
     </div>

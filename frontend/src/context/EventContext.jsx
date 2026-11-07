@@ -5,6 +5,7 @@ import { useAuth } from "./AuthContext";
 
 import { toSlug, eventPayload } from "../utils/events";
 import { emptyEventFilters, months } from "../utils/filters";
+
 import useDebouncing from "../utils/useDebouncing";
 
 const EventContext = createContext();
@@ -23,7 +24,9 @@ export function EventProvider({ children }) {
   const [favoritesOnly, setFavoritesOnly] = useState(false);
   const [loadedFilters, setLoadedFilters] = useState(null);
   const [eventsError, setEventsError] = useState(null);
-  const debouncedFilters = useDebouncing(filters);
+
+  const debouncedFilters = useDebouncing(filters, 200);
+  const debouncedFavorites = useDebouncing(favoritesOnly, 200);
   const eventsLoading = loadedFilters !== debouncedFilters;
 
   useEffect(() => {
@@ -83,7 +86,7 @@ export function EventProvider({ children }) {
 
   return (
     <EventContext.Provider value={{
-      events: favoritesOnly ? events.filter((event) => event.liked) : events,
+      events: debouncedFavorites ? events.filter((event) => event.liked) : events,
       filters,
       handleFilter,
       getEvent,
@@ -93,7 +96,7 @@ export function EventProvider({ children }) {
       refreshEvents,
       ...(user?.role === "ADMIN"
         ? { createEvent, updateEvent, archiveEvent, getVenueDates }
-        : { favoritesOnly, toggleFavoritesOnly, toggleFavorite, addComment, getFavorites })
+        : { favoritesOnly, debouncedFavorites, toggleFavoritesOnly, toggleFavorite, addComment, getFavorites })
     }}>
       {children}
     </EventContext.Provider>

@@ -103,7 +103,7 @@ export default function EventView() {
 
   return (
     <div>
-      <title>{event.title}</title>
+      <title>{`${event.title} | EVENTRIX`}</title>
       <div className="flex border-b-4 border-zinc-900">
         <h2 className="flex items-center gap-3 -mb-1 border-b-4 border-cyan-500 pb-3 text-3xl font-bold">
           <Link to={state?.from ?? "/events"} className="flex items-center gap-3 transition duration-200 hover:brightness-50">
@@ -132,80 +132,76 @@ export default function EventView() {
             ))}
           </div>
           <fieldset disabled={loading} className="mt-6 flex flex-1 min-w-0 flex-col">
-            <div className="flex-1 space-y-4">
-              {segment === "Details" && (
-                <div className="flex flex-col gap-4">
-                  <h3 className="text-3xl font-bold">{event.title}</h3>
-                  {event.category && <p className={tagStyle}><IconTag size={18} />{event.category}</p>}
-                  <EventField type="textarea" name="description" label="Description:" icon={IconFileText} value={event.description ?? ""} readOnly />
-                  <p className="-mb-3 text-sm">Additional Details:</p>
-                  <EventField name="eventDate" icon={IconCalendarEvent} value={toDate(event.dateTime)} readOnly />
-                  <EventField name="eventLocation" icon={IconMapPin} value={event.location} readOnly />
-                  <div className="grid grid-cols-2 gap-4">
-                    <EventField name="doorsOpen" icon={IconClock} value={`Doors Open: ${toTime(event.doorsOpen)}`} readOnly />
-                    <EventField name="showTime" icon={IconClock} value={`Show Time: ${toTime(event.showTime)}`} readOnly />
-                  </div>
+            <div className="flex-1">
+              <div className={segment === "Details" ? "flex flex-col gap-4" : "hidden"}>
+                <h3 className="text-3xl font-bold">
+                  <Reveal variant="type">{event.title}</Reveal>
+                </h3>
+                {event.category && <p className={tagStyle}><IconTag size={18} />{event.category}</p>}
+                <EventField type="textarea" name="description" label="Description:" icon={IconFileText} value={event.description ?? ""} readOnly />
+                <p className="-mb-3 text-sm">Additional Details:</p>
+                <EventField name="eventDate" icon={IconCalendarEvent} value={toDate(event.dateTime)} readOnly />
+                <EventField name="eventLocation" icon={IconMapPin} value={event.location} readOnly />
+                <div className="grid grid-cols-2 gap-4">
+                  <EventField name="doorsOpen" icon={IconClock} value={`Doors Open: ${toTime(event.doorsOpen)}`} readOnly />
+                  <EventField name="showTime" icon={IconClock} value={`Show Time: ${toTime(event.showTime)}`} readOnly />
                 </div>
-              )}
-              {segment === "Seats" && (
-                <>
-                  {tickets.map(({ name, price, quantity, availableQuantity, enabled }) => (
-                    <div key={name} className="space-y-3">
-                      <div className="flex items-center gap-4">
-                        <EventField type="toggle" label={name} enabled={enabled} onToggle={() => updateTicket(name, { enabled: !enabled })} />
-                        <p className="text-xl font-semibold text-cyan-400">₱{price}</p>
-                      </div>
-                      <div className={`space-y-3 transition-opacity duration-200 ${enabled ? "" : "opacity-50"}`}>
-                        <EventField type="number" name={`${name}Left`} label="Seats Left:" value={availableQuantity} readOnly />
-                        <EventField
-                          type="number"
-                          name={`${name}Quantity`}
-                          label="Quantity:"
-                          placeholder={`Must be at least ${defaultTicketQuantity}`}
-                          min={defaultTicketQuantity}
-                          max={availableQuantity}
-                          step="1"
-                          disabled={!enabled}
-                          value={quantity}
-                          onChange={(e) => updateTicket(name, { quantity: e.target.value })}
-                        />
-                      </div>
+              </div>
+              <div className={segment === "Seats" ? "space-y-4" : "hidden"}>
+                {tickets.map(({ name, price, quantity, availableQuantity, enabled }) => (
+                  <div key={name} className="space-y-3">
+                    <div className="flex items-center gap-4">
+                      <EventField type="toggle" label={name} enabled={enabled} onToggle={() => updateTicket(name, { enabled: !enabled })} />
+                      <p className="text-xl font-semibold text-cyan-400">₱{price}</p>
                     </div>
-                  ))}
-                  <div className="border-t border-zinc-700" />
-                  <EventField type="number" name="totalPrice" label="Total Price:" icon={IconCurrencyPeso} value={totalPrice(chosen, "quantity")} readOnly />
-                </>
-              )}
-              {segment === "Payment" && (
-                <>
-                  <div className="flex gap-4">
-                    {paymentMethods.map((item) => (
-                      <button
-                        key={item.label}
-                        type="button"
-                        onClick={() => {
-                          setMethod(item);
-                          setAccount("");
-                        }}
-                        className={`${methodStyle} ${method === item ? "ring-4 ring-cyan-500" : ""}`}
-                      >
-                        <img src={item.image} alt={item.label} className="h-8" />
-                      </button>
-                    ))}
+                    <div className={`space-y-3 transition-opacity duration-200 ${enabled ? "" : "opacity-50"}`}>
+                      <EventField type="number" name={`${name}Left`} label="Seats Left:" value={availableQuantity} readOnly />
+                      <EventField
+                        type="number"
+                        name={`${name}Quantity`}
+                        label="Quantity:"
+                        placeholder={`Must be at least ${defaultTicketQuantity}`}
+                        min={defaultTicketQuantity}
+                        max={availableQuantity}
+                        step="1"
+                        disabled={!enabled}
+                        value={quantity}
+                        onChange={(e) => updateTicket(name, { quantity: e.target.value })}
+                      />
+                    </div>
                   </div>
-                  <EventField
-                    name="account"
-                    label={method.field}
-                    placeholder={method.placeholder}
-                    maxLength={method.maxLength}
-                    value={account}
-                    onChange={(e) => setAccount(e.target.value)}
-                  />
-                  <div className="border-t border-zinc-700" />
-                  {ticketFields(({ carted }) => carted)}
-                  <EventField type="number" name="totalPrice" label="Total Price:" icon={IconCurrencyPeso} value={cartTotal} readOnly />
-                </>
-              )}
+                ))}
+                <div className="border-t border-zinc-700" />
+                <EventField type="number" name="totalPrice" label="Total Price:" icon={IconCurrencyPeso} value={totalPrice(chosen, "quantity")} readOnly />
+              </div>
+              <div className={segment === "Payment" ? "space-y-4" : "hidden"}>
+                <div className="flex gap-4">
+                  {paymentMethods.map((item) => (
+                    <button
+                      key={item.label}
+                      type="button"
+                      onClick={() => {
+                        setMethod(item);
+                        setAccount("");
+                      }}
+                      className={`${methodStyle} ${method === item ? "ring-4 ring-cyan-500" : ""}`}
+                    >
+                      <img src={item.image} alt={item.label} className="h-8" />
+                    </button>
+                  ))}
+                </div>
+                <EventField
+                  name="account"
+                  label={method.field}
+                  placeholder={method.placeholder}
+                  maxLength={method.maxLength}
+                  value={account}
+                  onChange={(e) => setAccount(e.target.value)}
+                />
+                <div className="border-t border-zinc-700" />
+                {ticketFields(({ carted }) => carted)}
+                <EventField type="number" name="cartTotal" label="Total Price:" icon={IconCurrencyPeso} value={cartTotal} readOnly />
+              </div>
             </div>
             <div className="flex gap-6 pt-4">
               {segment === "Details" && segments.length > 1 && (
