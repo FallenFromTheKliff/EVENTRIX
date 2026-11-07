@@ -48,3 +48,9 @@ export const menusss = [
   { to: "/profile", label: "Profile", icon: IconUser },
   { to: "/settings", label: "Settings", icon: IconSettings }
 ]
+
+export const backLabels = {
+  "/bookings": "My Bookings",
+  "/cart": "My Cart",
+  "/transactions": "Transaction History"
+}

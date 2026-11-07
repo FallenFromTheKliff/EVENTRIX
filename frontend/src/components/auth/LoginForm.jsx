@@ -7,7 +7,7 @@ import { useAuth } from "../../context/AuthContext";
 import useLoadingText from "../ui/useLoadingText";
 import ConfirmModal from "../ui/ConfirmModal";
 
-import { inputStyle } from "../../utils/events";
+import { inputStyle } from "../../utils/styles";
 
 export default function LoginForm() {
   const navigate = useNavigate();
@@ -26,7 +26,7 @@ export default function LoginForm() {
     }
   });
 
-    return (
+  return (
     <div>
       <h2 className="text-center text-2xl font-bold">SIGN IN</h2>
       <form onSubmit={handleSubmit(onSubmission)} noValidate className="mt-4 space-y-3">

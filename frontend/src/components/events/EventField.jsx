@@ -1,8 +1,9 @@
 import { useState } from "react";
 
 import { IconPhoto, IconCheck, IconPlus, IconEye, IconEyeOff } from "@tabler/icons-react";
-import { imageTypes, resizeImage, inputStyle, pillStyle, iconStyle } from "../../utils/events";
 
+import { imageTypes, resizeImage } from "../../utils/images";
+import { inputStyle, pillStyle, iconStyle } from "../../utils/styles";
 import { ticketBadges } from "../../data/statcheck";
 
 import DroppingDown from "../ui/DroppingDown";

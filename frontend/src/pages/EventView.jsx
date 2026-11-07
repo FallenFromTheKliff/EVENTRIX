@@ -6,7 +6,12 @@ import { IconArrowLeft, IconCalendarEvent, IconClock, IconCurrencyPeso, IconFile
 import { useEvents } from "../context/EventContext";
 import { useCart } from "../context/CartContext";
 
-import { emptySelection, backLabels, paymentMethods, eventTickets, selectedTickets, totalPrice, validSeats, segmentStyle, buttonStyle, tagStyle, toDate, toTime } from "../utils/events";
+import { backLabels } from "../data/navbox";
+import { defaultTicketQuantity } from "../data/details";
+import { paymentMethods } from "../data/payment";
+import { emptySelection, eventTickets, selectedTickets, totalPrice, validSeats, isSoldOut } from "../utils/tickets";
+import { toDate, toTime } from "../utils/dates";
+import { segmentStyle, buttonStyle, tagStyle } from "../utils/styles";
 
 import Reveal from "../components/ui/Reveal";
 import useLoadingText from "../components/ui/useLoadingText";
@@ -45,8 +50,8 @@ export default function EventView() {
   }, [state?.eventId, getEventById]);
 
   const event = fetched ?? getEvent(slug) ?? state?.event;
+  const segments = state?.payment ? ["Payment"] : event?.status === "ACTIVE" && !state?.from && !isSoldOut(event) ? ["Details", "Seats"] : ["Details"];
 
-  const segments = state?.payment ? ["Payment"] : event?.status === "ACTIVE" && !state?.from ? ["Details", "Seats"] : ["Details"];
   const [slide, setSlide] = useState(0);
   const [segment, setSegment] = useState(segments[0]);
   const [selection, setSelection] = useState(emptySelection);
@@ -156,8 +161,8 @@ export default function EventView() {
                           type="number"
                           name={`${name}Quantity`}
                           label="Quantity:"
-                          placeholder="Must be at least 1"
-                          min="1"
+                          placeholder={`Must be at least ${defaultTicketQuantity}`}
+                          min={defaultTicketQuantity}
                           max={availableQuantity}
                           step="1"
                           disabled={!enabled}

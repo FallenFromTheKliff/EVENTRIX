@@ -5,7 +5,7 @@ import EventCard from "../components/events/EventCard";
 import Reveal from "../components/ui/Reveal";
 import FilterRow from "../components/ui/FilterRow";
 
-import { messageStyle } from "../utils/events";
+import { messageStyle } from "../utils/styles";
 import { adminEventFilters, eventFilters, months, statuses } from "../utils/filters";
 import { categories } from "../data/details";
 

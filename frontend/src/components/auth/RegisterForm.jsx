@@ -8,7 +8,7 @@ import { useAuth } from "../../context/AuthContext";
 import useLoadingText from "../ui/useLoadingText";
 import ConfirmModal from "../ui/ConfirmModal";
 
-import { registerInputStyle } from "../../utils/events";
+import { registerInputStyle } from "../../utils/styles";
 
 export default function RegisterForm() {
   const navigate = useNavigate();

@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router";
 
-import { adminColumns, bookingButton, bookingColumns, toDate, toSlug } from "../../utils/events";
+import { toSlug } from "../../utils/events";
+import { toDate } from "../../utils/dates";
+import { adminColumns, bookingButton, bookingColumns } from "../../utils/styles";
 import { bookingStatuses, ticketBadges } from "../../data/statcheck";
 
 import Placeholder from "../../assets/images/EVENTRIX-Placeholder.jpeg";

@@ -2,7 +2,10 @@ import { useState } from "react";
 import { Link } from "react-router";
 
 import { IconCalendarEvent, IconClock, IconHeartFilled, IconLockFilled, IconMapPin } from "@tabler/icons-react";
-import { priceRange, toSlug, toTime, toDate, isSoldOut } from "../../utils/events";
+
+import { toSlug } from "../../utils/events";
+import { priceRange, isSoldOut, findTicket } from "../../utils/tickets";
+import { toTime, toDate } from "../../utils/dates";
 
 import { useEvents } from "../../context/EventContext";
 import { useCart } from "../../context/CartContext";
@@ -39,7 +42,7 @@ export default function EventCard({ event, role }) {
 
     quickBuy.runner(async () => {
       try {
-        const ticket = event.ticketTypes.find(({ name }) => name?.toUpperCase() === "STANDARD");
+        const ticket = findTicket(event.ticketTypes, "STANDARD");
 
         if (!ticket || ticket.availableQuantity < 1) {
           setFailed("Standard tickets are unavailable!");
@@ -57,7 +60,7 @@ export default function EventCard({ event, role }) {
 
   return (
     <>
-      <div className={`flex flex-col h-full min-h-136 ${colors[role]} overflow-hidden rounded-xl shadow-2xl shadow-black/60`}>
+      <div className={`flex flex-col h-full min-h-136 ${colors[role]} overflow-hidden rounded-xl shadow-2xl shadow-black/60 ${isSoldOut(event) ? "brightness-75" : ""}`}>
         <div className="relative">
           <img src={event.thumbnailUrl || Placeholder} alt={event.title} className="h-72 w-full object-cover" />
           {event.status === "ACTIVE" && isSoldOut(event.ticketTypes) && (
@@ -121,10 +124,10 @@ export default function EventCard({ event, role }) {
                 </Link>
                 <button
                   onClick={handleQuickBuy}
-                  disabled={quickBuy.loading || isSoldOut(event.ticketTypes)}
-                  className={`${buttonStyle} ${disabledStyle} bg-yellow-500`}
+                  disabled={quickBuy.loading || isSoldOut(event)}
+                  className={`${buttonStyle} ${disabledStyle} ${isSoldOut(event) ? "bg-red-500" : "bg-yellow-500"}`}
                 >
-                  {added ? "ADDED!" : quickBuy.texter("QUICK BUY", "ADDING")}
+                  {isSoldOut(event) ? "SOLD OUT" : added ? "ADDED!" : quickBuy.texter("QUICK BUY", "ADDING")}
                 </button>
               </>
             )}

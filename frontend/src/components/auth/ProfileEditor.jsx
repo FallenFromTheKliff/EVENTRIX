@@ -5,8 +5,9 @@ import { IconArrowLeft, IconCake, IconCalendarPlus, IconFileText, IconLock, Icon
 
 import { useAuth } from "../../context/AuthContext";
 
-import { buttonStyle, segmentStyle, profileSegments, nowLocal, removeStyle, pillStyle, toDate } from "../../utils/events";
-import { genders, cities } from "../../data/details";
+import { genders, cities, profileSegments } from "../../data/details";
+import { buttonStyle, segmentStyle, removeStyle } from "../../utils/styles";
+import { today, toDate } from "../../utils/dates";
 
 import Reveal from "../ui/Reveal";
 import EventField from "../events/EventField";
@@ -149,7 +150,6 @@ export default function ProfileEditor({ onExit }) {
                     label="Email:"
                     icon={IconMail}
                     hint="Your email cannot be changed."
-                    className={pillStyle}
                     value={profile.email}
                     readOnly
                   />
@@ -169,7 +169,6 @@ export default function ProfileEditor({ onExit }) {
                     name="createdAt"
                     label="Account Created:"
                     icon={IconCalendarPlus}
-                    className={pillStyle}
                     value={toDate(profile.createdAt, "long")}
                     readOnly
                   />
@@ -198,6 +197,7 @@ export default function ProfileEditor({ onExit }) {
                       </button>
                     )}
                   </EventField>
+                  {user.role === "USER" && (
                   <EventField
                     type="photo"
                     label="Banner Picture:"
@@ -226,6 +226,7 @@ export default function ProfileEditor({ onExit }) {
                       )}
                     </div>
                   </EventField>
+                )}
                 </div>
                 {user.role === "USER" && (
                   <div className={segment === "Additional Details" ? "space-y-4" : "hidden"}>
@@ -245,7 +246,7 @@ export default function ProfileEditor({ onExit }) {
                         ))}
                       </div>
                     </div>
-                    <EventField type="date" label="Birthday:" icon={IconCake} max={nowLocal().slice(0, 10)} {...register("birthday")} />
+                    <EventField type="date" label="Birthday:" icon={IconCake} max={today()} {...register("birthday")} />
                     <EventField
                       type="select"
                       label="Location:"

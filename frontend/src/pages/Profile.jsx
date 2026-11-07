@@ -4,7 +4,8 @@ import { IconArchive, IconBroadcast, IconCalendarEvent, IconCalendarPlus, IconFi
 import { useAuth } from "../context/AuthContext";
 import { useEvents } from "../context/EventContext";
 
-import { messageStyle, tagStyle, toDate } from "../utils/events";
+import { messageStyle, tagStyle } from "../utils/styles";
+import { toDate } from "../utils/dates";
 import { statusBadges } from "../data/statcheck";
 
 import Reveal from "../components/ui/Reveal";

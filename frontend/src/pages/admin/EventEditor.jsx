@@ -5,9 +5,13 @@ import { IconArrowLeft, IconPhoto, IconTrash, IconCategory, IconCalendar, IconCl
 
 import { useEvents } from "../../context/EventContext";
 
-import { buttonStyle, segmentStyle, steps, backLabels, emptyEventValues, eventFormValues, filled, selectedTickets as getSelectedTickets, ticketCount as getTicketCount, validTickets, dateInPast, dateTaken, doorsOpenAt, nowLocal, removeStyle } from "../../utils/events";
+import { steps, categories, cities, defaultTicketPrice, defaultTicketQuantity } from "../../data/details";
+import { backLabels } from "../../data/navbox";
+import { emptyEventValues, eventFormValues, filled } from "../../utils/events";
+import { selectedTickets as getSelectedTickets, ticketCount as getTicketCount, validTicketSetup } from "../../utils/tickets";
+import { dateInPast, dateTaken, doorsOpenAt, today } from "../../utils/dates";
+import { buttonStyle, segmentStyle, removeStyle } from "../../utils/styles";
 import { statuses } from "../../utils/filters";
-import { categories, cities } from "../../data/details";
 
 import Reveal from "../../components/ui/Reveal";
 import PictureSlider from "../../components/events/PictureSlider";
@@ -72,12 +76,12 @@ export default function EventEditor() {
 
   const tickets = getSelectedTickets(values.ticketTypes);
   const totalTickets = getTicketCount(tickets);
-  const past = !id && dateInPast(values);
+  const past = !id && dateInPast(values.dateTime, values.showTime);
   const taken = dateTaken(values.dateTime, values.location ? takenDates : []);
   const ready = [
     filled(values.title),
     filled(values.location) && filled(values.dateTime) && filled(values.showTime) && !past && !taken,
-    validTickets(tickets)
+    validTicketSetup(tickets)
   ];
 
   const unsaved = (isDirty || image !== "" || pictures.some(({ id }) => !id) || pictures.length !== (event?.previewImages?.length ?? 0)) && message?.type !== "success";
@@ -237,7 +241,7 @@ export default function EventEditor() {
                       type="date"
                       label="Date:"
                       icon={IconCalendar}
-                      min={id ? undefined : nowLocal().slice(0, 10)}
+                      min={id ? undefined : today()}
                       error={past ? "Date cannot be earlier than now!" : taken ? "Location is unavailable on or beside that date!" : ""}
                       {...register("dateTime")}
                     />
@@ -271,8 +275,8 @@ export default function EventEditor() {
                                 type="number"
                                 label="Price:"
                                 icon={IconCurrencyPeso}
-                                placeholder="Must be at least 200"
-                                min="200"
+                                placeholder={`Must be at least ${defaultTicketPrice}`}
+                                min={defaultTicketPrice}
                                 step="1"
                                 disabled={!enabled}
                                 {...register(`ticketTypes.${index}.price`)}
@@ -280,8 +284,8 @@ export default function EventEditor() {
                               <EventField
                                 type="number"
                                 label="Ticket Quantity:"
-                                placeholder="Must be at least 1"
-                                min="1"
+                                placeholder={`Must be at least ${defaultTicketQuantity}`}
+                                min={defaultTicketQuantity}
                                 step="1"
                                 disabled={!enabled}
                                 {...register(`ticketTypes.${index}.availableQuantity`)}

@@ -57,3 +57,11 @@ export const traits = {
   Positive: ["Unforgettable", "Great Vibes", "Well Organized"],
   Negative: ["Overpriced", "Overcrowded", "Disorganized", "Underwhelming"]
 };
+
+export const ticketNames = ["STANDARD", "VIP"];
+export const ticketTypes = ticketNames.map((name) => ({ value: name, label: name }));
+export const defaultTicketPrice = 200;
+export const defaultTicketQuantity = 1;
+
+export const steps = ["Introduction", "Venue", "Tickets", "Display"];
+export const profileSegments = ["Introduction", "Aesthetics", "Additional Details", "Security"];

@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 
 import { useTransactions } from "../../context/TransactionContext";
 
-import { categories } from "../../data/details";
-import { messageStyle, bookingButton, ticketTypes } from "../../utils/events";
+import { categories, ticketTypes } from "../../data/details";
+import { messageStyle, bookingButton } from "../../utils/styles";
 import { cartFilters as transactionFilters, emptyFilters, months } from "../../utils/filters";
 
 import BookingCard from "../../components/transactions/BookingCard";

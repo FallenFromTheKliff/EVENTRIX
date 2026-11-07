@@ -1,4 +1,4 @@
-import { adminColumns, bookingColumns } from "../../utils/events";
+import { adminColumns, bookingColumns } from "../../utils/styles";
 
 const labels = ["Event", "Tickets", "Status", "Reference ID"];
 

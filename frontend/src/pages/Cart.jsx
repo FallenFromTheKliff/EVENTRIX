@@ -2,8 +2,10 @@ import { useState } from "react";
 import { Link } from "react-router";
 
 import { useCart } from "../context/CartContext";
-import { categories } from "../data/details";
-import { toSlug, messageStyle, bookingButton, ticketTypes } from "../utils/events";
+
+import { categories, ticketTypes } from "../data/details";
+import { toSlug } from "../utils/events";
+import { messageStyle, bookingButton } from "../utils/styles";
 import { cartFilters, emptyCartFilters, months } from "../utils/filters";
 
 import BookingCard from "../components/transactions/BookingCard";
